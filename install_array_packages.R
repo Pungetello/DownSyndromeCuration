@@ -17,7 +17,7 @@ platform_list = list(
   
 platform_to_package_list = list()
 
-#setwd("C:/Users/punge/DownSyndromeCuration")
+#setwd("~/DownSyndromeCuration")
   
 for (geo_id in names(platform_list)){
   original_wd = getwd()
