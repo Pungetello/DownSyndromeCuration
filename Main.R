@@ -18,6 +18,6 @@ platforms_list = list(
 )
 
 
-download_data((names(platforms_list)), "C:/Users/punge/DownSyndromeCuration/Platforms")
+download_data((names(platforms_list)), "Platforms")
 
 
