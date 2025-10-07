@@ -17,6 +17,7 @@ platforms_list = list(
   "GSE1789" = "GPL96"
 )
 
-#for (i in length(names(platforms_list))){
-  download_data((names(platforms_list)), "C:/Users/punge/DownSyndromeCuration/Platforms")
-#}
+
+download_data((names(platforms_list)), "C:/Users/punge/DownSyndromeCuration/Platforms")
+
+
