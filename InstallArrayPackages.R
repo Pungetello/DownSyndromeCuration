@@ -26,3 +26,4 @@ for (geo_id in names(platform_list)){
   platform_to_package_list[[platform]] = pkgName
       
 }
+
