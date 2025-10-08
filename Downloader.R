@@ -1,11 +1,12 @@
 #-----------loading_libraries-----------
 library(GEOquery)
-source(PlatformsList)
+source("PlatformsList.R")
 
 
 #-----------downloading_data-----------
 download_data = function(accession_id_list, platform_folder){
   original_wd = getwd()
+  print(getwd())
   # Create and set the working directory to your desired path
   if (!dir.exists(platform_folder)){
     dir.create(platform_folder)
@@ -16,6 +17,7 @@ download_data = function(accession_id_list, platform_folder){
     gse_accession = accession_id
     getGEOSuppFiles(gse_accession, makeDirectory = TRUE)
   }
+  
   setwd(original_wd)
 }
 
