@@ -6,11 +6,7 @@ library(SCAN.UPC)
 #library(lubridate)
 library(arrayQualityMetrics)
 
-platform_list = list(
-  "GSE110064" = "GPL570",
-  "GSE48611"= "GPL570",
-  "GSE1789" = "GPL96"
-)
+source("PlatformsList.R")
   
 platform_to_package_list = list()
   

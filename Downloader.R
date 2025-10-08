@@ -1,5 +1,6 @@
 #-----------loading_libraries-----------
 library(GEOquery)
+source(PlatformsList)
 
 
 #-----------downloading_data-----------
@@ -18,5 +19,4 @@ download_data = function(accession_id_list, platform_folder){
   setwd(original_wd)
 }
 
-
-#yotestingline22
+download_data((names(platforms_list)), "platforms")
