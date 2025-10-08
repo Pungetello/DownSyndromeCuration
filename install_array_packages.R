@@ -17,22 +17,19 @@ platform_list = list(
   
 platform_to_package_list = list()
 
-#setwd("~/DownSyndromeCuration")
+setwd("~/DownSyndromeCuration")
   
 for (geo_id in names(platform_list)){
   original_wd = getwd()
   print(original_wd)
-  new_wd = sprintf("%s/Platforms/%s", original_wd, geo_id)
-  print(new_wd)
-  setwd(new_wd)
+  geo_id_dir = sprintf("%s/Platforms/%s", original_wd, geo_id)
   
-  tar_file = sprintf("%s_RAW.tar", geo_id)
-  #cel_folder = dir.create(tempfile("cel_files"))
-  untar(tar_file, exdir = "cel_folder")
+  tar_file = sprintf("%s/%s_RAW.tar", geo_id_dir, geo_id)
+  untar(tar_file, exdir = geo_id_dir)
   
   platform = platform_list[[geo_id]]
-  cel_files = list.files(path = paste(original_wd, new_wd, "/cel_folder"), pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-  pkgName = InstallBrainArrayPackage(cel_files[1], "25.0.0", "hs", "entrezg")   # in SCAN.UPC package, finds what package needed to read the type of file in arg 1
+  cel_files = list.files(path = geo_id_dir, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
+  pkgName = InstallBrainArrayPackage(cel_files[1], "25.0.0", "hs", "entrezg")           # in SCAN.UPC package, finds what package needed to read the type of file in arg 1
       platform_to_package_list[[platform]] = pkgName
   
   setwd(original_wd)
