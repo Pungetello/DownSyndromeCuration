@@ -17,6 +17,6 @@ platforms_list = list(
 )
 
 
-download_data((names(platforms_list)), "Platforms")
+download_data((names(platforms_list)), "platforms")
 
 source(column_cleaner.R)
