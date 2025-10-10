@@ -2,9 +2,9 @@
 library(GEOquery)
 source("PlatformsList.R")
 
-
 #-----------downloading_data-----------
-download_data = function(accession_id_list, platform_folder){
+  accession_id_list = names(platforms_list)
+  platform_folder = "Platforms"
   original_wd = getwd()
   print(getwd())
   # Create and set the working directory to your desired path
@@ -19,6 +19,3 @@ download_data = function(accession_id_list, platform_folder){
   }
   
   setwd(original_wd)
-}
-
-download_data((names(platforms_list)), "platforms")
