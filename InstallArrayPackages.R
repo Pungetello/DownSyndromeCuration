@@ -11,7 +11,9 @@ source("PlatformsList.R")
 #-----------installing_array_packages-----------
 #platform_to_package_list = list()
 
-# TODO: Make sure the logic ensures that only unique platforms are downloaded  
+# TODO: Make sure the logic ensures that only unique platforms are downloaded 
+
+
 for (geo_id in names(platform_list)){
   geo_id_dir = sprintf("%s/BrainArrayExamples/%s", getwd(), geo_id)  #directory where the tar file is
   
@@ -20,10 +22,15 @@ for (geo_id in names(platform_list)){
   
   platform = platform_list[[geo_id]]
   cel_files = list.files(path = geo_id_dir, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE) # TODO: find a way to just untar one cel file
+}
+ 
 
-  
-  # TODO: Put a descriptive comment that describes what we are doing here and why.
+ 
+BrainInstall2 = function(cel_files){ 
+  # Specifying only one file needed
   celFilePath = cel_files[1]
+  
+  #Explicitly naming the source, organism, and version
   annotationSource = "entrezg"
   organism = "hs"
   version = "25.0.0"
@@ -34,7 +41,8 @@ for (geo_id in names(platform_list)){
   platform = sub("stv2", "st", platform)
   packageName = paste(platform, organism, annotationSource, 
                       "probe", sep = "")
-
+ 
+   #creates a temporary directory to hold the packages
   tmpDir = tempdir()
   packageFileName = paste(packageName, "_", version, ".tar.gz",
                           sep = "")
@@ -43,11 +51,10 @@ for (geo_id in names(platform_list)){
                      "/", annotationSource, ".download/", packageFileName,
                      sep = "")
   download.file(packageUrl, tempPackageFilePath)
-
+  
+  #installs packages while ignoring errors
   try(install.packages(tempPackageFilePath, repos = NULL, type = "source"), silent = TRUE)
-
-  #platform_to_package_list[[platform]] = pkgName
-      
 }
+  #platform_to_package_list[[platform]] = pkgName
 
 # TODO: remove platform directory
