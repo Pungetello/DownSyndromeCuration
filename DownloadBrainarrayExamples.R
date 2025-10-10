@@ -4,7 +4,7 @@ source("PlatformsList.R")
 
 #-----------downloading_data-----------
 accession_id_list = names(platforms_list)       #TODO: rework so it's only for unique ones
-platform_folder = "Platforms"
+platform_folder = "BrainArrayExamples"
 # Create and set the working directory to your desired path
 if (!dir.exists(platform_folder)){
   dir.create(platform_folder)
