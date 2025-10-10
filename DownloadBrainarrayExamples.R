@@ -3,7 +3,7 @@ library(GEOquery)
 source("PlatformsList.R")
 
 #-----------downloading_data-----------
-accession_id_list = names(platforms_list)       #TODO: rework so it's only for unique ones
+accession_id_list = create_unique_vector(platforms_list)
 platform_folder = "BrainArrayExamples"
 # Create and set the working directory to your desired path
 if (!dir.exists(platform_folder)){

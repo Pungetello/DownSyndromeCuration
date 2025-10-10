@@ -14,7 +14,7 @@ source("PlatformsList.R")
 # TODO: Make sure the logic ensures that only unique platforms are downloaded 
 
 
-for (geo_id in names(platform_list)){
+for (geo_id in create_unique_vector(platform_list)){
   geo_id_dir = sprintf("%s/BrainArrayExamples/%s", getwd(), geo_id)  #directory where the tar file is
   
   tar_file = sprintf("%s/%s_RAW.tar", geo_id_dir, geo_id)
