@@ -13,7 +13,7 @@ source("PlatformsList.R")
 platform_to_package_list = list()
   
 for (geo_id in names(platform_list)){
-  geo_id_dir = sprintf("%s/Platforms/%s", original_wd, geo_id)  #directory where the tar file is
+  geo_id_dir = sprintf("%s/Platforms/%s", getwd(), geo_id)  #directory where the tar file is
   
   tar_file = sprintf("%s/%s_RAW.tar", geo_id_dir, geo_id)
   untar(tar_file, exdir = geo_id_dir)                           #gets all the cel files from the tar file
