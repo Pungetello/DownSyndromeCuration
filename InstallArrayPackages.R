@@ -1,3 +1,4 @@
+#-----------loading_libraries-----------
 library(GEOquery)
 library(affy)
 library(tidyverse)
@@ -8,6 +9,7 @@ library(arrayQualityMetrics)
 
 source("PlatformsList.R")
   
+#-----------installing_array_packages-----------
 platform_to_package_list = list()
   
 for (geo_id in names(platform_list)){

@@ -1,3 +1,4 @@
+#-----------installing_libraries-----------
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install(version = "3.21")
@@ -15,6 +16,7 @@ BiocManager::install(c("tidyverse",
                        )
 )
 
+#-----------libraries_likely_needed_for_future_step-----------
 #"clariomshumanhsentrezgprobe",
 # "pd.clariom.s.human",
 # "clariomshumancdf"

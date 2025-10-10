@@ -1,4 +1,4 @@
-#installs packages that are necessary for later steps. These two scripts only need to be executed once
+#installs packages that are necessary for later steps. These only need to be executed once
 source("InstallCorePackages.R")
 source("Downloader.R")
 source("InstallArrayPackages.R")
