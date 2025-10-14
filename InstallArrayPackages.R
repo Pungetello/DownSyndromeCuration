@@ -8,7 +8,7 @@ library(arrayQualityMetrics)
 
 source("PlatformsList.R")
 
-#_______________functions------------------
+#-----------functions------------------
 
 BrainInstall2 = function(cel_files){ 
   print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
