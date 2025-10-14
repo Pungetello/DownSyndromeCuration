@@ -4,7 +4,7 @@ source("DownloadBrainarrayExamples.R")
 source("InstallArrayPackages.R")
 
 #execute every time:
-source("ColumnCleaner.R")
+source("StandardizeMetadata.R")
 #source(StatisticalTester)
 
 
