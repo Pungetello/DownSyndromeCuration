@@ -20,6 +20,9 @@ for (geo_id in create_unique_vector(platform_list)){
   
   platform = platform_list[[geo_id]]
   cel_files = list.files(path = geo_id_dir, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE) # TODO: find a way to just untar one cel file (I looked it up and it's actually very complicated, so maybe not...)
+
+  pkgName = InstallBrainArrayPackage(cel_files[1], "25.0.0", "hs", "entrezg")
+  #BrainInstall2(cel_files)
 }
  
 
@@ -56,8 +59,6 @@ BrainInstall2 = function(cel_files){
 }
 
 
-
-BrainInstall2(cel_files)
 #delete BrainArrayExamples directory and contents
 unlink(sprintf("%s/BrainArrayExamples", getwd()), recursive = TRUE)
 
