@@ -14,7 +14,7 @@ get_metadata = function(series_ID) {
   return (metadata)
 }
 
-
+#saves version of metadata having removed columns with keywords
 drop_cols = function(metadata, file_location, series_ID) {
   keywords = c("contact", "library", "processing", "description", "relation",
                "platform", "instrument", "protocol", "file", "date", "row",
