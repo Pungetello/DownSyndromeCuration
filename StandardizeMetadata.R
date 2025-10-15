@@ -16,27 +16,17 @@ get_metadata = function(series_ID) {
 
 
 drop_cols = function(metadata, file_location, series_ID) {
-  cols_to_drop = names(metadata)[grepl("contact", names(metadata)) |     #TODO: remove repetition
-                                    grepl("library", names(metadata)) | 
-                                    grepl("processing", names(metadata)) | 
-                                    grepl("description", names(metadata)) |
-                                    grepl("relation", names(metadata)) | 
-                                    grepl("platform", names(metadata)) | 
-                                    grepl("instrument", names(metadata)) |     #TODO: clarify that we are removing the correct ones
-                                    grepl("protocol", names(metadata)) | 
-                                    grepl("file", names(metadata)) | 
-                                    grepl("date", names(metadata)) | 
-                                    grepl("row", names(metadata)) | 
-                                    grepl("status", names(metadata)) | 
-                                    grepl("characteristics", names(metadata)) |
-                                    grepl("time", names(metadata)) | 
-                                    grepl("channel", names(metadata)) | 
-                                    grepl("taxid", names(metadata))
+  keywords = c("contact", "library", "processing", "description", "relation",
+               "platform", "instrument", "protocol", "file", "date", "row",
+               "status", "characteristics", "time", "channel", "taxid") # TODO: make sure we're removing the right things
+  
+  cols_to_drop = names(metadata)[
+    grepl(paste(keywords, collapse = "|"), names(metadata))
   ]
   
   # drop columns that are not needed based on above criteria
   metadata_filtered = metadata %>% 
-  select(all_of(-cols_to_drop))
+  select(-cols_to_drop)
   
   write_tsv(metadata_filtered, paste0(file_location, series_ID, "_metadata.tsv"))
 }
