@@ -69,7 +69,7 @@ select_attributes = function(geo_id, metadata, target_attributes_tibble){
     }
     
     #look for ploidy
-    if (any(str_detect(row, regex("trisomic | trisomy | down syndrome | ts21", ignore_case = TRUE)), na.rm = TRUE)){ # first check each cell in row for 'trisomic' if found set current ploidy to trisomic
+    if (any(str_detect(row, regex("trisomic | trisomy | down syndrome | ts21", ignore_case = TRUE)), na.rm = TRUE)){ #TODO: make it match the first cell
       current_ploidy = "trisomic"
     } else if (any(str_detect(row, regex("disomic | disomy | WT | normal | control | euploid", ignore_case = TRUE)), na.rm = TRUE)){
       current_ploidy = "disomic"
