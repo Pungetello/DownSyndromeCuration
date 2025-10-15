@@ -6,25 +6,22 @@ source("PlatformsList.R")
 
 #----------functions-------------
 
-get_metadata = function(series_ID, file_location) {
+get_metadata = function(series_ID) {
   metadata = getGEO(series_ID)[[1]] # retrieves metadata using GEOquery function
   
   metadata = as_tibble(pData(metadata))
-  print(metadata)
-  
-  write_tsv(metadata, file_location) # writes metadata to a temporary file
+  return (metadata)
 }
 
 
-drop_cols = function(temp_file_location, series_ID) {
-  metadata = read_tsv(temp_file_location)                               #TODO: leave metadata as a variable instead of reading it in again?
+drop_cols = function(metadata, file_location, series_ID) {
   cols_to_drop = names(metadata)[grepl("contact", names(metadata)) |     #TODO: remove repetition
                                     grepl("library", names(metadata)) | 
                                     grepl("processing", names(metadata)) | 
                                     grepl("description", names(metadata)) |
                                     grepl("relation", names(metadata)) | 
                                     grepl("platform", names(metadata)) | 
-                                    grepl("instrument", names(metadata)) | 
+                                    grepl("instrument", names(metadata)) |     #TODO: clarify that we are removing the correct ones
                                     grepl("protocol", names(metadata)) | 
                                     grepl("file", names(metadata)) | 
                                     grepl("date", names(metadata)) | 
@@ -37,32 +34,22 @@ drop_cols = function(temp_file_location, series_ID) {
   ]
   
   metadata_filtered = metadata %>% # drop columns that are not needed based on above criteria
-    select(-cols_to_drop)
+  select(-cols_to_drop)
   
-  # assign(paste0(series_ID, "_metadata_filtered"), metadata_filtered)
-  # view(get(paste0(series_ID, "_metadata_filtered")))
-  
-  file.remove(temp_file_location) # remove temporary file
-  
-  file_location = "Data/Metadata/"
   write_tsv(metadata_filtered, paste0(file_location, series_ID, "_metadata.tsv"))
 }
 
 
-process_metadata = function(series_ID, temp_file_location) {
-  if (file.exists(temp_file_location)) { # check if temporary file exists
-    drop_cols(temp_file_location, series_ID) # if it does, drop columns
-  } else {
-    get_metadata(series_ID, temp_file_location) # if it doesn't, get metadata and drop columns
-    drop_cols(temp_file_location, series_ID)
-  }
+#--------------process_metadata-------------
+
+file_location = "Data/Metadata/"
+
+if (!dir.exists(file_location)){
+  dir.create(file_location, recursive = TRUE)
 }
 
-#--------------Script-------------
-
-temp_file_location = "Data/Metadata/temp_metadata_file.tsv"
-
 for (geo_id in names(platforms_list)) { # loop through all series IDs
-  process_metadata(geo_id, temp_file_location)
+  metadata = get_metadata(geo_id) # get metadata and drop columns
+  drop_cols(metadata, file_location, geo_id)
 }
 
