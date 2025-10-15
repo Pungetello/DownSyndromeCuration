@@ -6,8 +6,9 @@ source("PlatformsList.R")
 
 #----------functions-------------
 
+# retrieves metadata using GEOquery function
 get_metadata = function(series_ID) {
-  metadata = getGEO(series_ID)[[1]] # retrieves metadata using GEOquery function
+  metadata = getGEO(series_ID)[[1]] 
   
   metadata = as_tibble(pData(metadata))
   return (metadata)
@@ -33,8 +34,9 @@ drop_cols = function(metadata, file_location, series_ID) {
                                     grepl("taxid", names(metadata))
   ]
   
-  metadata_filtered = metadata %>% # drop columns that are not needed based on above criteria
-  select(-cols_to_drop)
+  # drop columns that are not needed based on above criteria
+  metadata_filtered = metadata %>% 
+  select(all_of(-cols_to_drop))
   
   write_tsv(metadata_filtered, paste0(file_location, series_ID, "_metadata.tsv"))
 }
@@ -48,8 +50,10 @@ if (!dir.exists(file_location)){
   dir.create(file_location, recursive = TRUE)
 }
 
-for (geo_id in names(platforms_list)) { # loop through all series IDs
-  metadata = get_metadata(geo_id) # get metadata and drop columns
+# loop through all series IDs
+for (geo_id in names(platforms_list)) {
+  # read metadata into a variable, drop unneeded columns, and save it
+  metadata = get_metadata(geo_id) 
   drop_cols(metadata, file_location, geo_id)
 }
 
