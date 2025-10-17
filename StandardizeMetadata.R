@@ -33,6 +33,67 @@ drop_cols = function(metadata, series_ID) {
   return(metadata_filtered)
 }
 
+#################################################################################
+
+
+standardize_tibble <- function(input_tbl, attr_tbl) {
+  result <- map_dfc(seq_len(nrow(attr_tbl)), function(i) {
+    attr <- attr_tbl[i, ]
+    attr_name <- attr$attr_name
+    match_type <- attr$match_type
+    
+    # ---- Column matching ----
+    if (match_type == "column") {
+      pattern <- attr$regex
+      col_match <- names(input_tbl)[str_detect(names(input_tbl), pattern)]
+      
+      if (length(col_match) > 0) {
+        return(tibble(!!attr_name := input_tbl[[col_match[1]]]))
+      } else {
+        return(tibble(!!attr_name := rep(NA_character_, nrow(input_tbl))))
+      }
+    }
+    
+    # ---- Value matching ----
+    if (match_type == "value") {
+      value_dict <- attr$value_dict[[1]] # because it's stored in list-column
+      
+      # For each column, count how many regex patterns it matches
+      score_column <- function(col) {
+        sum(map_int(value_dict, function(pat) {
+          any(str_detect(tolower(as.character(col)), pat), na.rm = TRUE)
+        }))
+      }
+      
+      best_col <- names(input_tbl) %>%
+        map_chr(~ .x) %>%
+        keep(~ is.character(input_tbl[[.x]]) | is.factor(input_tbl[[.x]])) %>%
+        map_int(~ score_column(input_tbl[[.x]])) %>%
+        { names(input_tbl)[which.max(.)] }
+      
+      if (length(best_col) == 0 || score_column(input_tbl[[best_col]]) == 0) {
+        return(tibble(!!attr_name := rep(NA_character_, nrow(input_tbl))))
+      }
+      
+      col_values <- tolower(as.character(input_tbl[[best_col]]))
+      standardized <- rep(NA_character_, length(col_values))
+      
+      for (key in names(value_dict)) {
+        standardized[str_detect(col_values, value_dict[[key]])] <- key
+      }
+      
+      return(tibble(!!attr_name := standardized))
+    }
+    
+    stop("Unknown match type: ", match_type)
+  })
+  
+  bind_cols(result)
+  return(result)
+}
+
+
+##############################################################################
 
 # adds a row to the target_attributes_tibble with the attributes needed
 select_attributes = function(geo_id, metadata, target_attributes_tibble){
@@ -100,13 +161,30 @@ target_attributes_tibble = tibble (
   
 )
 
+
+attr_tbl <- tibble(
+  attr_name = c("ID", "Ploidy"),
+  match_type = c("column", "value"),
+  regex = c("geo", NA),
+  value_dict = list(
+    NULL,
+    list(
+      trisomic = regex("trisomic|trisomy|down syndrome|ts21", ignore_case = TRUE),
+      disomic = regex("disomic|disomy|WT|normal|control|euploid", ignore_case = TRUE)
+    )
+  )
+)
+
+
 # loop through all series IDs
 for (geo_id in names(platforms_list)) {
   # read metadata into a variable, drop unneeded columns, and save it
   metadata = get_metadata(geo_id) 
   filtered_metadata = drop_cols(metadata, geo_id)
-  target_attributes_tibble = select_attributes(geo_id, filtered_metadata, target_attributes_tibble)
+  #target_attributes_tibble = select_attributes(geo_id, filtered_metadata, target_attributes_tibble)
+  result = standardize_tibble(filtered_metadata, attr_tbl)
+  print(result)
 }
 
-print(target_attributes_tibble, n = Inf)         #TODO: reformat: GSE_ID(dataset), geo_accession, Attribute, Value
-write_tsv(target_attributes_tibble, paste0(file_location, "StandardizedMetadata.tsv"))
+#print(target_attributes_tibble, n = Inf)         #TODO: reformat: GSE_ID(dataset), geo_accession, Attribute, Value
+#write_tsv(target_attributes_tibble, paste0(file_location, "StandardizedMetadata.tsv"))
