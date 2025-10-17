@@ -15,12 +15,13 @@ get_metadata = function(series_ID) {
   return (metadata)
 }
 
-#saves version of metadata having removed columns with keywords
-drop_cols = function(metadata, file_location, series_ID) {
+
+# returns version of metadata having removed columns with keywords
+drop_cols = function(metadata, series_ID) {
   keywords = c("contact", "library", "processing", "description", "relation",
                "platform", "instrument", "protocol", "file", "date", "row",
                "status", "characteristics", "time", "channel", "taxid") # TODO: make sure we're removing the right things
-                                                                                # in some cases, characteristics should be kept. check to see if they got extracted.
+                                                                                # in some cases, characteristics should be kept. check to see if they got extracted. Add arg?
   cols_to_drop = names(metadata)[
     grepl(paste(keywords, collapse = "|"), names(metadata))
   ]
@@ -30,9 +31,10 @@ drop_cols = function(metadata, file_location, series_ID) {
   select(-cols_to_drop)
   
   return(metadata_filtered)
-  #write_tsv(metadata_filtered, paste0(file_location, series_ID, "_metadata.tsv"))
 }
 
+
+# adds a row to the target_attributes_tibble with the attributes needed
 select_attributes = function(geo_id, metadata, target_attributes_tibble){
   
   # loop through all rows in metadata
@@ -78,9 +80,10 @@ select_attributes = function(geo_id, metadata, target_attributes_tibble){
     
     target_attributes_tibble = add_row(target_attributes_tibble, geo_accession = ID , sex = current_sex, ploidy = current_ploidy, cell_type = current_cell_type) # append to tiblle with row contained retrieved values
   }
-  #file.remove(temp_file_location) # remove temporary file
+  
   return(target_attributes_tibble)
-}
+}         
+#TODO: make this more tidyverse-ish
 
 
 #--------------process_metadata-------------
@@ -101,9 +104,9 @@ target_attributes_tibble = tibble (
 for (geo_id in names(platforms_list)) {
   # read metadata into a variable, drop unneeded columns, and save it
   metadata = get_metadata(geo_id) 
-  filtered_metadata = drop_cols(metadata, file_location, geo_id)
+  filtered_metadata = drop_cols(metadata, geo_id)
   target_attributes_tibble = select_attributes(geo_id, filtered_metadata, target_attributes_tibble)
 }
 
-print(target_attributes_tibble, n = Inf)
-
+print(target_attributes_tibble, n = Inf)         #TODO: reformat: GSE_ID(dataset), geo_accession, Attribute, Value
+write_tsv(target_attributes_tibble, "standardized_metadata.tsv")
