@@ -11,7 +11,6 @@ get_metadata = function(series_ID) {
   metadata = getGEO(series_ID)[[1]] 
   
   metadata = as_tibble(pData(metadata))
-  print(names(metadata))
   return (metadata)
 }
 
@@ -36,15 +35,15 @@ drop_cols = function(metadata, series_ID) {
 #################################################################################
 
 
-standardize_tibble <- function(input_tbl, attr_tbl) {
+standardize_tibble <- function(geo_id, input_tbl, attr_tbl) {
   result <- map_dfc(seq_len(nrow(attr_tbl)), function(i) {
     attr <- attr_tbl[i, ]
     attr_name <- attr$attr_name
-    match_type <- attr$match_type
+    match_type <- attr$match_type          #TODO: add GeoID column
     
     # ---- Column matching ----
     if (match_type == "column") {
-      pattern <- attr$regex
+      pattern <- attr$col_regex
       col_match <- names(input_tbl)[str_detect(names(input_tbl), pattern)]
       
       if (length(col_match) > 0) {
@@ -163,14 +162,19 @@ target_attributes_tibble = tibble (
 
 
 attr_tbl <- tibble(
-  attr_name = c("ID", "Ploidy"),
-  match_type = c("column", "value"),
-  regex = c("geo", NA),
+  attr_name = c("ID", "Ploidy", "Sex"),
+  match_type = c("column", "value", "value"),
+  col_regex = c("geo", NA, NA),
   value_dict = list(
     NULL,
     list(
-      trisomic = regex("trisomic|trisomy|down syndrome|ts21", ignore_case = TRUE),
+      trisomic = regex("trisomic|trisomy|down.syndrome|ts21", ignore_case = TRUE),
       disomic = regex("disomic|disomy|WT|normal|control|euploid", ignore_case = TRUE)
+    ),
+    #TODO: make a better way to construct this
+    list(
+      male = regex("male", ignore_case = TRUE),
+      female = regex("female", ignore_case = TRUE)
     )
   )
 )
@@ -182,7 +186,7 @@ for (geo_id in names(platforms_list)) {
   metadata = get_metadata(geo_id) 
   filtered_metadata = drop_cols(metadata, geo_id)
   #target_attributes_tibble = select_attributes(geo_id, filtered_metadata, target_attributes_tibble)
-  result = standardize_tibble(filtered_metadata, attr_tbl)
+  result = standardize_tibble(geo_id, filtered_metadata, attr_tbl)
   print(result)
 }
 
