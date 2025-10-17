@@ -109,4 +109,4 @@ for (geo_id in names(platforms_list)) {
 }
 
 print(target_attributes_tibble, n = Inf)         #TODO: reformat: GSE_ID(dataset), geo_accession, Attribute, Value
-write_tsv(target_attributes_tibble, "standardized_metadata.tsv")
+write_tsv(target_attributes_tibble, paste0(file_location, "StandardizedMetadata.tsv"))
