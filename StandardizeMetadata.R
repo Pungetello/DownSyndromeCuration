@@ -20,7 +20,7 @@ drop_cols = function(metadata, file_location, series_ID) {
   keywords = c("contact", "library", "processing", "description", "relation",
                "platform", "instrument", "protocol", "file", "date", "row",
                "status", "characteristics", "time", "channel", "taxid") # TODO: make sure we're removing the right things
-  
+                                                                                # in some cases, characteristics should be kept. check to see if they got extracted.
   cols_to_drop = names(metadata)[
     grepl(paste(keywords, collapse = "|"), names(metadata))
   ]
@@ -43,6 +43,7 @@ select_attributes = function(geo_id, metadata, target_attributes_tibble){
     current_ploidy = NA
     current_cell_type = NA
     ID = NA
+    # TODO: could add more later, make code flexible for adding more
     
     
     #look for cell_type
