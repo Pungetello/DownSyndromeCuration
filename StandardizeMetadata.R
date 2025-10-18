@@ -93,57 +93,7 @@ standardize_tibble <- function(geo_id, input_tbl, attr_tbl) {
 
 
 ##############################################################################
-
-# adds a row to the target_attributes_tibble with the attributes needed
-select_attributes = function(geo_id, metadata, target_attributes_tibble){
-  
-  # loop through all rows in metadata
-  for (i in 1:nrow(metadata)){ 
-    row = metadata[i, ]
-    
-    current_sex = NA
-    current_ploidy = NA
-    current_cell_type = NA
-    ID = NA
-    # TODO: could add more later, make code flexible for adding more
-    
-    
-    #look for cell_type
-    column_name = names(metadata)[grepl("cell type", names(metadata)) | # get column name for cell type
-                                     grepl("cell_type", names(metadata))]
-    if (length(column_name) == 0){
-      column_name = names(metadata)[grepl("tissue", names(metadata))]
-    }
-    if (length(column_name) != 0) { # if column name exists
-      current_cell_type = row[[column_name]] # current cell type is the value in that column
-    }
-    
-    # look for ID
-    column_name = names(metadata)[grepl("geo", names(metadata))] # get column name for ID
-    if (length(column_name) != 0) { # if column name exists
-      ID = row[[column_name]] # current ID is the value in that column
-    }
-    
-    #look for sex
-    if (any(str_detect(row, regex("female", ignore_case = TRUE)), na.rm = TRUE)){ # first check each cell in row for 'female' if found set current sex to female
-      current_sex = "female" 
-    } else if (any(str_detect(row, regex("male", ignore_case = TRUE)), na.rm = TRUE)){
-      current_sex = "male"
-    }
-    
-    #look for ploidy
-    if (any(str_detect(row, regex("trisomic | trisomy | down syndrome | ts21", ignore_case = TRUE)), na.rm = TRUE)){ #TODO: make it match the first cell
-      current_ploidy = "trisomic"
-    } else if (any(str_detect(row, regex("disomic | disomy | WT | normal | control | euploid", ignore_case = TRUE)), na.rm = TRUE)){
-      current_ploidy = "disomic"
-    }
-    
-    target_attributes_tibble = add_row(target_attributes_tibble, geo_accession = ID , sex = current_sex, ploidy = current_ploidy, cell_type = current_cell_type) # append to tiblle with row contained retrieved values
-  }
-  
-  return(target_attributes_tibble)
-}         
-#TODO: make this more tidyverse-ish
+#TODO: understand what bot code is doing
 
 
 #--------------process_metadata-------------
@@ -153,12 +103,6 @@ file_location = "Data/Metadata/"
 if (!dir.exists(file_location)){
   dir.create(file_location, recursive = TRUE)
 }
-
-# create tibble to store target attributes
-target_attributes_tibble = tibble ( 
-  geo_accession = character(), sex = character(), ploidy = character(), cell_type = character()   #TODO: clean up somewhow idk
-  
-)
 
 
 attr_tbl <- tibble(
@@ -179,16 +123,19 @@ attr_tbl <- tibble(
   )
 )
 
+output = tibble(geo_id, attr_tbl$attr_name)    #TODO: figure out how to initialize this so it will bind_rows correctly.
+print(output)
 
 # loop through all series IDs
 for (geo_id in names(platforms_list)) {
   # read metadata into a variable, drop unneeded columns, and save it
   metadata = get_metadata(geo_id) 
   filtered_metadata = drop_cols(metadata, geo_id)
-  #target_attributes_tibble = select_attributes(geo_id, filtered_metadata, target_attributes_tibble)
   result = standardize_tibble(geo_id, filtered_metadata, attr_tbl)
   print(result)
+  bind_rows(output, result)
 }
 
+print(output)
 #print(target_attributes_tibble, n = Inf)         #TODO: reformat: GSE_ID(dataset), geo_accession, Attribute, Value
-#write_tsv(target_attributes_tibble, paste0(file_location, "StandardizedMetadata.tsv"))
+write_tsv(output, paste0(file_location, "StandardizedMetadata.tsv"))
