@@ -2,6 +2,7 @@
 library(GEOquery)
 library(tidyverse)
 source("PlatformsList.R")
+source("MetadataAttributes.R")
 
 
 #----------functions-------------
@@ -19,7 +20,7 @@ get_metadata = function(geo_ID) {
 drop_cols = function(metadata, series_ID) {
   keywords = c("contact", "library", "processing", "description", "relation",
                "platform", "instrument", "protocol", "file", "date", "row",
-               "status", "characteristics", "time", "channel", "taxid") # TODO: make sure we're removing the right things
+               "status", "characteristics", "time", "channel", "taxid") # TODO: figure out what to do for characteristics column.
                                                                                 # in some cases, characteristics should be kept. check to see if they got extracted. Add arg?
   cols_to_drop = names(metadata)[
     grepl(paste(keywords, collapse = "|"), names(metadata))
@@ -188,25 +189,6 @@ if (!dir.exists(file_location)){
 }
 
 
-attr_tbl <- tibble(
-  attr_name = c("ID", "Ploidy", "Sex"),
-  match_type = c("column", "value", "value"),
-  col_regex = c("geo", NA, NA),
-  value_dict = list(
-    NULL,
-    list(
-      trisomic = regex("trisomic|trisomy|down.syndrome|ts21", ignore_case = TRUE),
-      disomic = regex("disomic|disomy|WT|normal|control|euploid", ignore_case = TRUE)
-    ),
-    #TODO: make a better way to construct this
-    list(
-      male = regex("male", ignore_case = TRUE),
-      female = regex("female", ignore_case = TRUE)
-    )
-  )
-)
-
-
 # loop through all series IDs
 combined_output = tibble()
 for (geo_id in names(platforms_list)) {
@@ -216,7 +198,7 @@ for (geo_id in names(platforms_list)) {
   result = standardize_tibble(geo_id, filtered_metadata, attr_tbl)
   combined_output = bind_rows(combined_output, result)
 }
-print(combined_output, n=Inf) #debug
 
-#print(target_attributes_tibble, n = Inf)         #TODO: reformat: GSE_ID(dataset), geo_accession, Attribute, Value
-write_tsv(output, paste0(file_location, "StandardizedMetadata.tsv"))
+rotated_standardized_metadata = pivot_longer(combined_output, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
+
+write_tsv(rotated_standardized_metadata, paste0(file_location, "StandardizedMetadata.tsv"))
