@@ -7,8 +7,8 @@ source("PlatformsList.R")
 #----------functions-------------
 
 # retrieves metadata using GEOquery function
-get_metadata = function(series_ID) {
-  metadata = getGEO(series_ID)[[1]] 
+get_metadata = function(geo_ID) {
+  metadata = getGEO(geo_ID)[[1]] 
   
   metadata = as_tibble(pData(metadata))
   return (metadata)
