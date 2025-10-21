@@ -34,7 +34,7 @@ drop_cols = function(metadata, series_ID) {
 
 #################################################################################
 
-
+# goes through each row in the attributes tibble and searches the input for the attributes desired, creating a column for each in the output.
 standardize_tibble <- function(geo_id, input_tbl, attr_tbl) {
   result <- map_dfc(seq_len(nrow(attr_tbl)), function(i) {
     attr <- attr_tbl[i, ]
@@ -128,7 +128,7 @@ print(output)
 
 # loop through all series IDs
 for (geo_id in names(platforms_list)) {
-  # read metadata into a variable, drop unneeded columns, and save it
+  # read metadata into a variable, drop unneeded columns, get standardized metadata
   metadata = get_metadata(geo_id) 
   filtered_metadata = drop_cols(metadata, geo_id)
   result = standardize_tibble(geo_id, filtered_metadata, attr_tbl)
