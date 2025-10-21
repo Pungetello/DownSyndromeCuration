@@ -40,19 +40,11 @@ library(stringr)
 library(rlang)
 
 standardize_tibble <- function(geo_id, input_tbl, attr_tbl) {
-  # Basic checks
   n <- nrow(input_tbl)
-  if (length(geo_id) == 1) {
-    geo_col <- rep(as.character(geo_id), n)
-  } else if (length(geo_id) == n) {
-    geo_col <- as.character(geo_id)
-  } else {
-    stop("geo_id must be length 1 or length nrow(input_tbl).")
-  }
+  geo_col <- rep(as.character(geo_id), n)
   
-  # Helper: score how many distinct dict-patterns appear anywhere in a column
+  # For each column, count how many regex pattern matches
   score_column <- function(col, value_dict) {
-    # col: vector (already coerced to character/lower)
     sum(map_int(value_dict, function(pat) {
       pat_collapsed <- if (length(pat) > 1) paste(pat, collapse = "|") else pat
       any(str_detect(col, pat_collapsed), na.rm = TRUE)
@@ -69,7 +61,6 @@ standardize_tibble <- function(geo_id, input_tbl, attr_tbl) {
       pattern <- as.character(attr$col_regex)
       col_match <- names(input_tbl)[str_detect(names(input_tbl), pattern)]
       if (length(col_match) > 0) {
-        # Use first match; preserve original column (no forced coercion)
         return(tibble(!!attr_name := input_tbl[[col_match[1]]]))
       } else {
         return(tibble(!!attr_name := rep(NA_character_, n)))
@@ -77,7 +68,6 @@ standardize_tibble <- function(geo_id, input_tbl, attr_tbl) {
     }
     
     if (match_type == "value") {
-      # value_dict is stored as a list-column (one element per attr row)
       value_dict <- attr$value_dict[[1]]
       if (is.null(value_dict) || length(value_dict) == 0) {
         return(tibble(!!attr_name := rep(NA_character_, n)))
@@ -215,7 +205,6 @@ attr_tbl <- tibble(
     )
   )
 )
-
 
 
 # loop through all series IDs
