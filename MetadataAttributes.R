@@ -15,8 +15,8 @@ new_value_dict = list(
 attr_tbl = add_row(attr_tbl, attr_name = "Ploidy", match_type = "value", col_regex = regex(""), value_dict = list(new_value_dict))
 
 new_value_dict = list(
-  male = regex("male", ignore_case = TRUE),
-  female = regex("female", ignore_case = TRUE)
+  female = regex("female", ignore_case = TRUE),
+  male = regex("male", ignore_case = TRUE)
 )
 attr_tbl = add_row(attr_tbl, attr_name = "Sex", match_type = "value", col_regex = regex(""), value_dict = list(new_value_dict))
 
