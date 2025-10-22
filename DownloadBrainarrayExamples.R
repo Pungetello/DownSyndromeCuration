@@ -14,3 +14,5 @@ for (accession_id in accession_id_list) {
   gse_accession = accession_id
   getGEOSuppFiles(gse_accession, makeDirectory = TRUE, baseDir = platform_folder)
 }
+
+#TODO: refactor to do one at a time for space efficiency?
