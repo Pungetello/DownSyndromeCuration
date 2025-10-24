@@ -1,6 +1,6 @@
 #function sources
 source("PlatformsList.R")
-source("DownloadTarFiles.R")
+source("DownloadFiles.R")
 
 #installs packages that are necessary for later steps. These only need to be executed once
 # source("InstallCorePackages.R")
@@ -12,4 +12,4 @@ DownloadData(create_unique_vector(platforms_list), "BrainArrayExamples")
 #execute every time:
 DownloadData(names(platforms_list), "Data/Files")
 source("StandardizeMetadata.R")
-source("RunStatisticalTests.R")
+# source("RunStatisticalTests.R")
