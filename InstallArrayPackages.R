@@ -63,6 +63,7 @@ for (geo_id in create_unique_vector(platform_list)){
 
 
 #TODO: delete BrainArrayExamples directory and contents
+#TODO: make it create a list mapping the package names to the type
 #unlink(sprintf("%s/BrainArrayExamples", getwd()), recursive = TRUE)
 
 #platform_to_package_list[[platform]] = pkgName
