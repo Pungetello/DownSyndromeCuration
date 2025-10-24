@@ -130,8 +130,7 @@ for (geo_id in names(platforms_list)) {
   result = standardize_tibble(geo_id, filtered_metadata, attr_tbl)
   combined_output = bind_rows(combined_output, result)
 }
-#debug
-print(combined_output, n=Inf)
+
 
 rotated_standardized_metadata = pivot_longer(combined_output, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
 
