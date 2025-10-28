@@ -1,16 +1,14 @@
 #-----------loading_libraries-----------
 source("PlatformsList.R")
+library(arrayQualityMetrics)
 
 
 #-----------functions------------------
-quality_control_removal(
-  #do the three statistical tests -- remove array data that fails all three
-)
 
 #line 286 uses SCAN with the name of the Brainarray package to normalize the data
 
-quality_control_removal <- function(file_list, platform, geo_id){
- 
+quality_control_removal = function(file_list, platform, geo_id){
+
   cel_files = read.celfiles(file_list)
   
   test_results = arrayQualityMetrics(expressionset = cel_files, force = TRUE, outdir = "QualityOutput")
@@ -72,6 +70,9 @@ quality_control_removal <- function(file_list, platform, geo_id){
 }
 
 #-----------run statistical tests-----------
-file_list = list.files(path = tar_file_output_f, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-filtered_file_list = quality_control_removal(file_list, platform, geo_id)
+for (geo_id in names(platforms_list)){
+  file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
+  file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
+  filtered_file_list = quality_control_removal(file_list, platforms_list[geo_id], geo_id)
+}
 

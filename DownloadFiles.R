@@ -18,7 +18,7 @@ DownloadData = function(accession_id_list, platform_folder){
     tar_file = sprintf("%s/%s_RAW.tar", geo_id_dir, geo_id)
     untar(tar_file, exdir = geo_id_dir)
   }
-  
+  #TODO: make delete tar file
   
   
 }
