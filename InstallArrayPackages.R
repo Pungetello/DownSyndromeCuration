@@ -8,6 +8,9 @@ library(arrayQualityMetrics)
 
 source("PlatformsList.R")
 
+#TODO: override downloading from insecure servers -- ask chat if this is an issue 
+#TODO: replace mbni.org with longer path
+
 #-----------functions------------------
 
 BrainInstall2 = function(cel_files){ 

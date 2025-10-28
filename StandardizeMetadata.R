@@ -6,7 +6,7 @@ source("MetadataAttributes.R")
 
 
 #----------functions-------------
-
+#TODO: expand characteristics column if we see it's needed
 # retrieves metadata using GEOquery function
 get_metadata = function(geo_ID) {
   metadata = getGEO(geo_ID)[[1]] 
@@ -110,7 +110,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
   result = bind_cols(tibble(GeoID = geo_col), bind_cols(cols_list))
   return(result)
 }
-
+#TODO: make bespoke solutions to file idiosyncrasies
 
 #--------------process_metadata-------------
 

@@ -1,5 +1,5 @@
 library(tidyverse)
-
+# TODO: figure out for the three data sets how many metadata attributes are useful
 # I'm not really sure which method is best. creating each row at once in the code, or letting it be a file that we read in?
 
 #initialize tibble

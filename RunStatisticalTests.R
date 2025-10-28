@@ -12,7 +12,7 @@ quality_control_removal = function(file_list, platform, geo_id){
   cel_files = read.celfiles(file_list)
   
   test_results = arrayQualityMetrics(expressionset = cel_files, force = TRUE, outdir = "QualityOutput")
-  # unlink("quality_output_file", recursive = TRUE) #TODO: figure out what this does/use case
+  unlink("QualityOutput", recursive = TRUE) #TODO: figure out how to not download in first place
   
   
   outlierIndices = c(test_results$modules$heatmap@outliers@which, test_results$modules$boxplot@outliers@which, test_results$modules$maplot@outliers@which)
