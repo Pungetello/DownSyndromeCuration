@@ -6,7 +6,7 @@ source("DownloadFiles.R")
 # source("InstallCorePackages.R")
 ##Download Brainarray Examples
 DownloadData(create_unique_vector(platforms_list), "BrainArrayExamples")
-# source("InstallArrayPackages.R")  #TODO: finish this once website is back up           #TODO: ask if we should just download all the data at the begining
+# source("InstallArrayPackages.R")  #TODO: finish this once website is back up           #TODO: ask if we should just download all the data at the beginning
 
 
 #execute every time:

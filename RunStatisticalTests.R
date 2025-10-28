@@ -70,9 +70,17 @@ quality_control_removal = function(file_list, platform, geo_id){
 }
 
 #-----------run statistical tests-----------
+
+#TODO: add platforms to package list for normalization?
+
 for (geo_id in names(platforms_list)){
   file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
   file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
   filtered_file_list = quality_control_removal(file_list, platforms_list[geo_id], geo_id)
+  
+  
+  
+  
+  
 }
 
