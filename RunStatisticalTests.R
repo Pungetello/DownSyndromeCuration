@@ -1,6 +1,8 @@
 #-----------loading_libraries-----------
 source("PlatformsList.R")
 library(arrayQualityMetrics)
+library(SCAN.UPC)
+library(tidyverse)
 
 
 #-----------functions------------------
@@ -9,9 +11,10 @@ library(arrayQualityMetrics)
 
 quality_control_removal = function(file_list, platform, geo_id){
 
-  cel_files = read.celfiles(file_list)
+  cel_files = read.celfiles(file_list) # TODO: perhaps refactor so it reads in one cel file at a time?
   
   test_results = arrayQualityMetrics(expressionset = cel_files, force = TRUE, outdir = "QualityOutput")
+  
   unlink("QualityOutput", recursive = TRUE) #TODO: figure out how to not download in first place
   
   
@@ -40,13 +43,13 @@ quality_control_removal = function(file_list, platform, geo_id){
   # Keep files that do not fail all three tests
   accepted_indices = which(counts != 3)
   files_to_keep = c(file_list[accepted_indices])
-  
+
   file_vector = unlist(file_list)
   gsm_ids = str_extract(file_vector, "GSM\\d+")
   pass_reject_tibble = as_tibble(gsm_ids)
   # pass_reject_tibble = mutate(pass_reject_tibble, cel_file = gsm_ids) #TODO: what does this do? Delete?
   num_samples = length(gsm_ids)
-  
+
   current_platforms = rep(platform, num_samples)
   current_platforms = unlist(current_platforms)
   current_platforms = gsub("\t", " ", current_platforms)
@@ -55,7 +58,7 @@ quality_control_removal = function(file_list, platform, geo_id){
   current_geo_id <- rep(geo_id, num_samples)
   current_geo_id <- unlist(current_geo_id)
   pass_reject_tibble <- add_column(pass_reject_tibble, geo_id = current_geo_id)
-  
+
   rejected_gsms <- names(which(counts == 3))
   rejected_gsms <- str_extract(rejected_gsms, "GSM\\d+")
   # print(paste(rejected_gsms, '3333'))
@@ -64,7 +67,7 @@ quality_control_removal = function(file_list, platform, geo_id){
   # print(pass_status)
   pass_reject_tibble <- add_column(pass_reject_tibble, "Pass?" = pass_status)
   
-  write_tsv(pass_reject_tibble, "Data/Affymetrix/quality_output_file.tsv", append = TRUE, col_names = FALSE)
+  write_tsv(pass_reject_tibble, "Data/quality_output_file.tsv", append = TRUE, col_names = FALSE)
   
   return(files_to_keep)
 }
@@ -73,12 +76,11 @@ quality_control_removal = function(file_list, platform, geo_id){
 
 #TODO: add platforms to package list for normalization?
 
+
 for (geo_id in names(platforms_list)){
   file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
   file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
   filtered_file_list = quality_control_removal(file_list, platforms_list[geo_id], geo_id)
-  
-  
   
   
   
