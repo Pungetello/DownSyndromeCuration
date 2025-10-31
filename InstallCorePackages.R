@@ -12,7 +12,8 @@ BiocManager::install(c("tidyverse",
                        "affy",
                        "pdInfoBuilder", 
                        "affxparser", 
-                       "Biostrings"
+                       "Biostrings",
+                       "janitor"
                        )
 )
 

@@ -1,6 +1,7 @@
 #-----------loading_libraries-----------
 library(GEOquery)
 library(tidyverse)
+library(janitor)
 source("PlatformsList.R")
 source("MetadataAttributes.R")
 
@@ -12,7 +13,20 @@ get_metadata = function(geo_ID) {
   metadata = getGEO(geo_ID)[[1]] 
   
   metadata = as_tibble(pData(metadata))
+  metadata = clean_names(metadata)
+  metadata = fix_bespoke_issues(geo_ID, metadata) # debug
   return (metadata)
+}
+
+
+# fixes specific issues in the data for certain datasets
+fix_bespoke_issues = function(geo_ID, metadata){
+  if(geo_ID == "GSE1789"){
+    metadata = mutate(metadata, age_ch1 = ifelse(is.na(age_ch1), substr(characteristics_ch1_1, start = 5, stop = nchar(characteristics_ch1_1) ), age_ch1)) %>%
+      mutate(tissue_ch1 = ifelse(is.na(tissue_ch1), tissue_ch1[1], tissue_ch1))
+  }else{
+    return(metadata)
+  }
 }
 
 
@@ -110,7 +124,6 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
   result = bind_cols(tibble(GeoID = geo_col), bind_cols(cols_list))
   return(result)
 }
-#TODO: make bespoke solutions to file idiosyncrasies
 
 #--------------process_metadata-------------
 
@@ -128,10 +141,11 @@ for (geo_id in names(platforms_list)) {
   metadata = get_metadata(geo_id) 
   filtered_metadata = drop_cols(metadata, geo_id)
   result = standardize_tibble(geo_id, filtered_metadata, attr_tbl)
-  combined_output = bind_rows(combined_output, result)
+  
+  # remove any attributes where every row is NA for this geoID, then rotate
+  result = Filter(function(x)!all(is.na(x)), result)
+  rotated_result = pivot_longer(result, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
+  combined_output = bind_rows(combined_output, rotated_result)
 }
-
-
-rotated_standardized_metadata = pivot_longer(combined_output, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
 
 write_tsv(rotated_standardized_metadata, paste0(file_location, "StandardizedMetadata.tsv"))
