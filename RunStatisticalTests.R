@@ -106,10 +106,13 @@ get_scan_upc_files <- function(cel_files_id, platform_to_package_list, platform)
 
 
 for (geo_id in names(platforms_list)){
+  platform = platforms_list[[geo_id]]
+  
   file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
   file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-  filtered_file_list = quality_control_removal(file_list, platforms_list[[geo_id]], geo_id)
+  filtered_file_list = quality_control_removal(file_list, platform, geo_id)
   
+  #should be working, once we can run InstallArrayPackages again.
   #normalized = get_scan_upc_files(file_list, platform_to_package_list, platform)
   #save_normalized_file(geo_id, platform, normalized)
   
