@@ -92,7 +92,8 @@ get_scan_upc_files <- function(cel_files_id, platform_to_package_list, platform)
   
   # last step to converting the information
   print('test2')
-  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName)
+  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName)
+  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #remove arg until website is working
   print('test3')
   print(normalized)
   print(typeof(normalized))
