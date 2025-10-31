@@ -10,7 +10,7 @@ library(tidyverse)
 #line 286 uses SCAN with the name of the Brainarray package to normalize the data
 
 quality_control_removal = function(file_list, platform, geo_id){
-
+  
   cel_files = read.celfiles(file_list) # TODO: perhaps refactor so it reads in one cel file at a time?
   
   test_results = arrayQualityMetrics(expressionset = cel_files, force = TRUE, outdir = "QualityOutput")
@@ -25,44 +25,71 @@ quality_control_removal = function(file_list, platform, geo_id){
   counts = sapply(unique(outlierNames), function(x) {
     tests_failed = length(which(outlierNames == x))
   })
-    
+  
   # print("REJECTED ASSAYS:\t") #debug
   # print(paste(names(which(counts == 3)), collapse="\t")) #debug
   
   # Keep files that do not fail all three tests
   accepted_indices = which(counts != 3)
   files_to_keep = c(file_list[accepted_indices])
-
+  
   file_vector = unlist(file_list)
   gsm_ids = str_extract(file_vector, "GSM\\d+")
   pass_reject_tibble = as_tibble(gsm_ids)
   pass_reject_tibble = rename(pass_reject_tibble, GSM_id = value)
   num_samples = length(gsm_ids)
-
+  
   current_platforms = rep(platform, num_samples)
   pass_reject_tibble = add_column(pass_reject_tibble, platform = current_platforms)
   
   current_geo_id = rep(geo_id, num_samples)
   pass_reject_tibble = add_column(pass_reject_tibble, geo_id = current_geo_id)
-
+  
   rejected_gsms = names(which(counts == 3))
   rejected_gsms = str_extract(rejected_gsms, "GSM\\d+")
   pass_status = !(gsm_ids %in% rejected_gsms)
-  pass_reject_tibble <- add_column(pass_reject_tibble, pass_status)
-  # print(pass_reject_tibble) # debug
+  pass_reject_tibble = add_column(pass_reject_tibble, pass_status)
+  colnames(pass_reject_tibble) = c("GSM_ID", "Platform", "GSE_ID", "DataQuality")
+  pass_reject_tibble = mutate(pass_reject_tibble, DataQuality = ifelse(DataQuality == "TRUE", "PASS", "FAIL"))
   
-  write_tsv(pass_reject_tibble, "Data/quality_output_file.tsv", append = TRUE, col_names = FALSE)
+  if (!file.exists("Data/quality_output_file.tsv")) {
+    write_tsv(pass_reject_tibble, "Data/quality_output_file.tsv")
+  } else {
+    write_tsv(pass_reject_tibble, "Data/quality_output_file.tsv", append = TRUE, col_names = FALSE)
+  }
   
   return(files_to_keep)
 }
 
 
 # TODO: go over this function
-save_normalized_file <- function(geo_id, platform, normalized){
+get_scan_upc_files = function(cel_files_id, platform_to_package_list, platform, geo_id){
+  
+  # Sets the file pattern to .CEL, so scan pulls everything with that ending
+  celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") ##tar_file_output_f 
+  
+  # formatted string for the SCAN output
+  #scan_output_file_f = sprintf("affymetrix_data/%s_SCAN", geo_id). ## not used in this function?
+  
+  # This cleans up the data and removes outliers
+  platform = unlist(platform)
+  # pkgName = platform_to_package_list[[platform]]
+  
+  # last step to converting the information
+  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName)
+  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #remove arg until website is working
+  return (normalized)
+}
+
+
+
+# TODO: clean up this function
+# TODO: change the directory to have a folder of normalized data
+save_normalized_file = function(geo_id, platform, normalized){
   normalized_tibble = as_tibble(normalized)
   normalized_tibble = normalized_tibble %>%
     rename_with(
-      ~make.unique(coalesce(str_extract(., "\\d+"), .), sep = "_"),
+      ~make.unique(coalesce(str_extract(., "\\d+"), .), sep = "_"), #TODO: check if we actually need this
       everything()
     )
   
@@ -77,28 +104,7 @@ save_normalized_file <- function(geo_id, platform, normalized){
   write_tsv(final_tibble, tibble_file_location)
 }
 
-# TODO: go over this function
-get_scan_upc_files <- function(cel_files_id, platform_to_package_list, platform){
-  
-  # Sets the file pattern to .CEL, so scan pulls everything with that ending
-  celFilePattern <- file.path(tar_file_output_f, "*.CEL.gz")
-  
-  # formated string for the SCAN output
-  scan_output_file_f = sprintf("affymetrix_data/%s_SCAN", geo_id)
-  
-  # This cleans up the data and removes outliers
-  platform = unlist(platform)
-  pkgName = platform_to_package_list[[platform]]
-  
-  # last step to converting the information
-  print('test2')
-  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName)
-  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #remove arg until website is working
-  print('test3')
-  print(normalized)
-  print(typeof(normalized))
-  return (normalized)
-}
+
 
 
 #-----------run statistical tests-----------
@@ -114,7 +120,7 @@ for (geo_id in names(platforms_list)){
   filtered_file_list = quality_control_removal(file_list, platform, geo_id)
   
   #should be working, once we can run InstallArrayPackages again.
-  #normalized = get_scan_upc_files(file_list, platform_to_package_list, platform)
-  #save_normalized_file(geo_id, platform, normalized)
+  normalized = get_scan_upc_files(file_list, platform_to_package_list, platform, geo_id)
+  save_normalized_file(geo_id, platform, normalized)
   
 }
