@@ -20,4 +20,7 @@ new_value_dict = list(
 )
 attr_tbl = add_row(attr_tbl, attr_name = "Sex", match_type = "value", col_regex = regex(""), value_dict = list(new_value_dict))
 
+#Tissue
+#attr_tbl = add_row(attr_tbl, attr_name = "Tissue", match_type = "column", col_regex = regex("tissue|cell.type", ignore_case = TRUE), value_dict = NULL)
+
 # rotated_standardized_metadata = rotate_longer(combined_output, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
