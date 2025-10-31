@@ -8,6 +8,7 @@ library(arrayQualityMetrics)
 
 source("PlatformsList.R")
 
+#TODO: figure out how to download it with the GEOID, and not with downloading the actual cel files as examples.
 #TODO: override downloading from insecure servers -- ask chat if this is an issue 
 #TODO: replace mbni.org with longer path
 
