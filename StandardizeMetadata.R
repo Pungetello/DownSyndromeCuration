@@ -21,7 +21,7 @@ get_metadata = function(geo_ID) {
 
 # fixes specific issues in the data for certain datasets
 fix_bespoke_issues = function(geo_ID, metadata){
-  if(geo_ID == "GSE1789"){
+  if(geo_ID == "GSE1789"){      #TODO: fix it more
     metadata = mutate(metadata, age_ch1 = ifelse(is.na(age_ch1), substr(characteristics_ch1_1, start = 5, stop = nchar(characteristics_ch1_1) ), age_ch1)) %>%
       mutate(tissue_ch1 = ifelse(is.na(tissue_ch1), tissue_ch1[1], tissue_ch1))
   }else{
@@ -32,8 +32,8 @@ fix_bespoke_issues = function(geo_ID, metadata){
 
 # returns version of metadata having removed columns with keywords
 drop_cols = function(metadata, series_ID) {
-  keywords = c("contact", "library", "processing", "description", "relation",
-               "platform", "instrument", "protocol", "file", "date", "row",
+  keywords = c("contact", "library", "processing", "relation",
+               "platform", "instrument", "file", "date", "row",
                "status", "characteristics", "time", "channel", "taxid") # TODO: figure out what to do for characteristics column.
                                                                         # in some cases, characteristics should be kept. check to see if they got extracted. Add arg?
   cols_to_drop = names(metadata)[
@@ -45,6 +45,16 @@ drop_cols = function(metadata, series_ID) {
   select(-cols_to_drop)
   
   return(metadata_filtered)
+}
+
+
+# splits the metadata into two tibbles: one containing only columns where there is a difference in values, one with only columns where they're all the same.
+split_metadata = function(metadata) {
+  diff_metadata = select(metadata, where(~n_distinct(.) > 1))
+  print(diff_metadata)
+  same_metadata = select(metadata, where(~n_distinct(.) == 1))
+  print(same_metadata)
+  return(c(diff_metadata, same_metadata))
 }
 
 
@@ -125,6 +135,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
   return(result)
 }
 
+
 #--------------process_metadata-------------
 
 file_location = "Data/Metadata/"
@@ -136,16 +147,32 @@ if (!dir.exists(file_location)){
 
 # loop through all series IDs
 combined_output = tibble()
+dataset_combined_output = tibble()
+
 for (geo_id in names(platforms_list)) {
-  # read metadata into a variable, drop unneeded columns, get standardized metadata
-  metadata = get_metadata(geo_id) 
+  
+  # read metadata into a variable, drop unneeded columns, split into same and diff
+  metadata = get_metadata(geo_id)
   filtered_metadata = drop_cols(metadata, geo_id)
-  result = standardize_tibble(geo_id, filtered_metadata, attr_tbl)
+  splitted_metadata = split_metadata(filtered_metadata)
+  same_metadata = splitted_metadata[2]
+  diff_metadata = splitted_metadata[1]
+  print(same_metadata)
+  print(diff_metadata)
+  stop()
+  
+  # get standardized metadata
+  result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
   
   # remove any attributes where every row is NA for this geoID, then rotate
   result = Filter(function(x)!all(is.na(x)), result)
   rotated_result = pivot_longer(result, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
   combined_output = bind_rows(combined_output, rotated_result)
+  
+  #get dataset metadata 
+  dataset_result = standardize_tibble(geo_id, same_metadata, dataset_attr_tbl) #TODO: make dataset attribute tibble
+  dataset_combined_output = bind_rows(dataset_combined_output)
 }
 
-write_tsv(rotated_standardized_metadata, paste0(file_location, "StandardizedMetadata.tsv"))
+write_tsv(combined_output, paste0(file_location, "StandardizedMetadata.tsv"))
+write_tsv(dataset_combined_output, paste0(file_location, "DatasetMetadata.tsv"))
