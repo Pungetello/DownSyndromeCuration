@@ -15,7 +15,7 @@ quality_control_removal = function(file_list, platform, geo_id){
   
   test_results = arrayQualityMetrics(expressionset = cel_files, force = TRUE, outdir = "QualityOutput")
   
-  unlink("QualityOutput", recursive = TRUE) #TODO: figure out how to not download in first place
+  unlink("QualityOutput", recursive = TRUE)
   
   outlierIndices = c(test_results$modules$heatmap@outliers@which, test_results$modules$boxplot@outliers@which, test_results$modules$maplot@outliers@which)
   # Get the assay names corresponding to the indices above from the arrayTable data frame.
@@ -26,8 +26,6 @@ quality_control_removal = function(file_list, platform, geo_id){
     tests_failed = length(which(outlierNames == x))
   })
   
-  # print("REJECTED ASSAYS:\t") #debug
-  # print(paste(names(which(counts == 3)), collapse="\t")) #debug
   
   # Keep files that do not fail all three tests
   accepted_indices = which(counts != 3)
@@ -61,50 +59,39 @@ quality_control_removal = function(file_list, platform, geo_id){
   return(files_to_keep)
 }
 
-
-# TODO: go over this function
+#reads the cel files from the untarred data
 get_scan_upc_files = function(cel_files_id, platform_to_package_list, platform, geo_id){
   
   # Sets the file pattern to .CEL, so scan pulls everything with that ending
-  celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") ##tar_file_output_f 
-  
-  # formatted string for the SCAN output
-  #scan_output_file_f = sprintf("affymetrix_data/%s_SCAN", geo_id). ## not used in this function?
+  celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") 
   
   # This cleans up the data and removes outliers
   platform = unlist(platform)
-  # pkgName = platform_to_package_list[[platform]]
+  # pkgName = platform_to_package_list[[platform]] #removed until website is up
   
   # last step to converting the information
-  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName)
-  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #remove arg until website is working
+  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #removed until website is up
+  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA)
   return (normalized)
 }
 
-
-
-# TODO: clean up this function
-# TODO: change the directory to have a folder of normalized data
-save_normalized_file = function(geo_id, platform, normalized){
-  normalized_tibble = as_tibble(normalized)
-  normalized_tibble = normalized_tibble %>%
-    rename_with(
-      ~make.unique(coalesce(str_extract(., "\\d+"), .), sep = "_"), #TODO: check if we actually need this
-      everything()
-    )
+#changes normalized data to matrix, creates new directory for these files and saves them gzipped
+save_normalized_file = function(geo_id, platform, normalized) {
+  normalized = as.matrix(normalized)
   
-  test_dataframe = as.data.frame(normalized)
-  normalized_row_names = rownames(test_dataframe)
-  new_names = str_extract(normalized_row_names, "GSM\\d+")
+  output_dir = file.path(getwd(), "Data", "NormalizedData")
+  if (!dir.exists(output_dir)) {dir.create(output_dir, recursive = TRUE)}
   
-  final_tibble = normalized_tibble %>%
-    add_column("Sample_ID" = new_names, .before = 1)
+  file_path = file.path(output_dir, paste0(geo_id, "_", platform, ".tsv.gz"))
   
-  tibble_file_location = paste0("Data/", geo_id, platform, ".tsv.gz")
-  write_tsv(final_tibble, tibble_file_location)
+  gsm_pattern = "GSM\\d+"
+  sample_ids = stringr::str_extract(rownames(normalized), gsm_pattern)
+  
+  final_tibble = as_tibble(normalized, rownames = NULL) %>%
+    bind_cols(Sample_ID = sample_ids, .)
+  
+  write_tsv(final_tibble, file_path)
 }
-
-
 
 
 #-----------run statistical tests-----------
@@ -122,5 +109,4 @@ for (geo_id in names(platforms_list)){
   #should be working, once we can run InstallArrayPackages again.
   normalized = get_scan_upc_files(file_list, platform_to_package_list, platform, geo_id)
   save_normalized_file(geo_id, platform, normalized)
-  
 }
