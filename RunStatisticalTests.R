@@ -50,6 +50,7 @@ quality_control_removal = function(file_list, platform, geo_id){
   colnames(pass_reject_tibble) = c("GSM_ID", "Platform", "GSE_ID", "DataQuality")
   pass_reject_tibble = mutate(pass_reject_tibble, DataQuality = ifelse(DataQuality == "TRUE", "PASS", "FAIL"))
   
+  
   if (!file.exists("Data/quality_output_file.tsv")) {
     write_tsv(pass_reject_tibble, "Data/quality_output_file.tsv")
   } else {
@@ -94,6 +95,20 @@ save_normalized_file = function(geo_id, platform, normalized) {
 }
 
 
+
+
+remove_fails_from_metadata = function(pass_reject_tibble){
+  failed_gsm_ids = filter(pass_reject_tibble, DataQuality == "FAIL")%>%
+    pull(GSM_ID)
+  
+  metadata_location = paste0(getwd(), "/Data/Metadata/StandardizedMetadata.tsv")
+  metadata_tibble = read_tsv(metadata_location)%>%
+    filter(! ID %in% failed_gsm_ids)
+  
+  write_tsv(metadata_tibble, metadata_location)
+}
+
+
 #-----------run statistical tests-----------
 
 #TODO: add platforms to package list for normalization: waiting on website
@@ -110,3 +125,7 @@ for (geo_id in names(platforms_list)){
   normalized = get_scan_upc_files(file_list, platform_to_package_list, platform, geo_id)
   save_normalized_file(geo_id, platform, normalized)
 }
+
+quality_output_tibble = read_tsv(paste0(getwd(), "/Data/quality_output_file.tsv"))
+remove_fails_from_metadata(quality_output_tibble)
+
