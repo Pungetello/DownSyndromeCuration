@@ -146,8 +146,6 @@ for (geo_id in names(platforms_list)) {
   metadata = drop_cols(metadata, geo_id)
   diff_metadata = select(metadata, where(~n_distinct(.) > 1))
   same_metadata = select(metadata, where(~n_distinct(.) == 1))
-  print(same_metadata, n=Inf)
-  print(diff_metadata, n = Inf)
   
   # get standardized metadata
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
@@ -156,11 +154,12 @@ for (geo_id in names(platforms_list)) {
   result = Filter(function(x)!all(is.na(x)), result)
   rotated_result = pivot_longer(result, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
   combined_output = bind_rows(combined_output, rotated_result)
-  print(result)
   
   #get dataset metadata 
-  dataset_result = standardize_tibble(geo_id, same_metadata, dataset_attr_tbl) #TODO: make dataset attribute tibble
-  dataset_combined_output = bind_rows(dataset_combined_output)
+  dataset_result = same_metadata[1,] %>%
+    mutate(GeoID = geo_id)
+  roatated_result = rotated_result = pivot_longer(dataset_result, !"GeoID", names_to = "Attribute", values_to = "Value")
+  dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
 }
 
 write_tsv(combined_output, paste0(file_location, "StandardizedMetadata.tsv"))
