@@ -48,16 +48,6 @@ drop_cols = function(metadata, series_ID) {
 }
 
 
-# splits the metadata into two tibbles: one containing only columns where there is a difference in values, one with only columns where they're all the same.
-split_metadata = function(metadata) {
-  diff_metadata = select(metadata, where(~n_distinct(.) > 1))
-  print(diff_metadata)
-  same_metadata = select(metadata, where(~n_distinct(.) == 1))
-  print(same_metadata)
-  return(c(diff_metadata, same_metadata))
-}
-
-
 # goes through each row in the attributes tibble and searches the input for the attributes desired, creating a column for each in the output
 standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
   n = nrow(input_tbl)
@@ -167,6 +157,7 @@ for (geo_id in names(platforms_list)) {
   rotated_result = pivot_longer(result, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
   combined_output = bind_rows(combined_output, rotated_result)
   print(result)
+  
   #get dataset metadata 
   dataset_result = standardize_tibble(geo_id, same_metadata, dataset_attr_tbl) #TODO: make dataset attribute tibble
   dataset_combined_output = bind_rows(dataset_combined_output)
