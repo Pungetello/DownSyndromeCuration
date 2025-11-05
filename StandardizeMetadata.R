@@ -104,7 +104,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
       best_col_name = kept_names[best_index]
       best_col_values = kept_cols[[best_index]]
       
-      # Build standardized vector (first-match-wins)
+      # Build standardized vector (first match wins)
       standardized = rep(NA_character_, length(best_col_values))
       for (key in names(value_dict)) {
         pattern = value_dict[[key]]
@@ -158,9 +158,13 @@ for (geo_id in names(platforms_list)) {
   #get dataset metadata 
   dataset_result = same_metadata[1,] %>%
     mutate(GeoID = geo_id)
-  roatated_result = rotated_result = pivot_longer(dataset_result, !"GeoID", names_to = "Attribute", values_to = "Value")
+  roatated_result = rotated_result = pivot_longer(dataset_result, !"GeoID", names_to = "Attribute", values_to = "Value") %>%
+    mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
   dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
 }
+
+print(combined_output, n=Inf, width = Inf) # debug
+print(dataset_combined_output, n=Inf, width = Inf) #debug
 
 write_tsv(combined_output, paste0(file_location, "StandardizedMetadata.tsv"))
 write_tsv(dataset_combined_output, paste0(file_location, "DatasetMetadata.tsv"))
