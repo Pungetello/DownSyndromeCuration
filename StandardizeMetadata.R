@@ -21,9 +21,13 @@ get_metadata = function(geo_ID) {
 
 # fixes specific issues in the data for certain datasets
 fix_bespoke_issues = function(geo_ID, metadata){
-  if(geo_ID == "GSE1789"){      #TODO: fix it more
+  if(geo_ID == "GSE1789"){
     metadata = mutate(metadata, age_ch1 = ifelse(is.na(age_ch1), substr(characteristics_ch1_1, start = 5, stop = nchar(characteristics_ch1_1) ), age_ch1)) %>%
-      mutate(tissue_ch1 = ifelse(is.na(tissue_ch1), tissue_ch1[1], tissue_ch1))
+      mutate(tissue_ch1 = ifelse(is.na(tissue_ch1), tissue_ch1[1], tissue_ch1)) %>%
+      mutate(label_ch1 = ifelse(label_ch1 == "", label_ch1[2], label_ch1)) %>%
+      mutate(extract_protocol_ch1 = ifelse(extract_protocol_ch1 == "Total RNA was extract by Trizol", extract_protocol_ch1[1], extract_protocol_ch1)) %>%
+      mutate(description_1 = ifelse(startsWith(description_1, "Image data were analyzed using the Affymetrix  expression"), description_1[3], description_1)) %>%
+      mutate(tissue_ch1 = ifelse(startsWith(tissue_ch1,"H"), tissue_ch1[1], tissue_ch1))
   }else{
     return(metadata)
   }
@@ -158,13 +162,14 @@ for (geo_id in names(platforms_list)) {
   #get dataset metadata 
   dataset_result = same_metadata[1,] %>%
     mutate(GeoID = geo_id)
+  # rotate and remove _ch1 from attributes
   roatated_result = rotated_result = pivot_longer(dataset_result, !"GeoID", names_to = "Attribute", values_to = "Value") %>%
     mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
   dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
 }
 
-print(combined_output, n=Inf, width = Inf) # debug
-print(dataset_combined_output, n=Inf, width = Inf) #debug
+#print(combined_output, n=Inf, width = Inf) # debug
+#print(dataset_combined_output, n=Inf, width = Inf) #debug
 
 write_tsv(combined_output, paste0(file_location, "StandardizedMetadata.tsv"))
 write_tsv(dataset_combined_output, paste0(file_location, "DatasetMetadata.tsv"))
