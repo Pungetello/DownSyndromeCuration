@@ -10,7 +10,7 @@ DownloadData = function(accession_id_list, platform_folder){
   }
   # Specify the GSE accession number and then download to a new subdirectory named after accession number
   for (geo_id in accession_id_list) {
-    gse_accession = accession_id
+    gse_accession = geo_id
     getGEOSuppFiles(gse_accession, makeDirectory = TRUE, baseDir = platform_folder)
     
     geo_id_dir = sprintf("%s/%s/%s", getwd(), platform_folder, geo_id)  #directory where the tar file is
