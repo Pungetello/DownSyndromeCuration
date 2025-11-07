@@ -101,7 +101,7 @@ remove_fails_from_metadata = function(pass_reject_tibble){
   failed_gsm_ids = filter(pass_reject_tibble, DataQuality == "FAIL")%>%
     pull(GSM_ID)
   
-  metadata_location = paste0(getwd(), "/Data/Metadata/StandardizedMetadata.tsv")
+  metadata_location = paste0(getwd(), "/Data/Metadata/SampleMetadata.tsv")
   metadata_tibble = read_tsv(metadata_location)%>%
     filter(! ID %in% failed_gsm_ids)
   

@@ -151,7 +151,7 @@ for (geo_id in names(platforms_list)) {
   diff_metadata = select(metadata, where(~n_distinct(.) > 1))
   same_metadata = select(metadata, where(~n_distinct(.) == 1))
   
-  # get standardized metadata
+  # get sample metadata
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
   
   # remove any attributes where every row is NA for this geoID, then rotate
@@ -171,5 +171,5 @@ for (geo_id in names(platforms_list)) {
 #print(combined_output, n=Inf, width = Inf) # debug
 #print(dataset_combined_output, n=Inf, width = Inf) #debug
 
-write_tsv(combined_output, paste0(file_location, "StandardizedMetadata.tsv"))
+write_tsv(combined_output, paste0(file_location, "SampleMetadata.tsv"))
 write_tsv(dataset_combined_output, paste0(file_location, "DatasetMetadata.tsv"))
