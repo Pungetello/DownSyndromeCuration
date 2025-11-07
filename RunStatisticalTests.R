@@ -34,7 +34,7 @@ quality_control_removal = function(file_list, platform, geo_id){
   file_vector = unlist(file_list)
   gsm_ids = str_extract(file_vector, "GSM\\d+")
   pass_reject_tibble = as_tibble(gsm_ids)
-  pass_reject_tibble = rename(pass_reject_tibble, GSM_id = value)
+  pass_reject_tibble = dplyr::rename(pass_reject_tibble, GSM_id = value)
   num_samples = length(gsm_ids)
   
   current_platforms = rep(platform, num_samples)
