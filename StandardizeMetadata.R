@@ -167,7 +167,7 @@ for (geo_id in names(platforms_list)) {
   diff_metadata = select(metadata, where(~n_distinct(.) > 1))
   same_metadata = select(metadata, where(~n_distinct(.) == 1))
   
-  # print(diff_metadata)
+  #print(diff_metadata, n=Inf, width=Inf) #debug for ontology stuff
   
   # get sample metadata
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
