@@ -130,6 +130,23 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
 }
 
 
+get_gse_metadata <- function(gse_id) {
+  # Get GEO dataset (GSEMatrix = FALSE returns the main metadata structure)
+  gse = getGEO(gse_id, GSEMatrix = FALSE)
+  
+  # Extract metadata list
+  meta = Meta(gse)
+  
+  # Collapse any vector elements into single strings
+  meta_collapsed = map(meta, function(x) {
+    if (length(x) > 1) paste(x, collapse = "; ") else x
+  })
+  
+  # Create a single-row tibble
+  tibble::as_tibble_row(meta_collapsed)
+}
+
+
 #--------------process_metadata-------------
 
 file_location = "Data/Metadata/"
@@ -137,7 +154,6 @@ file_location = "Data/Metadata/"
 if (!dir.exists(file_location)){
   dir.create(file_location, recursive = TRUE)
 }
-
 
 # loop through all series IDs
 combined_output = tibble()
@@ -151,6 +167,8 @@ for (geo_id in names(platforms_list)) {
   diff_metadata = select(metadata, where(~n_distinct(.) > 1))
   same_metadata = select(metadata, where(~n_distinct(.) == 1))
   
+  # print(diff_metadata)
+  
   # get sample metadata
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
   
@@ -162,6 +180,11 @@ for (geo_id in names(platforms_list)) {
   #get dataset metadata 
   dataset_result = same_metadata[1,] %>%
     mutate(GeoID = geo_id)
+  # add attributes from website
+  website_metadata = get_gse_metadata(geo_id) %>%
+    drop_cols()
+  dataset_result = bind_cols(dataset_result, website_metadata)
+  
   # rotate and remove _ch1 from attributes
   roatated_result = rotated_result = pivot_longer(dataset_result, !"GeoID", names_to = "Attribute", values_to = "Value") %>%
     mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
