@@ -167,7 +167,8 @@ for (geo_id in names(platforms_list)) {
   diff_metadata = select(metadata, where(~n_distinct(.) > 1))
   same_metadata = select(metadata, where(~n_distinct(.) == 1))
   
-  #print(diff_metadata, n=Inf, width=Inf) #debug for ontology stuff
+  print(diff_metadata, n=Inf, width=Inf) #debug for ontology stuff
+  print(same_metadata, n=Inf, width=Inf) #debug for ontology stuff
   
   # get sample metadata
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
@@ -179,7 +180,8 @@ for (geo_id in names(platforms_list)) {
   
   #get dataset metadata 
   dataset_result = same_metadata[1,] %>%
-    mutate(GeoID = geo_id)
+    drop_cols(geo_id)%>%
+    mutate(Dataset_ID = geo_id)
   # add attributes from website
   website_metadata = get_gse_metadata(geo_id) %>%
     drop_cols()
