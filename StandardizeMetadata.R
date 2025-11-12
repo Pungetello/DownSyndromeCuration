@@ -34,11 +34,12 @@ fix_bespoke_issues = function(geo_ID, metadata){
 }
 
 
-# returns version of metadata having removed columns with keywords
-drop_cols = function(metadata, series_ID) {
+# returns version of metadata having removed columns with keywords (only called on dataset metadata)
+drop_cols = function(metadata) {
   keywords = c("contact", "library", "processing", "relation",
                "platform", "instrument", "file", "date", "row",
-               "status", "characteristics", "time", "channel", "taxid") # TODO: figure out what to do for characteristics column.
+               "status", "characteristics", "time", "channel", "taxid", 
+               "email", "web.link", "sample.id") # TODO: figure out what to do for characteristics column.
                                                                         # in some cases, characteristics should be kept. check to see if they got extracted. Add arg?
   cols_to_drop = names(metadata)[
     grepl(paste(keywords, collapse = "|"), names(metadata))
@@ -125,7 +126,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
   })
   
   # Combine all columns into one tibble
-  result = bind_cols(tibble(GeoID = geo_col), bind_cols(cols_list))
+  result = bind_cols(tibble(Dataset_ID = geo_col), bind_cols(cols_list))
   return(result)
 }
 
@@ -163,32 +164,33 @@ for (geo_id in names(platforms_list)) {
   
   # read metadata into a variable, drop unneeded columns, split into same and diff
   metadata = get_metadata(geo_id)
-  metadata = drop_cols(metadata, geo_id)
   diff_metadata = select(metadata, where(~n_distinct(.) > 1))
   same_metadata = select(metadata, where(~n_distinct(.) == 1))
   
-  print(diff_metadata, n=Inf, width=Inf) #debug for ontology stuff
-  print(same_metadata, n=Inf, width=Inf) #debug for ontology stuff
+  print(diff_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
+  print(same_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
   
   # get sample metadata
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
   
   # remove any attributes where every row is NA for this geoID, then rotate
   result = Filter(function(x)!all(is.na(x)), result)
-  rotated_result = pivot_longer(result, !c("GeoID", "ID"), names_to = "Attribute", values_to = "Value")
+  rotated_result = pivot_longer(result, !c("Dataset_ID", "ID"), names_to = "Attribute", values_to = "Value")
   combined_output = bind_rows(combined_output, rotated_result)
   
   #get dataset metadata 
   dataset_result = same_metadata[1,] %>%
-    drop_cols(geo_id)%>%
-    mutate(Dataset_ID = geo_id)
+    mutate(Dataset_ID = geo_id) %>%
+    rename(molecule_type = type)      #TODO: make it still work if the col doesn't exist
   # add attributes from website
-  website_metadata = get_gse_metadata(geo_id) %>%
-    drop_cols()
-  dataset_result = bind_cols(dataset_result, website_metadata)
+  website_metadata = get_gse_metadata(geo_id)
+  dataset_result = bind_cols(dataset_result, website_metadata) %>%
+    drop_cols() %>%
+    rename(platform_type = type) %>%
+    rename(repository = name)
   
   # rotate and remove _ch1 from attributes
-  roatated_result = rotated_result = pivot_longer(dataset_result, !"GeoID", names_to = "Attribute", values_to = "Value") %>%
+  roatated_result = rotated_result = pivot_longer(dataset_result, !"Dataset_ID", names_to = "Attribute", values_to = "Value") %>%
     mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
   dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
 }
