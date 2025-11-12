@@ -5,7 +5,13 @@ platforms_list = list(
 )
 
 #Populated by InstallArrayPackages
-platforms_to_package_list = list()    #TODO: decide if we should save this somewhere somehow do it doesn't get lost once we finish running it
+platforms_to_package_list = list(
+  "GPL570" = "GPL570hsentrezgprobe",
+  "GPL96" = "GPL96hsentrezgprobe"
+)    
+#created manually while we wait for the website
+
+#TODO: decide if we should save this somewhere somehow do it doesn't get lost once we finish running it
 
 #----------functions-------------
 

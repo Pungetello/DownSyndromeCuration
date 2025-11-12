@@ -27,7 +27,9 @@ fix_bespoke_issues = function(geo_ID, metadata){
       mutate(label_ch1 = ifelse(label_ch1 == "", label_ch1[2], label_ch1)) %>%
       mutate(extract_protocol_ch1 = ifelse(extract_protocol_ch1 == "Total RNA was extract by Trizol", extract_protocol_ch1[1], extract_protocol_ch1)) %>%
       mutate(description_1 = ifelse(startsWith(description_1, "Image data were analyzed using the Affymetrix  expression"), description_1[3], description_1)) %>%
-      mutate(tissue_ch1 = ifelse(startsWith(tissue_ch1,"H"), tissue_ch1[1], tissue_ch1))
+      mutate(tissue_ch1 = ifelse(startsWith(tissue_ch1,"H"), tissue_ch1[1], tissue_ch1)) %>%
+      mutate(source_name_ch1 = ifelse(endsWith(source_name_ch1, "week of gestation"), paste0(substr(source_name_ch1, start = 1, stop = 22), "s of gestation"), source_name_ch1))
+      # TODO: week of gestation -> weeks of gestation in source_name_ch1
   }else{
     return(metadata)
   }
