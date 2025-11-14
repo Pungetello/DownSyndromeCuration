@@ -12,4 +12,4 @@ source("DownloadFiles.R")
 #execute every time:
 DownloadData(names(platforms_list), "Data/Files")
 source("StandardizeMetadata.R")
-source("RunStatisticalTests.R")
+source("QualityControlTests.R")

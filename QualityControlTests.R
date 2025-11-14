@@ -70,6 +70,10 @@ get_scan_upc_files = function(cel_files_id, platform_to_package_list, platform, 
   platform = unlist(platform)
   pkgName = platform_to_package_list[[platform]] #removed until website is up
   
+  print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+  print(pkgName)
+  print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+  
   # last step to converting the information
   normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #removed until website is up
   #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #should be 0.01, 0.9 for debug

@@ -49,7 +49,7 @@ drop_cols = function(metadata) {
   
   # drop columns that are not needed based on above criteria
   metadata_filtered = metadata %>% 
-  select(-cols_to_drop)
+  dplyr::select(-cols_to_drop)
   
   return(metadata_filtered)
 }
@@ -166,8 +166,8 @@ for (geo_id in names(platforms_list)) {
   
   # read metadata into a variable, drop unneeded columns, split into same and diff
   metadata = get_metadata(geo_id)
-  diff_metadata = select(metadata, where(~n_distinct(.) > 1))
-  same_metadata = select(metadata, where(~n_distinct(.) == 1))
+  diff_metadata = dplyr::select(metadata, where(~n_distinct(.) > 1))
+  same_metadata = dplyr::select(metadata, where(~n_distinct(.) == 1))
   
   #print(diff_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
   #print(same_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
