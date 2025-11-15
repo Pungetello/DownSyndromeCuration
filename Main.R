@@ -8,8 +8,9 @@ source("DownloadFiles.R")
 # DownloadData(create_unique_vector(platforms_list), "BrainArrayExamples")
 # source("InstallArrayPackages.R")  #TODO: finish this once website is back up
 
-
 #execute every time:
+options(timeout = 10000) # allows very big tar files to still download
 DownloadData(names(platforms_list), "Data/Files")
 source("StandardizeMetadata.R")
 source("QualityControlTests.R")
+#source("GeneMetadata")
