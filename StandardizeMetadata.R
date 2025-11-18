@@ -133,7 +133,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
 }
 
 
-get_gse_metadata <- function(gse_id) {
+get_gse_metadata = function(gse_id) {
   # Get GEO dataset (GSEMatrix = FALSE returns the main metadata structure)
   gse = getGEO(gse_id, GSEMatrix = FALSE)
   
@@ -193,7 +193,7 @@ for (geo_id in names(platforms_list)) {
     rename_with(~"repository", any_of("name"))
   
   # rotate and remove _ch1 from attributes
-  roatated_result = rotated_result = pivot_longer(dataset_result, !"Dataset_ID", names_to = "Attribute", values_to = "Value") %>%
+  rotated_result = pivot_longer(dataset_result, !"Dataset_ID", names_to = "Attribute", values_to = "Value") %>%
     mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
   dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
 }
