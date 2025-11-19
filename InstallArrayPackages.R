@@ -64,9 +64,9 @@ BrainInstallFromOSF = function(packageName){
   files = osf_retrieve_node("b7r3g") %>%
     osf_ls_files()
   
-  print(files)
+  print(files) #TODO: make sure it's getting all the files
   
-  packageID = filter(files, names == packageFileName )%>%
+  packageID = filter(files, name == packageFileName )%>%
     pull(id)
   
   osf_retrieve_file(packageID) %>%
@@ -76,11 +76,10 @@ BrainInstallFromOSF = function(packageName){
   
 #-----------installing_array_packages-----------
 
-print(platform_list)
 
-for (geo_id in create_unique_vector(platform_list)){
+for (geo_id in create_unique_vector(platforms_list_new)){
   
-  pkgName = platform_list[[geo_id]]
+  pkgName = platforms_list_new[[geo_id]]
   print(pkgName)
   
   BrainInstallFromOSF(pkgName)

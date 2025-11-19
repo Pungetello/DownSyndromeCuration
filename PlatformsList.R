@@ -1,4 +1,4 @@
-platforms_list = list(
+platforms_list_new = list(
   "GSE110064" = "hgu133plus2hsensgprobe",
   "GSE48611"= "hgu133plus2hsensgprobe",
   "GSE1789" = "hgu133ahsensgprobe",
