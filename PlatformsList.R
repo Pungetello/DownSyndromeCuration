@@ -1,25 +1,22 @@
 platforms_list = list(
-  "GSE110064" = "GPL570",
-  "GSE48611"= "GPL570",
-  "GSE1789" = "GPL96",
-  "GSE11877" = "GPL570",
-  "GSE16176" = "GPL570",
-  "GSE16677" = "GPL570",
-  "GSE17459" = "GPL570", #c("GPL570", "GPL96"),
-  "GSE19680" = "GPL570",
-  "GSE19681" = "GPL570",
-  "GSE20910" = "GPL570",
-  "GSE30517"= "GPL96"
+  "GSE110064" = "hgu133plus2hsensgprobe",
+  "GSE48611"= "hgu133plus2hsensgprobe",
+  "GSE1789" = "hgu133ahsensgprobe",
+  "GSE11877" = "hgu133plus2hsensgprobe",
+  "GSE16176" = "hgu133plus2hsensgprobe",
+  "GSE16677" = "hgu133plus2hsensgprobe",
+  "GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"),
+  "GSE19680" = "hgu133plus2hsensgprobe",
+  "GSE19681" = "hgu133plus2hsensgprobe",
+  "GSE20910" = "hgu133plus2hsensgprobe",
+  "GSE30517"= "hgu133ahsensgprobe"
 )
 
 #Populated by InstallArrayPackages
 platforms_to_package_list = list(
-  "GPL570" = "hgu133plus2hsentrezgprobe",
-  "GPL96" = "hgu133ahsentrezgprobe"
-)    
-#created manually while we wait for the website
-
-#TODO: decide if we should save this somewhere somehow do it doesn't get lost once we finish running it
+  "GPL570" = "hgu133plus2hsensgprobe",
+  "GPL96" = "hgu133ahsensgprobe"
+) 
 
 #----------functions-------------
 

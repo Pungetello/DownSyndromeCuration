@@ -13,7 +13,8 @@ BiocManager::install(c("tidyverse",
                        "pdInfoBuilder", 
                        "affxparser", 
                        "Biostrings",
-                       "janitor"
+                       "janitor",
+                       "osfr"
                        )
 )
 
@@ -21,3 +22,5 @@ BiocManager::install(c("tidyverse",
 #"clariomshumanhsentrezgprobe",
 # "pd.clariom.s.human",
 # "clariomshumancdf"
+
+#TODO: go through this and see if there are any we never ended up using

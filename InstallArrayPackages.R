@@ -5,12 +5,9 @@ library(tidyverse)
 library(BiocManager)
 library(SCAN.UPC)
 library(arrayQualityMetrics)
+library(osfr)
 
 source("PlatformsList.R")
-
-#TODO: figure out how to download it with the GEOID, and not with downloading the actual cel files as examples.
-#TODO: override downloading from insecure servers -- ask chat if this is an issue 
-#TODO: replace mbni.org with longer path
 
 #-----------functions------------------
 
@@ -51,24 +48,40 @@ BrainInstall2 = function(cel_files){
   return(packageName)
 }
 
+
+BrainInstallFromOSF = function(packageName){
+  version = "25.0.0"
+  
+  #creates a temporary directory to hold the packages
+  tmpDir = tempdir()
+  packageFileName = paste(packageName, "_", version, ".tar.gz",
+                          sep = "")
+  
+  print(packageFileName)
+  
+  tempPackageFilePath = paste(tmpDir, packageFileName, sep = "")
+  
+  files = osf_retrieve_node("b7r3g") %>%
+    osf_ls_files()
+  
+  print(files)
+  
+  packageID = filter(files, names == packageFileName )%>%
+    pull(id)
+  
+  osf_retrieve_file(packageID) %>%
+    osf_download(path = tempPackageFilePath, conflicts = "overwrite")
+}
+
   
 #-----------installing_array_packages-----------
 
+print(platform_list)
 
 for (geo_id in create_unique_vector(platform_list)){
-  geo_id_dir = sprintf("%s/BrainArrayExamples/%s", getwd(), geo_id)  #directory where the tar file is
   
-  platform = platform_list[[geo_id]]
-  cel_files = list.files(path = geo_id_dir, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE) # TODO: find a way to just untar one cel file (I looked it up and it's actually very complicated, so maybe not...)
-
-  #pkgName = InstallBrainArrayPackage(cel_files[1], "25.0.0", "hs", "entrezg")
-  pkgName = BrainInstall2(cel_files)
-  #add to list in PlatformsList file
-  platform_to_package_list[[platform]] = pkgName
+  pkgName = platform_list[[geo_id]]
+  print(pkgName)
+  
+  BrainInstallFromOSF(pkgName)
 }
-
-
-#TODO: delete BrainArrayExamples directory and contents
-#TODO: make it create a list mapping the package names to the type
-#unlink(sprintf("%s/BrainArrayExamples", getwd()), recursive = TRUE)
-
