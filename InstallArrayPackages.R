@@ -57,20 +57,22 @@ BrainInstallFromOSF = function(packageName){
   packageFileName = paste(packageName, "_", version, ".tar.gz",
                           sep = "")
   
-  print(packageFileName)
-  
-  tempPackageFilePath = paste(tmpDir, packageFileName, sep = "")
+  tempPackagePath = file.path(tmpDir)
   
   files = osf_retrieve_node("b7r3g") %>%
-    osf_ls_files()
-  
-  print(files) #TODO: make sure it's getting all the files
+    osf_ls_files(n_max = Inf)
   
   packageID = filter(files, name == packageFileName )%>%
     pull(id)
   
+  print(tempPackagePath)
+  
   osf_retrieve_file(packageID) %>%
-    osf_download(path = tempPackageFilePath, conflicts = "overwrite")
+    osf_download(tempPackagePath, conflicts = "overwrite")
+  
+  tempPackageFilePath = paste0(tempPackagePath, "/", packageFileName)
+  
+  install.packages(tempPackageFilePath, repos = NULL, type = "source")
 }
 
   
