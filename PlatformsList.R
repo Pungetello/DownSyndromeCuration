@@ -5,19 +5,19 @@ platforms_list = list(
   "GSE184771" = NA, 
   "GSE190053" = NA, 
   "GSE202938" = NA, 
-  "GSE210117" = NA
-  # 
-  # "GSE110064" = "hgu133plus2hsensgprobe",
-  # "GSE48611"= "hgu133plus2hsensgprobe",
-  # "GSE1789" = "hgu133ahsensgprobe",
-  # "GSE11877" = "hgu133plus2hsensgprobe",
-  # "GSE16176" = "hgu133plus2hsensgprobe",
-  # "GSE16677" = "hgu133plus2hsensgprobe",
-  # "GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"),
-  # "GSE19680" = "hgu133plus2hsensgprobe",
-  # "GSE19681" = "hgu133plus2hsensgprobe",
-  # "GSE20910" = "hgu133plus2hsensgprobe",
-  # "GSE30517"= "hgu133ahsensgprobe"
+  "GSE210117" = NA,
+
+  "GSE110064" = "hgu133plus2hsensgprobe",
+  "GSE48611"= "hgu133plus2hsensgprobe",
+  "GSE1789" = "hgu133ahsensgprobe",
+  "GSE11877" = "hgu133plus2hsensgprobe",
+  "GSE16176" = "hgu133plus2hsensgprobe",
+  "GSE16677" = "hgu133plus2hsensgprobe",
+  "GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"),
+  "GSE19680" = "hgu133plus2hsensgprobe",
+  "GSE19681" = "hgu133plus2hsensgprobe",
+  "GSE20910" = "hgu133plus2hsensgprobe",
+  "GSE30517"= "hgu133ahsensgprobe"
 )
 
 #Populated by InstallArrayPackages

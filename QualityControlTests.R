@@ -120,14 +120,16 @@ remove_fails_from_metadata = function(pass_reject_tibble){
 
 for (geo_id in names(platforms_list)){
   platform = platforms_list[[geo_id]]
+  if (!is.na(platform)){
   
-  file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
-  file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-  filtered_file_list = quality_control_removal(file_list, platform, geo_id)
-  
-  #should be working, once we can run InstallArrayPackages again.
-  normalized = get_scan_upc_files(file_list, platform_to_package_list, platform, geo_id)
-  save_normalized_file(geo_id, platform, normalized)
+    file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
+    file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
+    filtered_file_list = quality_control_removal(file_list, platform, geo_id)
+    
+    #should be working, once we can run InstallArrayPackages again.
+    normalized = get_scan_upc_files(file_list, platform_to_package_list, platform, geo_id)
+    save_normalized_file(geo_id, platform, normalized)
+  }
 }
 
 quality_output_tibble = read_tsv(paste0(getwd(), "/Data/quality_output_file.tsv"))

@@ -70,7 +70,7 @@ BrainInstallFromOSF = function(packageName){
   osf_retrieve_file(packageID) %>%
     osf_download(tempPackagePath, conflicts = "overwrite")
   
-  tempPackageFilePath = paste0(tempPackagePath, "/", packageFileName)
+  tempPackageFilePath = paste0(tempPackagePath, "/", libpackageFileName)
   
   install.packages(tempPackageFilePath, repos = NULL, type = "source")
 }
@@ -79,10 +79,9 @@ BrainInstallFromOSF = function(packageName){
 #-----------installing_array_packages-----------
 
 
-for (geo_id in create_unique_vector(platforms_list_new)){
+for (geo_id in create_unique_vector(platforms_list_new)){ #TODO: refactor so it only downloads the files list once
   
   pkgName = platforms_list_new[[geo_id]]
-  print(pkgName)
   
   BrainInstallFromOSF(pkgName)
 }

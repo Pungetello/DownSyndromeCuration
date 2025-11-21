@@ -8,7 +8,7 @@ source("DownloadFiles.R")
 
 #execute every time:
 options(timeout = 10000) # allows very big tar files to still download
-DownloadData(names(platforms_list), "Data/Files")
+DownloadData(platforms_list, "Data/Files")
 source("StandardizeMetadata.R")
 source("QualityControlTests.R")
 #source("GeneMetadata")

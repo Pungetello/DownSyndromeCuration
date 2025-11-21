@@ -162,40 +162,52 @@ combined_output = tibble()
 dataset_combined_output = tibble()
 
 # loop through all series IDs
-for (geo_id in names(platforms_list)) {
+for (geo_id in names(platforms_list)) {         #TODO: refactor this mess
   
-  # read metadata into a variable, drop unneeded columns, split into same and diff
-  metadata = get_metadata(geo_id)
-  diff_metadata = dplyr::select(metadata, where(~n_distinct(.) > 1))
-  same_metadata = dplyr::select(metadata, where(~n_distinct(.) == 1))
+  #process affymetrix metadata
+  if (!is.na(platforms_list[[geo_id]])) {
   
-  #print(diff_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
-  #print(same_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
+    # read metadata into a variable, drop unneeded columns, split into same and diff
+    metadata = get_metadata(geo_id)
+    diff_metadata = dplyr::select(metadata, where(~n_distinct(.) > 1))
+    same_metadata = dplyr::select(metadata, where(~n_distinct(.) == 1))
+    
+    #print(diff_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
+    #print(same_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
+    
+    # get sample metadata
+    result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
+    
+    # remove any attributes where every row is NA for this geoID, then rotate
+    result = Filter(function(x)!all(is.na(x)), result)
+    rotated_result = pivot_longer(result, !c("Dataset_ID", "ID"), names_to = "Attribute", values_to = "Value")
+    combined_output = bind_rows(combined_output, rotated_result)
+    
+    #get dataset metadata 
+    dataset_result = same_metadata[1,] %>%
+      drop_cols() %>%
+      mutate(Dataset_ID = geo_id) %>%
+      rename_with(~"molecule_type", any_of("type"))
+    # add attributes from website
+    website_metadata = get_gse_metadata(geo_id)
+    dataset_result = bind_cols(dataset_result, website_metadata) %>%
+      drop_cols() %>%
+      rename_with(~"platform_type", any_of("type")) %>%
+      rename_with(~"repository", any_of("name"))
+    
+    # rotate and remove _ch1 from attributes
+    rotated_result = pivot_longer(dataset_result, !"Dataset_ID", names_to = "Attribute", values_to = "Value") %>%
+      mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
+    dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
+  }
   
-  # get sample metadata
-  result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
-  
-  # remove any attributes where every row is NA for this geoID, then rotate
-  result = Filter(function(x)!all(is.na(x)), result)
-  rotated_result = pivot_longer(result, !c("Dataset_ID", "ID"), names_to = "Attribute", values_to = "Value")
-  combined_output = bind_rows(combined_output, rotated_result)
-  
-  #get dataset metadata 
-  dataset_result = same_metadata[1,] %>%
-    drop_cols() %>%
-    mutate(Dataset_ID = geo_id) %>%
-    rename_with(~"molecule_type", any_of("type"))
-  # add attributes from website
-  website_metadata = get_gse_metadata(geo_id)
-  dataset_result = bind_cols(dataset_result, website_metadata) %>%
-    drop_cols() %>%
-    rename_with(~"platform_type", any_of("type")) %>%
-    rename_with(~"repository", any_of("name"))
-  
-  # rotate and remove _ch1 from attributes
-  rotated_result = pivot_longer(dataset_result, !"Dataset_ID", names_to = "Attribute", values_to = "Value") %>%
-    mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
-  dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
+  #process RNA metadata
+  else{
+    #TODO: figure this out
+    pass
+    
+    
+  }
 }
 
 #print(combined_output, n=Inf, width = Inf) # debug
