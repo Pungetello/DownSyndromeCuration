@@ -1,11 +1,11 @@
 platforms_list = list(
-  "GSE101942" = "placeholder", 
-  "GSE109293" = "placeholder",
-  "GSE109294" = "placeholder",
-  "GSE184771" = "placeholder", 
-  "GSE190053" = "placeholder", 
-  "GSE202938" = "placeholder", 
-  "GSE210117" = "placeholder"
+  "GSE101942" = NA, 
+  "GSE109293" = NA,
+  "GSE109294" = NA,
+  "GSE184771" = NA, 
+  "GSE190053" = NA, 
+  "GSE202938" = NA, 
+  "GSE210117" = NA
   # 
   # "GSE110064" = "hgu133plus2hsensgprobe",
   # "GSE48611"= "hgu133plus2hsensgprobe",
