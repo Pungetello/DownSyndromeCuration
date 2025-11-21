@@ -1,4 +1,12 @@
 platforms_list_new = list(
+  "GSE101942" = "placeholder", 
+  "GSE109293" = "placeholder",
+  "GSE109294" = "placeholder",
+  "GSE184771" = "placeholder", 
+  "GSE190053" = "placeholder", 
+  "GSE202938" = "placeholder", 
+  "GSE210117" = "placeholder", 
+  
   "GSE110064" = "hgu133plus2hsensgprobe",
   "GSE48611"= "hgu133plus2hsensgprobe",
   "GSE1789" = "hgu133ahsensgprobe",
