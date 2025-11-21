@@ -1,23 +1,23 @@
-platforms_list_new = list(
+platforms_list = list(
   "GSE101942" = "placeholder", 
   "GSE109293" = "placeholder",
   "GSE109294" = "placeholder",
   "GSE184771" = "placeholder", 
   "GSE190053" = "placeholder", 
   "GSE202938" = "placeholder", 
-  "GSE210117" = "placeholder", 
-  
-  "GSE110064" = "hgu133plus2hsensgprobe",
-  "GSE48611"= "hgu133plus2hsensgprobe",
-  "GSE1789" = "hgu133ahsensgprobe",
-  "GSE11877" = "hgu133plus2hsensgprobe",
-  "GSE16176" = "hgu133plus2hsensgprobe",
-  "GSE16677" = "hgu133plus2hsensgprobe",
-  "GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"),
-  "GSE19680" = "hgu133plus2hsensgprobe",
-  "GSE19681" = "hgu133plus2hsensgprobe",
-  "GSE20910" = "hgu133plus2hsensgprobe",
-  "GSE30517"= "hgu133ahsensgprobe"
+  "GSE210117" = "placeholder"
+  # 
+  # "GSE110064" = "hgu133plus2hsensgprobe",
+  # "GSE48611"= "hgu133plus2hsensgprobe",
+  # "GSE1789" = "hgu133ahsensgprobe",
+  # "GSE11877" = "hgu133plus2hsensgprobe",
+  # "GSE16176" = "hgu133plus2hsensgprobe",
+  # "GSE16677" = "hgu133plus2hsensgprobe",
+  # "GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"),
+  # "GSE19680" = "hgu133plus2hsensgprobe",
+  # "GSE19681" = "hgu133plus2hsensgprobe",
+  # "GSE20910" = "hgu133plus2hsensgprobe",
+  # "GSE30517"= "hgu133ahsensgprobe"
 )
 
 #Populated by InstallArrayPackages

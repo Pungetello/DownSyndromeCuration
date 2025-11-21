@@ -162,7 +162,7 @@ combined_output = tibble()
 dataset_combined_output = tibble()
 
 # loop through all series IDs
-for (geo_id in names(platforms_list_new)) {
+for (geo_id in names(platforms_list)) {
   
   # read metadata into a variable, drop unneeded columns, split into same and diff
   metadata = get_metadata(geo_id)
