@@ -4,7 +4,7 @@ source("DownloadFiles.R")
 
 #installs packages that are necessary for later steps. These only need to be executed once
 # source("InstallCorePackages.R")
-# source("InstallArrayPackages.R")  #TODO: finish this once website is back up
+# source("InstallArrayPackages.R")
 
 #execute every time:
 options(timeout = 10000) # allows very big tar files to still download

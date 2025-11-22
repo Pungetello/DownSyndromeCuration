@@ -7,8 +7,7 @@ library(tidyverse)
 
 #-----------functions------------------
 
-#line 286 uses SCAN with the name of the Brainarray package to normalize the data
-
+#Runs statistical tests on the data, determining which ones should be removed due to low quality
 quality_control_removal = function(file_list, platform, geo_id){
   
   cel_files = read.celfiles(file_list) # TODO: perhaps refactor so it reads in one cel file at a time?
@@ -60,36 +59,32 @@ quality_control_removal = function(file_list, platform, geo_id){
   return(files_to_keep)
 }
 
-#reads the cel files from the untarred data
-get_scan_upc_files = function(cel_files_id, platform_to_package_list, platform, geo_id){
+
+
+#Uses the SCAN function to normalize the data
+get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
   
-  # Sets the file pattern to .CEL, so scan pulls everything with that ending
+  # Set the file pattern to .CEL, so scan pulls everything with that ending
   celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") 
   
-  # This cleans up the data and removes outliers
-  platform = unlist(platform)
-  pkgName = platform_to_package_list[[platform]] #removed until website is up
-  
-  print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-  print(pkgName)
-  print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-  
-  # last step to converting the information
+  # clean up the data and removes outliers
   normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #removed until website is up
   #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #should be 0.01, 0.9 for debug
   return (normalized)
 }
 
+
+
 #changes normalized data to matrix, creates new directory for these files and saves them gzipped
 save_normalized_file = function(geo_id, platform, normalized) {
-  normalized = as.matrix(normalized)
   
+  normalized = as.matrix(normalized)
   output_dir = file.path(getwd(), "Data", "NormalizedData")
   if (!dir.exists(output_dir)) {dir.create(output_dir, recursive = TRUE)}
   
   file_path = file.path(output_dir, paste0(geo_id, "_", platform, ".tsv.gz"))
   
-  gsm_pattern = "GSM\\d+"
+  gsm_pattern = "ENSG\\d+_at"
   sample_ids = stringr::str_extract(rownames(normalized), gsm_pattern)
   
   final_tibble = as_tibble(normalized, rownames = NULL) %>%
@@ -100,7 +95,7 @@ save_normalized_file = function(geo_id, platform, normalized) {
 
 
 
-
+#removes samples from the SampleMetadata file if they were rejected in the previous step
 remove_fails_from_metadata = function(pass_reject_tibble){
   failed_gsm_ids = filter(pass_reject_tibble, DataQuality == "FAIL")%>%
     pull(GSM_ID)
@@ -113,10 +108,8 @@ remove_fails_from_metadata = function(pass_reject_tibble){
 }
 
 
+
 #-----------run statistical tests-----------
-
-#TODO: add platforms to package list for normalization: waiting on website
-
 
 for (geo_id in names(platforms_list)){
   platform = platforms_list[[geo_id]]
@@ -127,7 +120,7 @@ for (geo_id in names(platforms_list)){
     filtered_file_list = quality_control_removal(file_list, platform, geo_id)
     
     #should be working, once we can run InstallArrayPackages again.
-    normalized = get_scan_upc_files(file_list, platform_to_package_list, platform, geo_id)
+    normalized = get_scan_upc_files(file_list, platform, geo_id)
     save_normalized_file(geo_id, platform, normalized)
   }
 }
