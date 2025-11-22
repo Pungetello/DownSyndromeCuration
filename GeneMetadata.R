@@ -6,16 +6,23 @@ library(biomaRt)
 
 # TODO: write this
 # returns a vector with the Gene ID's present in all the quality output files
-get_gene_ids_from_quality_output = function() {
-  file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-  # output_files = read.celfiles(file_list) TODO: find command to read that file type
+get_gene_ids_from_quality_output = function(filePath) {
+  file_list = list.files(path = filePath, pattern="\\S+.tsv.gz", full.names= TRUE, ignore.case = TRUE)
+  geneIDs = c()
+  
+  for (file in file_list){
+    file_tibble = read_tsv(file)%>%
+      select(Sample_ID)%>%
+      drop_na()
+    geneIDs = geneIDs + file_tibble
+  }
   
 }
 
 #-----------script------------------
 
-#get tibble that's just one column of all Gene ID's from NormalizedData
-entrez_ids = get_gene_ids_from_quality_output()
+#get vector of all Gene ID's from NormalizedData
+entrez_ids = get_gene_ids_from_quality_output(paste0(getwd(), "/Data/NormalizedData"))
 
 mart = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
 
