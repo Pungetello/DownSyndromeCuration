@@ -14,7 +14,8 @@ BiocManager::install(c("tidyverse",
                        "affxparser", 
                        "Biostrings",
                        "janitor",
-                       "osfr"
+                       "osfr",
+                       "biomaRt"
                        )
 )
 

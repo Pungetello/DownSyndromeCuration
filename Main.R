@@ -11,4 +11,4 @@ options(timeout = 10000) # allows very big tar files to still download
 DownloadData(platforms_list, "Data/Files")
 source("StandardizeMetadata.R")
 source("QualityControlTests.R")
-#source("GeneMetadata")
+source("GeneMetadata")
