@@ -9,6 +9,12 @@ source("DownloadFiles.R")
 #execute every time:
 options(timeout = 10000) # allows very big tar files to still download
 DownloadData(platforms_list, "Data/Files")
+
+#creates Sample- and DatasetMetadata
 source("StandardizeMetadata.R")
+
+#creates NormalizedData for Affymetrix
 source("QualityControlTests.R")
+
+#reads NormalizedData to create GeneMetadata
 source("GeneMetadata")

@@ -1,4 +1,6 @@
 platforms_list = list(
+  
+  #RNA datasets
   "GSE101942" = NA, 
   "GSE109293" = NA,
   "GSE109294" = NA,
@@ -6,11 +8,12 @@ platforms_list = list(
   "GSE190053" = NA, 
   "GSE202938" = NA, 
   "GSE210117" = NA,
-
+  
+  #Affymetrix datasets
   "GSE110064" = "hgu133plus2hsensgprobe",
   "GSE48611"= "hgu133plus2hsensgprobe",
   "GSE1789" = "hgu133ahsensgprobe",
-  "GSE11877" = "hgu133plus2hsensgprobe",
+  #"GSE11877" = "hgu133plus2hsensgprobe", #the big one
   "GSE16176" = "hgu133plus2hsensgprobe",
   "GSE16677" = "hgu133plus2hsensgprobe",
   "GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"),
