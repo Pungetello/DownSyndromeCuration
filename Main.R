@@ -17,4 +17,4 @@ source("StandardizeMetadata.R")
 source("QualityControlTests.R")
 
 #reads NormalizedData to create GeneMetadata
-source("GeneMetadata")
+source("GeneMetadata.R")

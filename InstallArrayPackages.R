@@ -20,14 +20,15 @@ BrainInstallFromOSF = function(project_link, packages){
   
   #gets tibble of all the files in the OSF project
   files = osf_retrieve_node(project_link) %>%
-    osf_ls_files(n_max = Inf)
-  
+    osf_ls_files(n_max = Inf)%>%
+    arrange(name) #debug
+  print(files, n=Inf) #debug
   
   for (packageName in packages){
   
     packageFileName = paste(packageName, "_", version, ".tar.gz",
                             sep = "")
-    
+    print(packageFileName) #debug
     #Use the file list to find the file ID of the package
     packageID = filter(files, name == packageFileName )%>%
       pull(id)
@@ -48,6 +49,8 @@ BrainInstallFromOSF = function(project_link, packages){
 packages = unlist(platforms_list) %>%
   unique()
 packages = packages[!is.na(packages)]
+
+print(packages)
 
 
 BrainInstallFromOSF("b7r3g", packages)
