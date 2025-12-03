@@ -128,3 +128,5 @@ for (geo_id in names(platforms_list)){
 quality_output_tibble = read_tsv(paste0(getwd(), "/Data/quality_output_file.tsv"))
 remove_fails_from_metadata(quality_output_tibble)
 
+
+#TODO: make it not make a new normalized data file if it already exists
