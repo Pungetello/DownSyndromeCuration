@@ -53,16 +53,10 @@ BrainInstallFromZenodo = function(packages){
     download.file("https://zenodo.org/records/17808641/files/BrainArray.zip?download=1", zipFile)
   }
   
-  packages = unlist(lapply(packages, function(x) paste0(x, "_", version, ".tar.gz")))
-  #pull out package for it from zip
-    
-  print(packages)
+  packages = unlist(lapply(packages, function(x) paste0("BrainArray/", x, "_", version, ".tar.gz", method = curl)))
+  #pull out packages from zip
   
-  zipped_names <- archive::archive("BrainArray/BrainArrays.zip")
-  
-  print(zipped_names)
-  
-  archive::archive_extract(zipFile, file = packages, dir = "BrainArray") 
+  unzip(zipFile, files=packages)
   
 }
 
