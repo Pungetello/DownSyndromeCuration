@@ -18,3 +18,6 @@ source("QualityControlTests.R")
 
 #reads NormalizedData to create GeneMetadata
 source("GeneMetadata.R")
+
+#downloads Data and GeneData for RNA
+#???
