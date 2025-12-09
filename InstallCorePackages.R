@@ -15,7 +15,8 @@ BiocManager::install(c("tidyverse",
                        "Biostrings",
                        "janitor",
                        "osfr",
-                       "biomaRt"
+                       "biomaRt",
+                       "Rcurl"
                        )
 )
 

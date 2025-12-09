@@ -15,7 +15,7 @@ source("PlatformsList.R")
 
 BrainInstallFromZenodo = function(packages){
   version = "25.0.0"
-  zipFile = paste0(getwd(), "/BrainArray/BrainArrays.zip")
+  zipFile = file.path(getwd(), "/BrainArray/BrainArrays.zip")
   
   if (!file.exists(zipFile)) {
     options(timeout = 99999)
@@ -25,9 +25,10 @@ BrainInstallFromZenodo = function(packages){
     )
   }
   
+  #turn packages into file paths
   packages = unlist(lapply(packages, function(x) paste0("BrainArray/", x, "_", version, ".tar.gz")))
-  #pull out packages from zip
   
+  #pull out packages from zip
   unzip(zipFile, files=packages)
   
 }

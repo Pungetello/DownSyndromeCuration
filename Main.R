@@ -20,4 +20,4 @@ source("QualityControlTests.R")
 source("GeneMetadata.R")
 
 #downloads Data and GeneData for RNA
-#???
+source("GetRNASecData.R")
