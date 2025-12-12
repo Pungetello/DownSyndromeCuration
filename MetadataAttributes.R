@@ -9,8 +9,9 @@ attr_tbl = tibble(attr_name = character(), match_type = character(), col_regex =
 attr_tbl = add_row(attr_tbl, attr_name = "ID", match_type = "column", col_regex = list(regex("geo")), value_dict = NULL)
 
 new_value_dict = list(
-  trisomic = regex("trisomic|trisomy|down.syndrome|ts21", ignore_case = TRUE),
-  disomic = regex("disomic|disomy|WT|normal|control|euploid", ignore_case = TRUE)
+  affected_group = regex("trisomic|trisomy|down.syndrome|ts21|TcMAC21|Ts65Dn|Ts65Dn|1TybEmcf|treatment: untreated", ignore_case = TRUE),
+  control_group = regex("disomic|disomy|WT|normal|control|euploid|wild-type|Ring chromosome 21|treatment: beta-estradiol|healthy donor (HD)", ignore_case = TRUE),
+  na = regex("treatment: beta-estradiol", ignore_case = TRUE)
 )
 attr_tbl = add_row(attr_tbl, attr_name = "Ploidy", match_type = "value", col_regex = list(regex("")), value_dict = list(new_value_dict))
 
@@ -18,11 +19,12 @@ new_value_dict = list(
   female = regex("female", ignore_case = TRUE),
   male = regex("male", ignore_case = TRUE)
 )
-attr_tbl = add_row(attr_tbl, attr_name = "Sex", match_type = "value", col_regex = list(regex("")), value_dict = list(new_value_dict))
-
-#Tissue
-attr_tbl = add_row(attr_tbl, attr_name = "Tissue", match_type = "column", col_regex = list(regex("tissue|cell.type|source", ignore_case = TRUE)), value_dict = NULL)
-
+# #Sex
+# attr_tbl = add_row(attr_tbl, attr_name = "Sex", match_type = "value", col_regex = list(regex("")), value_dict = list(new_value_dict))
+# 
+# #Tissue
+# attr_tbl = add_row(attr_tbl, attr_name = "Tissue", match_type = "column", col_regex = list(regex("tissue|cell.type|source", ignore_case = TRUE)), value_dict = NULL)
+# print(attr_tbl)
 
 #========================================Dataset Metadata======================================================
 
