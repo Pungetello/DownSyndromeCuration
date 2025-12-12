@@ -9,7 +9,7 @@ source("PlatformsList.R")
 
 download_quality_output = function(geo_id){
   
-  # DOWNLOADS FOR 101942, 190053
+  # DOWNLOADS FOR 101942,190053
   # NO NCBI GENERATED DATA FOR 109293,109294,184771,202938,210117
   
   link = paste0("https://www.ncbi.nlm.nih.gov/geo/download/?type=rnaseq_counts&acc=", geo_id, "&format=file&file=", geo_id, "_raw_counts_GRCh38.p13_NCBI.tsv.gz")

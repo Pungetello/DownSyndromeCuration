@@ -63,12 +63,16 @@ quality_control_removal = function(file_list, platform, geo_id){
 
 #Uses the SCAN function to normalize the data
 get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
+  convThreshold = 0.9
   
   # Set the file pattern to .CEL, so scan pulls everything with that ending
   celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") 
   
   # clean up the data and removes outliers
-  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #removed until website is up
+  normalized = SCAN(geo_id, convThreshold = convThreshold) #Attempt to fix the NA's. Maybe don't need the other two args.
+  #print(normalized)
+  normalized = exprs(normalized)
+  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #removed until website is up
   #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #should be 0.01, 0.9 for debug
   return (normalized)
 }
@@ -83,14 +87,16 @@ save_normalized_file = function(geo_id, platform, normalized) {
   if (!dir.exists(output_dir)) {dir.create(output_dir, recursive = TRUE)}
   
   file_path = file.path(output_dir, paste0(geo_id, "_", platform, ".tsv.gz"))
+  if (!file.exists(file_path)){
   
-  gsm_pattern = "ENSG\\d+_at"
-  sample_ids = stringr::str_extract(rownames(normalized), gsm_pattern)
-  
-  final_tibble = as_tibble(normalized, rownames = NULL) %>%
-    bind_cols(Sample_ID = sample_ids, .)
-  
-  write_tsv(final_tibble, file_path)
+    gsm_pattern = "ENSG\\d+_at"
+    sample_ids = stringr::str_extract(rownames(normalized), gsm_pattern)
+    
+    final_tibble = as_tibble(normalized, rownames = NULL) %>%
+      bind_cols(Sample_ID = sample_ids, .)
+    
+    write_tsv(final_tibble, file_path)
+  }
 }
 
 
