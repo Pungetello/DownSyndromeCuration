@@ -100,7 +100,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
       
       # Score each kept column
       scores = map_int(kept_cols, function(.x){score_column(.x, value_dict)})
-      
+
       # If no column matched any pattern, return NA column
       if (all(scores == 0)) {
         return(tibble(!!attr_name := rep(NA_character_, n)))
@@ -174,17 +174,21 @@ for (geo_id in names(platforms_list)) {         #TODO: refactor this mess
   
   # get sample metadata
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
-  
+
+
   # remove any attributes where every row is NA for this geoID, then rotate
-  result = Filter(function(x)!all(is.na(x)), result)
+  # result = Filter(function(x)!all(is.na(x)), result)
+
   rotated_result = pivot_longer(result, !c("Dataset_ID", "ID"), names_to = "Attribute", values_to = "Value")
+
   combined_output = bind_rows(combined_output, rotated_result)
-  
+
   #get dataset metadata 
   dataset_result = same_metadata[1,] %>%
     drop_cols() %>%
     mutate(Dataset_ID = geo_id) %>%
     rename_with(~"data_type", any_of("type"))
+
   # add attributes from website
   website_metadata = get_gse_metadata(geo_id)
   dataset_result = bind_cols(dataset_result, website_metadata) %>%
