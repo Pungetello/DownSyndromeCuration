@@ -3,26 +3,23 @@ if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install(version = "3.21")
 BiocManager::install(c("tidyverse",
-                       "arrayQualityMetrics",
-                       "BiocManager",
+                       "BiocManager",#
                        "SCAN.UPC",
                        "GEOquery",
-                       "doParallel",
                        "arrayQualityMetrics",
-                       "affy",
-                       "pdInfoBuilder", 
-                       "affxparser", 
-                       "Biostrings",
+                       "affy",#
                        "janitor",
-                       "osfr",
                        "biomaRt",
                        "Rcurl"
                        )
 )
 
-#-----------libraries_likely_needed_for_future_step-----------
-#"clariomshumanhsentrezgprobe",
-# "pd.clariom.s.human",
-# "clariomshumancdf"
+#-----------Previously_included_libraries-----------
 
-#TODO: go through this and see if there are any we never ended up using
+#"pdInfoBuilder", 
+#"affxparser", 
+#"Biostrings",
+#"doParallel",
+#"osfr",
+
+#TODO: go through this periodically to see if there are any we are no longer using

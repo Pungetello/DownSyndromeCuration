@@ -60,7 +60,7 @@ quality_control_removal = function(file_list, platform, geo_id){
 }
 
 
-
+#TODO: fix NA issue 
 #Uses the SCAN function to normalize the data
 get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
   convThreshold = 0.9
@@ -69,11 +69,11 @@ get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
   celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") 
   
   # clean up the data and removes outliers
-  normalized = SCAN(geo_id, convThreshold = convThreshold) #Attempt to fix the NA's. Maybe don't need the other two args.
+  #normalized = SCAN(geo_id, convThreshold = convThreshold) #1
   #print(normalized)
-  normalized = exprs(normalized)
-  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #removed until website is up
-  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #should be 0.01, 0.9 for debug
+  #normalized = exprs(normalized)
+  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #3 only one that only does some NA's instead of all
+  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #should be 0.01, 0.9 for debug #4
   return (normalized)
 }
 

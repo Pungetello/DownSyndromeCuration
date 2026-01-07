@@ -1,13 +1,13 @@
 #-----------loading_libraries-----------
-library(GEOquery)
-library(affy)
+library(GEOquery)#
+library(affy)#
 library(tidyverse)
-library(BiocManager)
-library(SCAN.UPC)
-library(arrayQualityMetrics)
-library(osfr)
-library(archive)
+library(BiocManager)#
+library(SCAN.UPC)#
+library(arrayQualityMetrics)#
+library(archive)#
 library(curl)
+#TODO: verify we actually need these libraries still
 
 source("PlatformsList.R")
 
