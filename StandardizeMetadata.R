@@ -43,9 +43,7 @@ drop_cols = function(metadata) {
                "status", "characteristics", "time", "channel", "taxid", 
                "email", "web.link", "sample.id", "geo.accession") # TODO: figure out what to do for characteristics column.
                                                                         # in some cases, characteristics should be kept. check to see if they got extracted. Add arg?
-  cols_to_drop = names(metadata)[
-    grepl(paste(keywords, collapse = "|"), names(metadata))
-  ]
+  cols_to_drop = names(metadata)[grepl(paste(keywords, collapse = "|"), names(metadata))]
   
   # drop columns that are not needed based on above criteria
   metadata_filtered = metadata %>% 
@@ -57,6 +55,7 @@ drop_cols = function(metadata) {
 
 # goes through each row in the attributes tibble and searches the input for the attributes desired, creating a column for each in the output
 standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
+  #TODO: refactor so it doesn't count matches (unneeded since we're separating same and diff)
   n = nrow(input_tbl)
   geo_col = rep(as.character(geo_id), n)
   
@@ -150,6 +149,15 @@ get_gse_metadata = function(gse_id) {
 }
 
 
+append_to_file = function(data, file){
+  if (!file.exists(file)) {
+    write_tsv(data, file)
+  } else {
+    write_tsv(data, file, append = TRUE, col_names = FALSE)
+  }
+}
+
+
 #--------------process_metadata-------------
 
 file_location = "Data/Metadata/"
@@ -158,32 +166,26 @@ if (!dir.exists(file_location)){
   dir.create(file_location, recursive = TRUE)
 }
 
-combined_output = tibble()
-dataset_combined_output = tibble()
 
 # loop through all series IDs
-for (geo_id in names(platforms_list)) {         #TODO: refactor this mess
+for (geo_id in names(platforms_list)) {
   
   # read metadata into a variable, drop unneeded columns, split into same and diff
   metadata = get_metadata(geo_id)
   diff_metadata = dplyr::select(metadata, where(~n_distinct(.) > 1))
   same_metadata = dplyr::select(metadata, where(~n_distinct(.) == 1))
   
-  #print(diff_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
-  #print(same_metadata)#, n=Inf, width=Inf) #debug for ontology stuff
   
   # get sample metadata
+  #TODO: make it include original values
   result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
-
-
-  # remove any attributes where every row is NA for this geoID, then rotate
-  # result = Filter(function(x)!all(is.na(x)), result)
-
   rotated_result = pivot_longer(result, !c("Dataset_ID", "ID"), names_to = "Attribute", values_to = "Value")
 
-  combined_output = bind_rows(combined_output, rotated_result)
+  append_to_file(rotated_result, "Data/Metadata/SampleMetadata.tsv")
+  
 
   #get dataset metadata 
+  #TODO: make a function for this?
   dataset_result = same_metadata[1,] %>%
     drop_cols() %>%
     mutate(Dataset_ID = geo_id) %>%
@@ -199,13 +201,6 @@ for (geo_id in names(platforms_list)) {         #TODO: refactor this mess
   # rotate and remove _ch1 from attributes
   rotated_result = pivot_longer(dataset_result, !"Dataset_ID", names_to = "Attribute", values_to = "Value") %>%
     mutate(Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute))
-  dataset_combined_output = bind_rows(dataset_combined_output, rotated_result)
+  
+  append_to_file(rotated_result, "Data/Metadata/DatasetMetadata.tsv")
 }
-
-#print(combined_output, n=Inf, width = Inf) # debug
-#print(dataset_combined_output, n=Inf, width = Inf) #debug
-
-write_tsv(combined_output, paste0(file_location, "SampleMetadata.tsv"))
-write_tsv(dataset_combined_output, paste0(file_location, "DatasetMetadata.tsv"))
-
-#TODO: refactor so it writes the tibble to the output file each loop, instead of waiting to do it all at once.

@@ -12,7 +12,7 @@ DownloadData(platforms_list, "Data/Files")
 
 #creates Sample- and DatasetMetadata
 source("StandardizeMetadata.R")
-
+ 
 #creates NormalizedData for Affymetrix
 source("QualityControlTests.R")
 

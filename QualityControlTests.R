@@ -60,6 +60,7 @@ quality_control_removal = function(file_list, platform, geo_id){
 }
 
 
+
 #TODO: fix NA issue 
 #Uses the SCAN function to normalize the data
 get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
@@ -111,6 +112,7 @@ remove_fails_from_metadata = function(pass_reject_tibble){
     filter(! ID %in% failed_gsm_ids)
   
   write_tsv(metadata_tibble, metadata_location)
+  #TODO: maybe check if an entire dataset is bad, to remove it from dataset metadata?
 }
 
 
@@ -119,20 +121,21 @@ remove_fails_from_metadata = function(pass_reject_tibble){
 
 for (geo_id in names(platforms_list)){
   platform = platforms_list[[geo_id]]
+  #skip if RNA
   if (!is.na(platform)){
-  
-    file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
-    file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-    filtered_file_list = quality_control_removal(file_list, platform, geo_id)
     
-    #should be working, once we can run InstallArrayPackages again.
-    normalized = get_scan_upc_files(file_list, platform, geo_id)
-    save_normalized_file(geo_id, platform, normalized)
+    #skip if normalized data already exists
+    if (!file.exists(sprintf("%s/Data/NormalizedData/%s_%s.tsv.gz", getwd(), geo_id, platform))){
+  
+      file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
+      file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
+      filtered_file_list = quality_control_removal(file_list, platform, geo_id)
+      
+      normalized = get_scan_upc_files(file_list, platform, geo_id)
+      save_normalized_file(geo_id, platform, normalized)
+    }
   }
 }
 
 quality_output_tibble = read_tsv(paste0(getwd(), "/Data/quality_output_file.tsv"))
 remove_fails_from_metadata(quality_output_tibble)
-
-
-#TODO: make it not make a new normalized data file if it already exists

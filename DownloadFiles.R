@@ -21,10 +21,9 @@ DownloadData = function(platforms_list, platform_folder){
       
       tar_file = sprintf("%s/%s_RAW.tar", geo_id_dir, geo_id)
       untar(tar_file, exdir = geo_id_dir)
+      
+      file.remove(tar_file)
     }
   }
-  #TODO: make delete tar file
-  
   
 }
-#TODO: refactor to do one at a time for space efficiency?
