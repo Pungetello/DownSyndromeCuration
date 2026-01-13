@@ -64,17 +64,20 @@ quality_control_removal = function(file_list, platform, geo_id){
 #TODO: fix NA issue 
 #Uses the SCAN function to normalize the data
 get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
-  convThreshold = 0.9
+  convThreshold = 0.9 # should be 0.01, 0.9 for debug 
   
   # Set the file pattern to .CEL, so scan pulls everything with that ending
   celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") 
   
   # clean up the data and removes outliers
-  #normalized = SCAN(geo_id, convThreshold = convThreshold) #1
-  #print(normalized)
-  #normalized = exprs(normalized)
-  normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA, probeSummaryPackage=pkgName) #3 only one that only does some NA's instead of all
-  #normalized = SCAN(celFilePattern, convThreshold = .9, probeLevelOutDirPath = NA) #should be 0.01, 0.9 for debug #4
+  
+  #normalized = SCAN(celFilePattern, convThreshold = .9, probeSummaryPackage=pkgName) 
+  normalized = SCAN(geo_id, convThreshold = .9, probeSummaryPackage=pkgName)
+  
+  # downloads it all again, but the only way we can figure out to make it not have NA's
+  normalized = exprs(normalized)
+  View(normalized)
+  
   return (normalized)
 }
 
@@ -87,7 +90,7 @@ save_normalized_file = function(geo_id, platform, normalized) {
   output_dir = file.path(getwd(), "Data", "NormalizedData")
   if (!dir.exists(output_dir)) {dir.create(output_dir, recursive = TRUE)}
   
-  file_path = file.path(output_dir, paste0(geo_id, "_", platform, ".tsv.gz"))
+  file_path = file.path(output_dir, paste0(geo_id, ".tsv.gz"))
   if (!file.exists(file_path)){
   
     gsm_pattern = "ENSG\\d+_at"
@@ -126,10 +129,10 @@ for (geo_id in names(platforms_list)){
     
     #skip if normalized data already exists
     if (!file.exists(sprintf("%s/Data/NormalizedData/%s_%s.tsv.gz", getwd(), geo_id, platform))){
-  
-      file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
-      file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-      filtered_file_list = quality_control_removal(file_list, platform, geo_id)
+
+      #file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
+      #file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
+      #filtered_file_list = quality_control_removal(file_list, platform, geo_id)
       
       normalized = get_scan_upc_files(file_list, platform, geo_id)
       save_normalized_file(geo_id, platform, normalized)

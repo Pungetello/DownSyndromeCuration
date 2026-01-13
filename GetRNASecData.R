@@ -14,7 +14,7 @@ download_quality_output = function(geo_id){
   
   link = paste0("https://www.ncbi.nlm.nih.gov/geo/download/?type=rnaseq_counts&acc=", geo_id, "&format=file&file=", geo_id, "_raw_counts_GRCh38.p13_NCBI.tsv.gz")
   
-  destination = paste0(getwd(), "/Data/NormalizedData/RNA/", geo_id, ".tsv.gz")
+  destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
   
   if(!file.exists(destination) && RCurl::url.exists(link)){
     print(paste0("FILE EXISTS FOR ", geo_id))
@@ -55,8 +55,8 @@ get_gene_symbols_from_quality_output = function(file) {
 
 #-----------Get_RNASec_Data-----------
 
-if (!dir.exists("Data/NormalizedData/RNA")){
-  dir.create("Data/NormalizedData/RNA", recursive = TRUE)
+if (!dir.exists("Data/NormalizedData")){
+  dir.create("Data/NormalizedData", recursive = TRUE)
 }
 
 for (geo_id in names(platforms_list)){

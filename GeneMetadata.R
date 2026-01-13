@@ -45,7 +45,7 @@ for(file in file_list){
     )
     
     dataset_name = str_match(file, "\\/([\\w]+[\\d]+)_")[,2]
-    write_tsv(gene_metadata, paste0(getwd(), "/Data/Metadata/GeneMetadata/", dataset_name, "_genes.tsv"))
+    write_tsv(gene_metadata, paste0(getwd(), "/Data/Metadata/GeneMetadata/", dataset_name, ".tsv.gz"))
   } else {
     print(paste0("NO GENE IDS IN FILE ", file))
   }
