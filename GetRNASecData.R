@@ -16,11 +16,15 @@ download_quality_output = function(geo_id){
   
   destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
   
-  if(!file.exists(destination) && RCurl::url.exists(link)){
-    print(paste0("FILE EXISTS FOR ", geo_id))
-    #check if link exists
-    options(timeout = Inf)
-    download.file(link, destination)
+  if(!file.exists(destination)){
+    if (RCurl::url.exists(link)){
+      print(paste0("FILE EXISTS FOR ", geo_id))
+      #check if link exists
+      options(timeout = Inf)
+      download.file(link, destination)
+    } else {
+      print(paste0("DATA FOR ", geo_id, " CANNOT BE DOWNLOADED"))
+    }
   }
 }
 
@@ -37,20 +41,6 @@ download_gene_data = function(){ #maybe add some parameters
   return(destination)
 }
 
-#TODO: refactor so you're not repeating from GeneMetadata!
-#TODO: save gene file in all the places!
-
-# returns a vector with the Gene symbols present in the file
-get_gene_symbols_from_quality_output = function(file) {
-  
-  file_tibble = read_tsv(file)%>%
-    drop_na()%>%
-    dplyr::pull(Symbol)
-  geneIDs = c(file_tibble)
-  
-  unique(geneIDs)%>%
-    return()
-}
 
 
 #-----------Get_RNASec_Data-----------
@@ -59,6 +49,7 @@ if (!dir.exists("Data/NormalizedData")){
   dir.create("Data/NormalizedData", recursive = TRUE)
 }
 
+# download data for all RNAsec in platforms list
 for (geo_id in names(platforms_list)){
   platform = platforms_list[[geo_id]]
   if (is.na(platform)){
@@ -66,24 +57,5 @@ for (geo_id in names(platforms_list)){
   }
 }
 
-gene_file = download_gene_data()
-
-#get vector of all Gene symbols from that file
-gene_symbols = get_gene_symbols_from_quality_output(gene_file)
-
-mart = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-
-#use biomaRt to get corresponding data
-if(length(gene_symbols) > 0){
-  gene_metadata = getBM(
-    attributes = c("entrezgene_id", "hgnc_symbol", "ensembl_gene_id", "chromosome_name", "start_position", "end_position"), #cols are in a different order for some reason?
-    filters = "hgnc_symbol",
-    values = gene_symbols,
-    mart = mart
-  )
-  
-  dataset_name = "rna"#str_match(file, "\\/([\\w]+[\\d]+)_")[,2]
-  write_tsv(gene_metadata, paste0(getwd(), "/Data/Metadata/GeneMetadata/", dataset_name, "_genes.tsv"))
-} else {
-  print(paste0("NO GENE IDS IN FILE ", file))
-}
+# download the genes needed
+download_gene_data()

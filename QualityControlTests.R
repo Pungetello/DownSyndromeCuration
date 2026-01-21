@@ -61,7 +61,6 @@ quality_control_removal = function(file_list, platform, geo_id){
 
 
 
-#TODO: fix NA issue 
 #Uses the SCAN function to normalize the data
 get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
   convThreshold = 0.9 # should be 0.01, 0.9 for debug 
@@ -70,37 +69,34 @@ get_scan_upc_files = function(cel_files_id, pkgName, geo_id){
   celFilePattern = file.path(sprintf("%s/Data/Files/%s", getwd(), geo_id), "*.CEL*") 
   
   # clean up the data and removes outliers
-  
-  #normalized = SCAN(celFilePattern, convThreshold = .9, probeSummaryPackage=pkgName) 
-  normalized = SCAN(geo_id, convThreshold = .9, probeSummaryPackage=pkgName)
-  
-  # downloads it all again, but the only way we can figure out to make it not have NA's
+  normalized = SCAN(celFilePattern, convThreshold = convThreshold, probeSummaryPackage=pkgName)
   normalized = exprs(normalized)
-  View(normalized)
   
   return (normalized)
 }
 
 
 
-#changes normalized data to matrix, creates new directory for these files and saves them gzipped
-save_normalized_file = function(geo_id, platform, normalized) {
+#changes normalized data to tibble and cleans it up, creates new directory for these files and saves them gzipped
+save_normalized_file = function(geo_id, normalized) {
   
   normalized = as.matrix(normalized)
   output_dir = file.path(getwd(), "Data", "NormalizedData")
+  print(normalized)#debug
   if (!dir.exists(output_dir)) {dir.create(output_dir, recursive = TRUE)}
   
   file_path = file.path(output_dir, paste0(geo_id, ".tsv.gz"))
-  if (!file.exists(file_path)){
+    
+  pattern = "ENSG\\d+"
+  sample_ids = stringr::str_extract(rownames(normalized), pattern)
+  print(sample_ids)#debug
   
-    gsm_pattern = "ENSG\\d+_at"
-    sample_ids = stringr::str_extract(rownames(normalized), gsm_pattern)
-    
-    final_tibble = as_tibble(normalized, rownames = NULL) %>%
-      bind_cols(Sample_ID = sample_ids, .)
-    
-    write_tsv(final_tibble, file_path)
-  }
+  final_tibble = as_tibble(normalized, rownames = NULL) %>%
+    bind_cols(Sample_ID = sample_ids, .) %>%
+    #(Sample_ID = str_sub(Sample_ID, 1, -4)) %>%
+    drop_na()
+  
+  write_tsv(final_tibble, file_path)
 }
 
 
@@ -128,14 +124,14 @@ for (geo_id in names(platforms_list)){
   if (!is.na(platform)){
     
     #skip if normalized data already exists
-    if (!file.exists(sprintf("%s/Data/NormalizedData/%s_%s.tsv.gz", getwd(), geo_id, platform))){
+    if (!file.exists(sprintf("%s/Data/NormalizedData/%s.tsv.gz", getwd(), geo_id))){
 
       #file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
       #file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
       #filtered_file_list = quality_control_removal(file_list, platform, geo_id)
       
       normalized = get_scan_upc_files(file_list, platform, geo_id)
-      save_normalized_file(geo_id, platform, normalized)
+      save_normalized_file(geo_id, normalized)
     }
   }
 }

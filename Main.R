@@ -8,7 +8,7 @@ source("DownloadFiles.R")
 
 #execute every time:
 options(timeout = 10000) # allows very big tar files to still download
-DownloadData(platforms_list, "Data/Files")
+DownloadData(platforms_list, "Data/Files") #TODO: maybe change this to source, if we never use this function again?
 
 #creates Sample- and DatasetMetadata
 source("StandardizeMetadata.R")
@@ -16,8 +16,11 @@ source("StandardizeMetadata.R")
 #creates NormalizedData for Affymetrix
 source("QualityControlTests.R")
 
-#reads NormalizedData to create GeneMetadata
-source("GeneMetadata.R")
-
-#downloads Data and GeneData for RNA
+#downloads gene_data for RNA
 source("GetRNASecData.R")
+
+#processes RNA data that is not downloadable
+source("ProcessRNAData.R")
+
+#creates GeneMetadata by reading NormalizedData for affymetrix, gene_data for RNA.
+source("GeneMetadata.R")
