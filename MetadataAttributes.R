@@ -1,5 +1,4 @@
 library(tidyverse)
-# TODO: figure out for the three data sets how many metadata attributes are useful
 # I'm not really sure which method is best. creating each row at once in the code, or letting it be a file that we read in?
 
 #initialize tibble
@@ -9,8 +8,8 @@ attr_tbl = tibble(attr_name = character(), match_type = character(), col_regex =
 attr_tbl = add_row(attr_tbl, attr_name = "ID", match_type = "column", col_regex = list(regex("geo")), value_dict = NULL)
 
 new_value_dict = list(
-  affected_group = regex("trisomic|trisomy|down.syndrome|ts21|TcMAC21|Ts65Dn|Ts65Dn|1TybEmcf|treatment: untreated", ignore_case = TRUE),
   control_group = regex("disomic|disomy|WT|normal|control|euploid|wild-type|Ring chromosome 21|treatment: beta-estradiol|healthy donor (HD)", ignore_case = TRUE),
+  affected_group = regex("trisomic|trisomy|down.syndrome|ts21|TcMAC21|Ts65Dn|Ts65Dn|1TybEmcf|treatment: untreated", ignore_case = TRUE),
   na = regex("treatment: beta-estradiol", ignore_case = TRUE)
 )
 attr_tbl = add_row(attr_tbl, attr_name = "Ploidy", match_type = "value", col_regex = list(regex("")), value_dict = list(new_value_dict))

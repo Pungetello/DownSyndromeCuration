@@ -29,7 +29,6 @@ fix_bespoke_issues = function(geo_ID, metadata){
       mutate(description_1 = ifelse(startsWith(description_1, "Image data were analyzed using the Affymetrix  expression"), description_1[3], description_1)) %>%
       mutate(tissue_ch1 = ifelse(startsWith(tissue_ch1,"H"), tissue_ch1[1], tissue_ch1)) %>%
       mutate(source_name_ch1 = ifelse(endsWith(source_name_ch1, "week of gestation"), paste0(substr(source_name_ch1, start = 1, stop = 22), "s of gestation"), source_name_ch1))
-      # TODO: week of gestation -> weeks of gestation in source_name_ch1
   }else{
     return(metadata)
   }
@@ -102,7 +101,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
 
       # If no column matched any pattern, return NA column
       if (all(scores == 0)) {
-        return(tibble(!!attr_name := rep(NA_character_, n)))
+        return(tibble(!!attr_name := rep(NA_character_, n), "Original_Value" := rep(NA_character_, n)))
       }
       
       # Choose best column (first with max score)
@@ -119,7 +118,7 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
         standardized[is.na(standardized) & matches] = key
       }
       
-      return(tibble(!!attr_name := standardized))
+      return(tibble(!!attr_name := standardized, "Original_Value" := best_col_values))
     }
     else{
       stop("Unknown match type: ", match_type)
@@ -128,7 +127,8 @@ standardize_tibble = function(geo_id, input_tbl, attr_tbl) {
   
   # Combine all columns into one tibble
   result = bind_cols(tibble(Dataset_ID = geo_col), bind_cols(cols_list))
-  return(result)
+  rotated_result = pivot_longer(result, !c("Dataset_ID", "ID", "Original_Value"), names_to = "Attribute", values_to = "Value")
+  return(rotated_result)
 }
 
 
@@ -177,15 +177,13 @@ for (geo_id in names(platforms_list)) {
   
   
   # get sample metadata
-  #TODO: make it include original values
-  result = standardize_tibble(geo_id, diff_metadata, attr_tbl)
-  rotated_result = pivot_longer(result, !c("Dataset_ID", "ID"), names_to = "Attribute", values_to = "Value")
+  result = standardize_tibble(geo_id, diff_metadata, attr_tbl) %>%
+    relocate(Original_Value, .after = Value)
 
-  append_to_file(rotated_result, "Data/Metadata/SampleMetadata.tsv")
+  append_to_file(result, "Data/Metadata/SampleMetadata.tsv")
   
 
-  #get dataset metadata 
-  #TODO: make a function for this?
+  #get dataset metadata
   dataset_result = same_metadata[1,] %>%
     drop_cols() %>%
     mutate(Dataset_ID = geo_id) %>%

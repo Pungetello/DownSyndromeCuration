@@ -9,6 +9,7 @@ source("PlatformsList.R")
 
 #--------------process_RNA_data-------------
 
+#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in names(platforms_list)){
   platform = platforms_list[[geo_id]]
   
