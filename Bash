@@ -1,3 +1,4 @@
+#!/bin/bash
 #!/apps/spack/root/opt/spack/linux-rhel9-haswell/gcc-13.2.0/r-4.5.1-264p7tzsobm57jhwvpte6ky7gzb45g7j/bin/Rscript
 
 #SBATCH --time=01:00:00   # walltime
