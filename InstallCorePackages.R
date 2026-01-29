@@ -1,7 +1,7 @@
 #-----------installing_libraries-----------
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-BiocManager::install(version = "3.21")
+BiocManager::install(version = "3.22")
 BiocManager::install(c("tidyverse",
                        "SCAN.UPC",
                        "GEOquery",
