@@ -1,3 +1,6 @@
+#replace with Conda?
+#check if can do it one by one
+
 #-----------installing_libraries-----------
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")

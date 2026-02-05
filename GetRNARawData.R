@@ -19,10 +19,8 @@ source("PlatformsList.R")
 #make sure the SRA toolkit has been downloaded by the user
 check_sra = function(){
   if (Sys.which(fasterq) == "") {
-    print(
-      "SRA Toolkit (fasterq-dump) not found.\n",
-      "Installing..."
-    )
+    print("SRA Toolkit (fasterq-dump) not found.\nInstalling...")
+    
     #Maybe reconfigure so it can work with different operating systems and SRA toolkit versions?
     system2("wget", args = c("--output-document", "sratoolkit.tar.gz", "https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz"))
     
@@ -104,9 +102,6 @@ for (geo_id in names(platforms_list)){
       download_raw(geo_id)
       
       print(geo_id)
-      
-      
-      
     }
   }
 }
