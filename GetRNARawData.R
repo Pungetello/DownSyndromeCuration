@@ -11,15 +11,34 @@ source("PlatformsList.R")
 
 
 #fasterq-dump command location
-fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
-prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
+#fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
+#prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
 
 #TODO: add script to download and install SRA toolkit in location used.
 
+#make sure the SRA toolkit has been downloaded by the user
+check_sra = function(){
+  if (Sys.which(fasterq) == "") {
+    print(
+      "SRA Toolkit (fasterq-dump) not found.\n",
+      "Installing..."
+    )
+    #Maybe reconfigure so it can work with different operating systems and SRA toolkit versions?
+    system2("wget", args = c("--output-document", "sratoolkit.tar.gz", "https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz"))
+    
+    system2("tar", args = c("-vxzf", "sratoolkit.tar.gz"))
+    
+    system2("export", c("PATH=$PATH:~/sratoolkit/sratoolkit.3.3.0-platform/bin"))
+    
+    system2("source", args = "~/.bashrc")
+    
+    #test
+    system2("fastrq-dump", args = "--version")
+  }
+}
 
 
 
-#TODO: maybe return the list of SRR's in main and read it into the process file? Or save it somewhere? So we dont' have to do this twice.
 get_srr_from_srx <- function(srx_id) {
   # 1. Search the SRA database for the SRX ID
   search <- entrez_search(db = "sra", term = srx_id)
@@ -51,26 +70,24 @@ download_raw = function(geo_id){
     
     srx = strsplit(link, '=')[[1]][2]
     srr = get_srr_from_srx(srx)
-
+    
     # print(paste(
     #   fasterq,
     #   srr
     #   #"--split-files",
     #   #"--outdir fastq"
     # ))
-
+    
     system2(
-      fasterq,
-      args = c(srr, "--split-files", "--outdir fastq"))
-      #"-p"
-      #wait = TRUE, stdout = TRUE)
+      "prefetch",
+      args = srr)
   }
   
 }
 
 
 
-#--------------process_RNA_data-------------
+#--------------Download_RNA_data-------------
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in names(platforms_list)){
@@ -80,7 +97,12 @@ for (geo_id in names(platforms_list)){
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     if(!file.exists(destination)){
       
-      #process the data
+      #make sure SRA toolkit has been downloaded
+      check_sra()
+      
+      #prefetch the raw data
+      download_raw(geo_id)
+      
       print(geo_id)
       
       

@@ -8,7 +8,9 @@ BiocManager::install(c("tidyverse",
                        "arrayQualityMetrics",
                        "janitor",
                        "biomaRt",
-                       "Rcurl"
+                       "Rcurl",
+                       "rentrez",
+                       "Rsubread"
                        )
 )
 
