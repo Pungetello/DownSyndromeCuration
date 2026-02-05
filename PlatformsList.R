@@ -10,11 +10,11 @@ platforms_list = list(
   "GSE210117" = NA,
   
   #Affymetrix datasets
-  "GSE110064" = "hgu133plus2hsensgprobe", #change names
-  "GSE48611"= "hgu133plus2hsensgprobe",
-  "GSE1789" = "hgu133ahsensgprobe",
+  "GSE110064" = "hgu133plus2hsentrezgprobe", #change names
+  "GSE48611"= "hgu133plus2hsentrezgprobe",
+  "GSE1789" = "hgu133ahsentrezgprobe",
   # #"GSE11877" = "hgu133plus2hsensgprobe", #the big one
-  "GSE16176" = "hgu133plus2hsensgprobe"
+  "GSE16176" = "hgu133plus2hsentrezgprobe"
   # "GSE16677" = "hgu133plus2hsensgprobe",
   # #"GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"), #does indeed need both, if we use this we'll need to redo stuff
   # "GSE19680" = "hgu133plus2hsensgprobe",

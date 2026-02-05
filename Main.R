@@ -20,6 +20,7 @@ source("QualityControlTests.R")
 source("GetRNASecData.R")
 
 #processes RNA data that is not downloadable
+source("GetRNARawData.R")
 source("ProcessRNAData.R")
 
 #creates GeneMetadata by reading NormalizedData for affymetrix, gene_data for RNA.
