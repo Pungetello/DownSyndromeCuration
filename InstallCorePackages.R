@@ -11,8 +11,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
   .libPaths(c(user_lib, .libPaths()))
 }
 
-print(user_lib)
-
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 
 
 if (!require("BiocManager", quietly = TRUE))
