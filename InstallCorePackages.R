@@ -16,7 +16,7 @@ print(user_lib)
 
 
 if (!require("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
+  install.packages("BiocManager", lib = user_lib)
 BiocManager::install(version = "3.22", lib = user_lib)
 BiocManager::install(c("tidyverse",
                        "SCAN.UPC",
