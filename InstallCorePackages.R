@@ -23,7 +23,7 @@ BiocManager::install(c("tidyverse",
                        "arrayQualityMetrics",
                        "janitor",
                        "biomaRt",
-                       "Rcurl",
+                       "RCurl",
                        "rentrez",
                        "Rsubread"
                        ), lib = user_lib
