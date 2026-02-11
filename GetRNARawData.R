@@ -1,3 +1,12 @@
+#change library path for supercomputer
+user_lib <- Sys.getenv("R_LIBS_USER")
+if (user_lib == "" || file.access(user_lib, 2) != 0) {
+  user_lib <- "~/R/library"
+  dir.create(user_lib, showWarnings = FALSE, recursive = TRUE)
+  .libPaths(c(user_lib, .libPaths()))
+}
+
+
 #-----------loading_libraries-----------
 library(GEOquery)
 library(rentrez)
@@ -11,8 +20,8 @@ source("PlatformsList.R")
 
 
 #fasterq-dump command location
-#fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
-#prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
+fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
+prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
 
 #TODO: add script to download and install SRA toolkit in location used.
 
