@@ -1,3 +1,12 @@
+#change library path for supercomputer
+user_lib <- Sys.getenv("R_LIBS_USER")
+if (user_lib == "" || file.access(user_lib, 2) != 0) {
+  user_lib <- "~/R/library"
+  dir.create(user_lib, showWarnings = FALSE, recursive = TRUE)
+  .libPaths(c(user_lib, .libPaths()))
+}
+
+
 #-----------loading_libraries-----------
 library(tidyverse)
 library(RCurl)
@@ -18,7 +27,7 @@ download_quality_output = function(geo_id){
   
   if(!file.exists(destination)){
     if (RCurl::url.exists(link)){
-      print(paste0("FILE EXISTS FOR ", geo_id))
+      print(paste0("DATA EXISTS FOR ", geo_id))
       #check if link exists
       options(timeout = Inf)
       download.file(link, destination)

@@ -64,6 +64,7 @@ get_srr_from_srx <- function(srx_id) {
 
 #get the true raw data using the SRA toolkit
 download_raw = function(geo_id){
+  print(paste0("PREFETCHING RAW DATA FOR ", geo_id))
   
   gse = getGEO(geo_id, GSEMatrix = FALSE)
   
@@ -86,7 +87,7 @@ download_raw = function(geo_id){
     # ))
     
     system2(
-      "prefetch",
+      prefetch,
       args = srr)
   }
   
@@ -104,7 +105,7 @@ for (geo_id in names(platforms_list)){
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     if(!file.exists(destination)){
       
-      #make sure SRA toolkit has been downloaded
+      #downloaded SRA toolkit if it cannot be found
       check_sra()
       
       #prefetch the raw data
