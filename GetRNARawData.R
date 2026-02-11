@@ -107,9 +107,10 @@ for (geo_id in names(platforms_list)){
       
       #downloaded SRA toolkit if it cannot be found
       check_sra()
+      print("SRA SHOULD NOW BE INSTALLED")
       
       #prefetch the raw data
-      download_raw(geo_id)
+      #download_raw(geo_id)
       
       print(geo_id)
     }
