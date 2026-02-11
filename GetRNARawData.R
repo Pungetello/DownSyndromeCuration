@@ -26,8 +26,8 @@ source("PlatformsList.R")
 # prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
 
 #Supercomputer locations
-fasterq = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/fasterq-dump.exe"))
-prefetch = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/prefetch.exe"))
+fasterq = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/fasterq-dump"))
+prefetch = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/prefetch"))
 
 #TODO: add script to download and install SRA toolkit in location used.
 
@@ -115,14 +115,15 @@ for (geo_id in names(platforms_list)){
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     if(!file.exists(destination)){
       
+      print(geo_id)
+      
       #download SRA toolkit if it cannot be found?
       check_sra()
       print("SRA SHOULD NOW BE INSTALLED")
       
       #prefetch the raw data
       #download_raw(geo_id)
-      
-      print(geo_id)
+
     }
   }
 }
