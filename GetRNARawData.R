@@ -20,27 +20,37 @@ source("PlatformsList.R")
 
 
 #fasterq-dump command location
-fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
-prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
+
+#Optimus Prime locations
+# fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
+# prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
+
+#Supercomputer locations
+fasterq = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/fasterq-dump.exe"))
+prefetch = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/prefetch.exe"))
 
 #TODO: add script to download and install SRA toolkit in location used.
+
+
 
 #make sure the SRA toolkit has been downloaded by the user
 check_sra = function(){
   if (Sys.which(fasterq) == "") {
-    print("SRA Toolkit (fasterq-dump) not found.\nInstalling...")
+    print("SRA Toolkit (fasterq-dump) not found. Please install.")
+    
+    #TODO: the following will download it but not for all machines so it should probably be removed
     
     #Maybe reconfigure so it can work with different operating systems and SRA toolkit versions?
-    system2("wget", args = c("--output-document", "sratoolkit.tar.gz", "https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz"))
-    
-    system2("tar", args = c("-vxzf", "sratoolkit.tar.gz"))
-    
-    system2("export", c("PATH=$PATH:~/sratoolkit/sratoolkit.3.3.0-platform/bin"))
-    
-    system2("source", args = "~/.bashrc")
-    
-    #test
-    system2("fastrq-dump", args = "--version")
+    # system2("wget", args = c("--output-document", "sratoolkit.tar.gz", "https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz"))
+    # 
+    # system2("tar", args = c("-vxzf", "sratoolkit.tar.gz"))
+    # 
+    # system2("export", c("PATH=$PATH:~/sratoolkit/sratoolkit.3.3.0-platform/bin"))
+    # 
+    # system2("source", args = "~/.bashrc")
+    # 
+    # #test
+    # system2("fastrq-dump", args = "--version")
   }
 }
 
@@ -105,7 +115,7 @@ for (geo_id in names(platforms_list)){
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     if(!file.exists(destination)){
       
-      #downloaded SRA toolkit if it cannot be found
+      #download SRA toolkit if it cannot be found?
       check_sra()
       print("SRA SHOULD NOW BE INSTALLED")
       
