@@ -19,7 +19,7 @@ source("PlatformsList.R")
 
 
 
-#fasterq-dump command location
+#command locations
 
 #Optimus Prime locations
 # fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))

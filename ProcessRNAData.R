@@ -1,3 +1,12 @@
+#change library path for supercomputer
+user_lib <- Sys.getenv("R_LIBS_USER")
+if (user_lib == "" || file.access(user_lib, 2) != 0) {
+  user_lib <- "~/R/library"
+  dir.create(user_lib, showWarnings = FALSE, recursive = TRUE)
+  .libPaths(c(user_lib, .libPaths()))
+}
+
+
 #-----------loading_libraries-----------
 library(GEOquery)
 library(rentrez)
@@ -10,9 +19,15 @@ source("PlatformsList.R")
 
 
 
-#fasterq-dump command location
-fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
-prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
+#command locations
+
+#Optimus Prime locations
+# fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
+# prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
+
+#Supercomputer locations
+fasterq = "fasterq-dump"
+prefetch = "prefetch"
 
 #TODO: add script to download and install SRA toolkit in location used.
 
@@ -36,8 +51,8 @@ get_srr_from_srx <- function(srx_id) {
 
 
 
-#get the true raw data using the SRA toolkit
-download_raw = function(geo_id){
+#install the raw data using the SRA toolkit
+install_raw = function(geo_id){
   
   gse = getGEO(geo_id, GSEMatrix = FALSE)
   
@@ -82,6 +97,7 @@ for (geo_id in names(platforms_list)){
       
       #process the data
       print(geo_id)
+      install_raw(geo_id)
       
       
       
