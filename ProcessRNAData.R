@@ -62,7 +62,7 @@ for (srr in srrs){
   print(srr)
   install_raw(srr)
   
-  process_data(srr)
+  #process_data(srr)
   
 }
 
