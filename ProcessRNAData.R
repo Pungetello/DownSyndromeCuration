@@ -8,10 +8,9 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 
 
 #-----------loading_libraries-----------
-
+library("Rsubread")
 
 #----------functions-------------
-
 
 
 #command locations
@@ -27,10 +26,11 @@ prefetch = "prefetch"
 
 #install the raw data using the SRA toolkit
 install_raw = function(srr){
+  in_path = paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sra")
 
   system2(
     fasterq,
-    args = c(srr, "--split-files", "--outdir fastq"))
+    args = c(srr, in_path, "--split-files", "--outdir fastq"))
     #"-p"
     #wait = TRUE, stdout = TRUE)
   
@@ -38,34 +38,35 @@ install_raw = function(srr){
 
 
 
+process_data = function(srr){
+  file_location = paste0(getwd(), "/fastq/", srr)#just guessing for now, fix later
+  
+  ref <- system.file("extdata","reference.fa",package="Rsubread")#default reference. Is probably human, so need different one.
+  buildindex(basename="reference_index",reference=ref)#puts index file in current directory
+  
+  reads <- system.file("extdata",file_location,package="Rsubread")#maps read dataset to reference
+  align.stat <- align(index="reference_index",readfile1=reads,output_file="alignResults.BAM",phredOffset=64)
+  
+}
+
+
+
 #--------------process_RNA_data-------------
 
-#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-# for (geo_id in names(platforms_list)){
-#   platform = platforms_list[[geo_id]]
-#   
-#   if(is.na(platform)){
-#     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
-#     if(!file.exists(destination)){
-#       
-#       #process the data
-#       print(geo_id)
-#       install_raw(geo_id)
-#       
-#       #put mouse strain list in platformslist
-#       #download the tables for strains needed
-#       
-#       
-#       
-#     }
-#   }
-# }
-
+#get list of all srr files prefetched by previous script
 srrs = list.files("Data/RawRNA")
 print(srrs)
 
+#finish installation by converting to fastq format
 for (srr in srrs){
   print(srr)
   install_raw(srr)
   
+  process_data(srr)
+  
 }
+
+
+
+
+

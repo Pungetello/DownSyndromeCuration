@@ -19,7 +19,7 @@ source("QualityControlTests.R")
 #downloads gene_data for RNA
 source("GetRNASecData.R")
 
-#processes RNA data that is not downloadable
+#processes mouse RNA data that is not downloadable
 source("GetRNARawData.R")
 source("ProcessRNAData.R")
 
