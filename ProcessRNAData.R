@@ -30,7 +30,7 @@ install_raw = function(srr){
 
   system2(
     fasterq,
-    args = c(srr, in_path, "--split-files", "--outdir fastq"))
+    args = c(in_path, "--split-files", "--outdir fastq"))
     #"-p"
     #wait = TRUE, stdout = TRUE)
   
