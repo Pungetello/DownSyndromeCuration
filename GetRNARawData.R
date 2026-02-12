@@ -26,8 +26,8 @@ source("PlatformsList.R")
 # prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
 
 #Supercomputer locations
-fasterq = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/fasterq-dump"))
-prefetch = normalizePath(paste0(getwd(),"/sratoolkit.3.3.0-ubuntu64/bin/prefetch"))
+fasterq = normalizePath(paste0(getwd(),"fasterq-dump"))
+prefetch = normalizePath(paste0(getwd(),"prefetch"))
 
 #TODO: add script to download and install SRA toolkit in location used.
 
