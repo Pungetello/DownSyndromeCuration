@@ -89,16 +89,9 @@ download_raw = function(geo_id){
     srx = strsplit(link, '=')[[1]][2]
     srr = get_srr_from_srx(srx)
     
-    # print(paste(
-    #   fasterq,
-    #   srr
-    #   #"--split-files",
-    #   #"--outdir fastq"
-    # ))
-    
     system2(
       prefetch,
-      args = srr)
+      args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
   }
   
 }
