@@ -27,19 +27,20 @@ prefetch = "prefetch"
 #install the raw data using the SRA toolkit
 install_raw = function(srr){
   in_path = paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sra")
-
-  system2(
-    fasterq,
-    args = c(in_path, "--split-files", "--outdir fastq"))
-    #"-p"
-    #wait = TRUE, stdout = TRUE)
+  out_path = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   
+  #skip if file has already been downloaded
+  if (!file.exists(out_path)){
+    system2(
+      fasterq,
+      args = c(in_path, "--split-files", "--outdir fastq"))
+  }
 }
 
 
 
 process_data = function(srr){
-  file_location = paste0(getwd(), "/fastq/", srr)#just guessing for now, fix later
+  file_location = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   
   ref <- system.file("extdata","reference.fa",package="Rsubread")#default reference. Is probably human, so need different one.
   buildindex(basename="reference_index",reference=ref)#puts index file in current directory
