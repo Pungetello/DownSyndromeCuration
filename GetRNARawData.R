@@ -85,6 +85,25 @@ download_raw = function(geo_id){
 
 
 
+#download refrence genomes for all mouse strains used
+download_reference = function(refrence_genomes){
+  if (!dir.exists("RefGenomes")){
+    dir.create("RefGenomes", recursive = TRUE)
+  }
+  
+  for (ref in refrence_genomes){
+    link = "IDK"
+    destination = paste0(getwd(), "/RefGenomes/", ref) #does this need to be .tsv.gz or anything?
+    if(!file.exists(destination)){
+      #check if link exists
+      options(timeout = Inf)
+      download.file(link, destination)
+    }
+  }
+}
+
+
+
 #--------------Download_RNA_data-------------
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
@@ -100,6 +119,9 @@ for (geo_id in names(platforms_list)){
       
       #prefetch the raw data
       download_raw(geo_id)
+      
+      #download refrence genomes needed
+      download_reference(platforms_to_refrence_genomes)
 
     }
   }

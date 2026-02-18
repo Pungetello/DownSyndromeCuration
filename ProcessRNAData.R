@@ -40,13 +40,14 @@ install_raw = function(srr){
 
 
 process_data = function(srr){
-  file_location = paste0(getwd(), "/fastq/", srr, "_1.fastq")
+  input_file = paste0(getwd(), "/fastq/", srr, "_1.fastq")
+  ref = paste0("strain_name.fa")
+  annotation = "strain_name.gtf"
   
-  ref <- system.file("extdata","reference.fa",package="Rsubread")#default reference. Is probably human, so need different one.
-  buildindex(basename="reference_index",reference=ref)#puts index file in current directory
+  buildindex(basename="strain_name_index",reference=ref)#puts index file in current directory
+  featureCounts(files="*.bam", annot.ext=annotation)
   
-  reads <- system.file("extdata",file_location,package="Rsubread")#maps read dataset to reference
-  align.stat <- align(index="reference_index",readfile1=reads,output_file="alignResults.BAM",phredOffset=64)
+  align.stat <- align(index="reference_index",readfile1=file_location,output_file="alignResults.BAM",phredOffset=64)
   
 }
 
