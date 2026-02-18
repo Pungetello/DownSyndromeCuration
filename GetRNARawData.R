@@ -51,7 +51,7 @@ get_srr_from_srx = function(srx_id) {
   search_result = entrez_search(db = "sra", term = srx_id)
   summary_metadata = entrez_summary(db = "sra", id = search_result$ids)
   
-  srr = regmatches(summary_metadata$runs, regexpr("SRR\\d+", summ$runs))
+  srr = regmatches(summary_metadata$runs, regexpr("SRR\\d+", summary_metadata$runs))
   
   return(srr)
 }
