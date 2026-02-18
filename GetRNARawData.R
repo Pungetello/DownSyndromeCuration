@@ -85,22 +85,28 @@ download_raw = function(geo_id){
 
 
 
-#download refrence genomes for all mouse strains used
-download_reference = function(refrence_genomes){
+#download reference genomes for GRCm39, since that is likely all we need
+download_reference = function(){
   if (!dir.exists("RefGenomes")){
     dir.create("RefGenomes", recursive = TRUE)
   }
   
-  for (ref in refrence_genomes){
-    link = "IDK"
-    destination = paste0(getwd(), "/RefGenomes/", ref) #does this need to be .tsv.gz or anything?
-    if(!file.exists(destination)){
-      #check if link exists
-      options(timeout = Inf)
-      download.file(link, destination)
-    }
+  #download reference genome
+  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
+  if(!file.exists(destination)){
+    options(timeout = Inf)
+    download.file(link, destination)
   }
-}
+  
+  #download annotation table
+  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_rna_from_genomic.fna.gz"
+  destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  if(!file.exists(destination)){
+    options(timeout = Inf)
+    download.file(link, destination)
+  }
+}#TODO: make these functions?
 
 
 
@@ -120,8 +126,8 @@ for (geo_id in names(platforms_list)){
       #prefetch the raw data
       download_raw(geo_id)
       
-      #download refrence genomes needed
-      download_reference(platforms_to_refrence_genomes)
+      #download reference genome needed
+      download_reference()
 
     }
   }

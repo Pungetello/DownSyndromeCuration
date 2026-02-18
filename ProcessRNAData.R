@@ -40,14 +40,32 @@ install_raw = function(srr){
 
 
 process_data = function(srr){
+  #build the index from annotation and reference genome files
+  ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  annotation = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
+  
+  buildindex(basename="GRCm39_index",reference=ref)#puts index file in current directory, maybe move
+  
+  #designate the files
   input_file = paste0(getwd(), "/fastq/", srr, "_1.fastq")
-  ref = paste0("strain_name.fa")
-  annotation = "strain_name.gtf"
+  input_file_2 = paste0(getwd(), "/fastq/", srr, "_2.fastq")
   
-  buildindex(basename="strain_name_index",reference=ref)#puts index file in current directory
-  featureCounts(files="*.bam", annot.ext=annotation)
+  output_file = paste0(getwd(), "/", srr, "AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
-  align.stat <- align(index="reference_index",readfile1=file_location,output_file="alignResults.BAM",phredOffset=64)
+  #map to reference genome
+  if(file.exists(input_file_2)){
+    #paired end
+    align.stat2 = align(index="GRCm39_index",readfile1=input_file,readfile2=input_file_2,
+                         + output_file=output_file,phredOffset=64)
+    
+  }else{
+    #not paired end
+    align.stat = align(index="GRCm39_index",readfile1=input_file,output_file=output_file,phredOffset=64)
+  }
+  
+  #save feature counts
+  feature_counts = featureCounts(files="*.BAM", annot.ext=annotation)
+  write.csv(feature_counts$counts, file=paste0(srr, "gene_counts.csv")) #again, move eventually
   
 }
 
