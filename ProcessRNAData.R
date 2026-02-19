@@ -55,8 +55,7 @@ process_data = function(srr){
   #map to reference genome
   if(file.exists(input_file_2)){
     #paired end
-    align.stat2 = align(index="GRCm39_index",readfile1=input_file,readfile2=input_file_2,
-                         + output_file=output_file,phredOffset=64)
+    align.stat2 = align(index="GRCm39_index",readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=64)
     
   }else{
     #not paired end
@@ -78,13 +77,13 @@ srrs = list.files("Data/RawRNA")
 print(srrs)
 
 #finish installation by converting to fastq format
-for (srr in srrs){
-  print(srr)
-  install_raw(srr)
+#for (srr in srrs){
+  print(srr[1])
+  install_raw(srrs[1])
   
-  #process_data(srr)
+  process_data(srrs[1])
   
-}
+#}
 
 
 
