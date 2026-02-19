@@ -78,7 +78,7 @@ print(srrs)
 
 #finish installation by converting to fastq format
 #for (srr in srrs){
-  print(srr[1])
+  print(srrs[1])
   install_raw(srrs[1])
   
   process_data(srrs[1])
