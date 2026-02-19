@@ -55,11 +55,11 @@ process_data = function(srr){
   #map to reference genome
   if(file.exists(input_file_2)){
     #paired end
-    align.stat2 = align(index="GRCm39_index,log",readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=64)
+    align.stat2 = align(index="GRCm39_index",readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=64)
     
   }else{
     #not paired end
-    align.stat = align(index="GRCm39_index.log",readfile1=input_file,output_file=output_file,phredOffset=64)
+    align.stat = align(index="GRCm39_index",readfile1=input_file,output_file=output_file,phredOffset=64)
   }
   
   #save feature counts
