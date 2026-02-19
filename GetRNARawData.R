@@ -121,10 +121,10 @@ for (geo_id in names(platforms_list)){
     if(!file.exists(destination)){
       
       #make sure SRA toolkit is downloaded
-      check_sra()
+      #check_sra()
       
       #prefetch the raw data
-      download_raw(geo_id)
+      #download_raw(geo_id)
       
       #download reference genome needed
       download_reference()
