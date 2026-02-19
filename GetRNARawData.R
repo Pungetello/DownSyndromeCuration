@@ -92,16 +92,16 @@ download_reference = function(){
   }
   
   #download reference genome
-  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.gtf.gz"
-  destination = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
+  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.fna.gz"
+  destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.gtf.gz")
   if(!file.exists(destination)){
     options(timeout = Inf)
     download.file(link, destination)
   }
   
   #download annotation table
-  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_rna_from_genomic.fna.gz"
-  destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/GRCm39_ann.fna.gz")
   if(!file.exists(destination)){
     options(timeout = Inf)
     download.file(link, destination)
