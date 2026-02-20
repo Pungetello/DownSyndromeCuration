@@ -85,7 +85,17 @@ download_raw = function(geo_id){
 
 
 
-#download reference genomes for GRCm39, since that is likely all we need
+safe_download = function(link, destination){
+  #download file from link only if nothing at destination yet
+  if(!file.exists(destination)){
+    options(timeout = Inf)
+    download.file(link, destination)
+  }
+}
+
+
+
+#download reference genomes for GRCm39, C57BL_6J, and DBA_2J
 download_reference = function(){
   if (!dir.exists("RefGenomes")){
     dir.create("RefGenomes", recursive = TRUE)
@@ -94,19 +104,32 @@ download_reference = function(){
   #download reference genome
   link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.fna.gz"
   destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-  if(!file.exists(destination)){
-    options(timeout = Inf)
-    download.file(link, destination)
-  }
+  safe_download(link, destination)
   
   #download annotation table
   link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.gtf.gz"
   destination = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
-  if(!file.exists(destination)){
-    options(timeout = Inf)
-    download.file(link, destination)
-  }
-}#TODO: make these functions?
+  safe_download(link, destination)
+  
+  #download strain-specific stuff for test
+  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_964188535.1/genome/softmasked.fa.gz"
+  destination = paste0(getwd(), "/RefGenomes/C57BL_6J_ref.fa.gz")
+  safe_download(link, destination)
+  
+  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_964188535.1/ensembl/geneset/2024_08/genes.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/C57BL_6J_ann.gtf.gz")
+  safe_download(link, destination)
+  
+  
+  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/genome/softmasked.fa.gz"
+  destination = paste0(getwd(), "/RefGenomes/DBA_2J_ref.fa.gz")
+  safe_download(link, destination)
+  
+  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/geneset/2025_07/genes.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/DBA_2J_ann.gtf.gz")
+  safe_download(link, destination)
+  
+}
 
 
 
