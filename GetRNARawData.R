@@ -121,13 +121,13 @@ download_reference = function(){
   safe_download(link, destination)
   
   
-  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/genome/softmasked.fa.gz"
-  destination = paste0(getwd(), "/RefGenomes/DBA_2J_ref.fa.gz")
-  safe_download(link, destination)
-  
-  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/geneset/2025_07/genes.gtf.gz"
-  destination = paste0(getwd(), "/RefGenomes/DBA_2J_ann.gtf.gz")
-  safe_download(link, destination)
+  # link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/genome/softmasked.fa.gz"
+  # destination = paste0(getwd(), "/RefGenomes/DBA_2J_ref.fa.gz")
+  # safe_download(link, destination)
+  # 
+  # link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/geneset/2025_07/genes.gtf.gz"
+  # destination = paste0(getwd(), "/RefGenomes/DBA_2J_ann.gtf.gz")
+  # safe_download(link, destination)
   
 }
 
