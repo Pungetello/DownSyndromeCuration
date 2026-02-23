@@ -39,18 +39,26 @@ install_raw = function(srr){
 
 
 
-process_data = function(srr){
-  #build the index from annotation and reference genome files
-  ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-  annotation = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
+#checks if index has already been built for given reference genome, builds it if not
+build_index = function(index_file, ref){
+  if (!file.exists(paste0(getwd(),index_file,".00.b.array")) && !file.exists(paste0(getwd(),index_file,".00.b.tab"))){ #add more to check for all of them?
+    print(paste0("INDEX FILES NOT FOUND FOR ", index_file, ", CREATING"))
+    #build the index from reference genome file
+    buildindex(basename=index_file,reference=ref)#puts index file in current directory, maybe move?
+  }
+    
   
-  buildindex(basename="GRCm39_index",reference=ref)#puts index file in current directory, maybe move
+}
+
+
+
+process_data = function(srr, index, annotation){
   
   #designate the files
   input_file = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   input_file_2 = paste0(getwd(), "/fastq/", srr, "_2.fastq")
   
-  output_file = paste0(getwd(), "/", srr, "AlignResults.BAM") #test, move to /Data/NormalizedData eventually
+  output_file = paste0(getwd(), "/", srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
   #map to reference genome
   if(file.exists(input_file_2)){
@@ -63,7 +71,7 @@ process_data = function(srr){
   }
   
   #save feature counts
-  feature_counts = featureCounts(files="*.BAM", annot.ext=annotation)
+  feature_counts = featureCounts(files=output_file, annot.ext=annotation)
   write.csv(feature_counts$counts, file=paste0(srr, "gene_counts.csv")) #again, move eventually
   
 }
@@ -79,9 +87,16 @@ print(srrs)
 #finish installation by converting to fastq format
 #for (srr in srrs){
   print(srrs[1])
+  
+  ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  annotation = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
+  index = "GRCm93_index"
+  
   install_raw(srrs[1])
   
-  process_data(srrs[1])
+  build_index(index, ref)
+  
+  process_data(srrs[1], index, annotation)
   
 #}
 
