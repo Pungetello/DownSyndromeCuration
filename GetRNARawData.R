@@ -102,13 +102,13 @@ download_reference = function(){
   }
   
   #download reference genome
-  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.fna.gz"
+  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/GRCm39.primary_assembly.genome.fa.gz"
   destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   safe_download(link, destination)
   
   #download annotation table
-  link = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/635/GCA_000001635.9_GRCm39/GCA_000001635.9_GRCm39_genomic.gtf.gz"
-  destination = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
+  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   safe_download(link, destination)
   
   #download strain-specific stuff for test

@@ -67,12 +67,13 @@ process_data = function(srr, index, annotation){
     
   }else{
     #not paired end
-    align.stat = align(index=paste0(getwd(),"/GRCm39_index"),readfile1=input_file,output_file=output_file,phredOffset=64)
+    align.stat = align(index=paste0(getwd(),"/GRCm39_index"),readfile1=input_file,output_file=output_file,phredOffset=64) #TODO: check phred
   }
   
   #save feature counts
   feature_counts = featureCounts(files=output_file, annot.ext=annotation)
-  write.csv(feature_counts$counts, file=paste0(srr, "gene_counts.csv")) #again, move eventually
+  write_csv(feature_counts$counts, file=paste0(srr, "_gene_counts.csv")) #again, move eventually
+  #also make the tpm file, called srr_tpm.csv or something
   
 }
 
@@ -89,7 +90,7 @@ print(srrs)
   print(srrs[1])
   
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-  annotation = paste0(getwd(), "/RefGenomes/GRCm39_ann.gtf.gz")
+  annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   index = "GRCm93_index"
   
   install_raw(srrs[1])
