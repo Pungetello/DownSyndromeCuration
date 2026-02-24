@@ -63,17 +63,26 @@ process_data = function(srr, index, annotation){
   #map to reference genome
   if(file.exists(input_file_2)){
     #paired end
-    align.stat2 = align(index=paste0(getwd(),"/GRCm39_index"),readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=64)
+    align.stat2 = align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
     
   }else{
     #not paired end
-    align.stat = align(index=paste0(getwd(),"/GRCm39_index"),readfile1=input_file,output_file=output_file,phredOffset=64) #TODO: check phred
+    align.stat = align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
   }
   
   #save feature counts
   feature_counts = featureCounts(files=output_file, annot.ext=annotation)
-  write_csv(feature_counts$counts, file=paste0(srr, "_gene_counts.csv")) #again, move eventually
-  #also make the tpm file, called srr_tpm.csv or something
+  write_tsv(feature_counts$counts, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
+  
+  #calculate tpm file
+  counts <- feature_counts$counts
+  gene_length <- feature_counts$annotation$Length
+  
+  length_kb <- gene_length / 1000
+  rpk <- counts / length_kb
+  tpm <- t( t(rpk) / colSums(rpk) ) * 1e6
+  
+  write_tsv(tpm, file=paste0(getwd(), "/", srr, "_TPM.txt"))
   
 }
 
@@ -91,7 +100,7 @@ print(srrs)
   
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-  index = "GRCm93_index"
+  index = "GRCm39_index"
   
   install_raw(srrs[1])
   
