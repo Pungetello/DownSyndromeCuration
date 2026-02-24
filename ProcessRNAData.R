@@ -9,6 +9,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 
 #-----------loading_libraries-----------
 library("Rsubread")
+library("tidyverse")
 
 #----------functions-------------
 
@@ -22,6 +23,7 @@ library("Rsubread")
 #Supercomputer locations
 fasterq = "fasterq-dump"
 prefetch = "prefetch"
+
 
 
 #install the raw data using the SRA toolkit
@@ -46,12 +48,11 @@ build_index = function(index_file, ref){
     #build the index from reference genome file
     buildindex(basename=index_file,reference=ref)#puts index file in current directory, maybe move?
   }
-    
-  
 }
 
 
 
+#runs alignment, gets feature counts, and makes tpm file
 process_data = function(srr, index, annotation){
   
   #designate the files
@@ -63,11 +64,11 @@ process_data = function(srr, index, annotation){
   #map to reference genome
   if(file.exists(input_file_2)){
     #paired end
-    align.stat2 = align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
+    align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
     
   }else{
     #not paired end
-    align.stat = align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
+    align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
   }
   
   #save feature counts
