@@ -91,7 +91,10 @@ process_data = function(srr, index, annotation){
   rpk <- counts / length_kb
   tpm <- t( t(rpk) / colSums(rpk) ) * 1e6
   
-  write_tsv(as.data.frame(tpm), file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
+  tpm_df = as.data.frame(tpm)
+  tpm_df$gene_id = rownames(tpm_df)
+  
+  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
   
 }
 
