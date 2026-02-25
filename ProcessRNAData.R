@@ -87,7 +87,7 @@ process_data = function(srr, index, annotation){
   rpk <- counts / length_kb
   tpm <- t( t(rpk) / colSums(rpk) ) * 1e6
   
-  write_tsv(tpm, file=paste0(getwd(), "/", srr, "_TPM.txt"))
+  write_tsv(tpm, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
   
 }
 
