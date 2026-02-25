@@ -61,18 +61,21 @@ process_data = function(srr, index, annotation){
   
   output_file = paste0(getwd(), "/", srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
-  #map to reference genome
+  #map to reference genome and get feature counts
   if(file.exists(input_file_2)){
     #paired end
     align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
+    print("GETTING FEATURE COUNTS")
+    feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE, isPairedEnd = TRUE)
     
   }else{
     #not paired end
     align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
+    print("GETTING FEATURE COUNTS")
+    feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE)
   }
   
   #save feature counts
-  feature_counts = featureCounts(files=output_file, annot.ext=annotation)
   write_tsv(feature_counts$counts, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
   
   #calculate tpm file
