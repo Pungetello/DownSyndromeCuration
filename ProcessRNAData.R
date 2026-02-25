@@ -78,7 +78,6 @@ process_data = function(srr, index, annotation){
   
   #save feature counts
   print("SAVING FILE")
-  print(class(feature_counts$counts))
   counts_df <- as.data.frame(feature_counts$counts)
   counts_df$gene_id <- rownames(counts_df)
   
@@ -92,9 +91,7 @@ process_data = function(srr, index, annotation){
   rpk <- counts / length_kb
   tpm <- t( t(rpk) / colSums(rpk) ) * 1e6
   
-  print(class(tpm))
-  
-  write_tsv(tpm, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
+  write_tsv(as.data.frame(tpm), file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
   
 }
 
