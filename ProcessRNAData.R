@@ -66,18 +66,15 @@ process_data = function(srr, index, annotation){
   if(file.exists(input_file_2)){
     #paired end
     align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
-    print("GETTING FEATURE COUNTS")
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE, isPairedEnd = TRUE)
     
   }else{
     #not paired end
-    #align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
-    print("GETTING FEATURE COUNTS")
+    align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE)
   }
   
   #save feature counts
-  print("SAVING FILE")
   counts_df <- as.data.frame(feature_counts$counts)
   counts_df$gene_id <- rownames(counts_df)
   
@@ -107,20 +104,20 @@ srrs = list.files("Data/RawRNA")
 print(srrs)
 
 #finish installation by converting to fastq format
-#for (srr in srrs){
-  print(srrs[1])
+for (srr in srrs){
+  print(srr)
   
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   index = "GRCm39_index"
   
-  install_raw(srrs[1])
+  install_raw(srr)
   
   build_index(index, ref)
   
-  process_data(srrs[1], index, annotation)
+  process_data(srr, index, annotation)
   
-#}
+}
 
 
 
