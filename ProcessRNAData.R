@@ -44,6 +44,7 @@ install_raw = function(srr){
 #checks if index has already been built for given reference genome, builds it if not
 build_index = function(index_file, ref){
   if (!file.exists(paste0(getwd(),index_file,".00.b.array"))){ #add more to check for all of them?
+    print(paste0(getwd(),index_file,".00.b.array"))
     print(paste0("INDEX FILES NOT FOUND FOR ", index_file, ", CREATING"))
     #build the index from reference genome file
     buildindex(basename=index_file,reference=ref)#puts index file in current directory, maybe move?
