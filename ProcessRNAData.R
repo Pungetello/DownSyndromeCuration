@@ -10,6 +10,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 #-----------loading_libraries-----------
 library("Rsubread")
 library("tidyverse")
+library("dplyr")
 
 #----------functions-------------
 
@@ -58,8 +59,8 @@ process_data = function(srr, index, annotation){
   
   output_file = paste0(getwd(), "/", srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
-  #check if alignment files already exist
-  if (file.exists(paste0(output_file,".indel.vcf")) && file.exists(paste0(output_file, ".summary")) && file.exists(output_file)){
+  #check if alignment has already been done
+  if (file.exists(paste0(output_file, ".summary"))){
     print("OUTPUT ALREADY EXISTS, SKIPPING")
     return()
   }
@@ -80,10 +81,16 @@ process_data = function(srr, index, annotation){
     align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE)
   }
+  #delete BAM files
+  file.remove(output_file)
+  file.remove(paste0(output_file, ".indel.vcf"))
   
   #save feature counts
-  counts_df <- as.data.frame(feature_counts$counts)
-  counts_df$gene_id <- rownames(counts_df)
+  counts_df = as.data.frame(feature_counts$counts)
+  counts_df$gene_id = rownames(counts_df)
+  counts_df = rename(counts_df, srr = paste0(srr,"_AlignResults.BAM")) %>%
+    select("gene_id", srr)
+  print(counts_df)
   
   write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
   
@@ -97,6 +104,9 @@ process_data = function(srr, index, annotation){
   
   tpm_df = as.data.frame(tpm)
   tpm_df$gene_id = rownames(tpm_df)
+  tpm_df = rename(tpm_df, srr = paste0(srr,"_AlignResults.BAM")) %>%
+    select("gene_id", srr)
+  print(tpm_df)
   
   write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
   
@@ -111,20 +121,20 @@ srrs = list.files("Data/RawRNA")
 print(srrs)
 
 #finish installation by converting to fastq format
-for (srr in srrs){
-  print(srr)
+#for (srr in srrs){
+  print(srrs[1])
   
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   index = "GRCm39_index"
   
-  install_raw(srr)
+  install_raw(srrs[1])
   
   build_index(index, ref)
   
-  process_data(srr, index, annotation)
+  process_data(srrs[1], index, annotation)
   
-}
+#}
 
 
 
