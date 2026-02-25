@@ -71,13 +71,13 @@ process_data = function(srr, index, annotation){
     
   }else{
     #not paired end
-    align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
+    #align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
     print("GETTING FEATURE COUNTS")
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE)
   }
   
   #save feature counts
-  write_tsv(feature_counts$counts, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
+  write_tsv(as.data.frame(feature_counts$counts), file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
   
   #calculate tpm file
   counts <- feature_counts$counts
