@@ -80,6 +80,7 @@ process_data = function(srr, index, annotation){
   print("SAVING FILE")
   counts_df <- as.data.frame(feature_counts$counts)
   counts_df$gene_id <- rownames(counts_df)
+  print(class(counts_df))
   readr::write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
   
   #calculate tpm file
