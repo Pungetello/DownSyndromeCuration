@@ -56,11 +56,18 @@ build_index = function(index_file, ref){
 #runs alignment, gets feature counts, and makes tpm file
 process_data = function(srr, index, annotation){
   
+  output_file = paste0(getwd(), "/", srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
+  
+  #check if alignment files already exist
+  if (file.exists(paste0(output_file,".indel.vcf")) && file.exists(paste0(output_file, ".summary")) && file.exists(output_file)){
+    print("OUTPUT ALREADY EXISTS, SKIPPING")
+    return()
+  }
+  
   #designate the files
   input_file = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   input_file_2 = paste0(getwd(), "/fastq/", srr, "_2.fastq")
   
-  output_file = paste0(getwd(), "/", srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
   #map to reference genome and get feature counts
   if(file.exists(input_file_2)){
