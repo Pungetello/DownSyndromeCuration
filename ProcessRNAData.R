@@ -88,7 +88,7 @@ process_data = function(srr, index, annotation){
   #save feature counts
   counts_df = as.data.frame(feature_counts$counts)
   counts_df$gene_id = rownames(counts_df)
-  counts_df = rename(counts_df, srr = paste0(srr,"_AlignResults.BAM")) %>%
+  counts_df = rename(counts_df, !!srr := paste0(srr,"_AlignResults.BAM")) %>%
     select("gene_id", srr)
   print(counts_df)
   
@@ -104,9 +104,8 @@ process_data = function(srr, index, annotation){
   
   tpm_df = as.data.frame(tpm)
   tpm_df$gene_id = rownames(tpm_df)
-  tpm_df = rename(tpm_df, srr = paste0(srr,"_AlignResults.BAM")) %>%
+  tpm_df = rename(tpm_df, !!srr := paste0(srr,"_AlignResults.BAM")) %>%
     select("gene_id", srr)
-  print(tpm_df)
   
   write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
   
