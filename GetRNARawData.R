@@ -10,6 +10,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 #-----------loading_libraries-----------
 library(GEOquery)
 library(rentrez)
+library(tidyverse)
 
 source("PlatformsList.R")
 #source ~/.bashrc
@@ -134,7 +135,8 @@ download_reference = function(){
 #--------------Download_RNA_data-------------
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-for (geo_id in names(platforms_list)){
+#for (geo_id in names(platforms_list)){
+geo_id = platforms_list[1]
   platform = platforms_list[[geo_id]]
   
   if(is.na(platform)){
@@ -152,4 +154,4 @@ for (geo_id in names(platforms_list)){
 
     }
   }
-}
+#}

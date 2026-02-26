@@ -8,9 +8,9 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 
 
 #-----------loading_libraries-----------
-library("Rsubread")
-library("tidyverse")
-library("dplyr")
+library(Rsubread)
+library(tidyverse)
+library(dplyr)
 
 #----------functions-------------
 
