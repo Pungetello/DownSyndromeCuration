@@ -64,7 +64,7 @@ download_raw = function(geo_id){
   
   gse = getGEO(geo_id, GSEMatrix = FALSE)
   print(gse)
-  print(GSMList(gse))
+  #print(GSMList(gse))
   
   #get SRA line for each GSM for the geo_id
   srrs = lapply(GSMList(gse), function(gsm) {
@@ -74,7 +74,7 @@ download_raw = function(geo_id){
   })
   
   n = length(srrs)
-  GSE_to_SRR = tibble(GSE = rep(geo_id, n), GSM = GSMList(gse), SRR = rep(NA, n))
+  GSE_to_SRR = tibble(GSE = rep(geo_id, n), SRR = rep(NA, n))
   
   for(i in 1:length(srrs)){
     link = srrs[i]
