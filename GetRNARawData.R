@@ -62,6 +62,8 @@ get_srr_from_srx = function(srx_id) {
 download_raw = function(geo_id){
   
   gse = getGEO(geo_id, GSEMatrix = FALSE)
+  print(gse)
+  print(GSMList(gse))
   
   #get SRA line for each GSM for the geo_id
   srrs = lapply(GSMList(gse), function(gsm) {
@@ -70,17 +72,32 @@ download_raw = function(geo_id){
     return(sra_line)
   })
   
-  for(link in srrs){
+  n = length(srrs)
+  GSE_to_SRR = tibble(GSE = rep(geo_id, n), GSM = GSMList(gse), SRR = rep(NA, n))
+  
+  for(i in 1:length(srrs)){
+    link = srrs[i]
     
     #extract SRX from line, convert to SRR
     srx = strsplit(link, '=')[[1]][2]
     srr = get_srr_from_srx(srx)
     
+    GSE_to_SRR[SRR][i] = srr
+    
     #download raw data by SRR ID
-    system2(
-      prefetch,
-      args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
+    # system2(
+    #   prefetch,
+    #   args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
   }
+  print(GSE_to_SRR)
+  
+  #append dataframe of GSE mapped to each SRR to file
+  # if (!file.exists("Data/RNA_GSE_to_SRR.tsv")) {
+  #   write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
+  # } else {
+  #   write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv", append = TRUE, col_names = FALSE)
+  # }
+  
 }
 
 
@@ -110,25 +127,6 @@ download_reference = function(){
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
   destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   safe_download(link, destination)
-  
-  #download strain-specific stuff for test
-  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_964188535.1/genome/softmasked.fa.gz"
-  destination = paste0(getwd(), "/RefGenomes/C57BL_6J_ref.fa.gz")
-  safe_download(link, destination)
-  
-  link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_964188535.1/ensembl/geneset/2024_08/genes.gtf.gz"
-  destination = paste0(getwd(), "/RefGenomes/C57BL_6J_ann.gtf.gz")
-  safe_download(link, destination)
-  
-  
-  # link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/genome/softmasked.fa.gz"
-  # destination = paste0(getwd(), "/RefGenomes/DBA_2J_ref.fa.gz")
-  # safe_download(link, destination)
-  # 
-  # link = "https://ftp.ebi.ac.uk/pub/ensemblorganisms/Mus_musculus/GCA_921998315.2/ensembl/geneset/2025_07/genes.gtf.gz"
-  # destination = paste0(getwd(), "/RefGenomes/DBA_2J_ann.gtf.gz")
-  # safe_download(link, destination)
-  
 }
 
 
@@ -144,10 +142,10 @@ for (geo_id in names(platforms_list)){
     if(!file.exists(destination)){
       
       #make sure SRA toolkit is downloaded
-      #check_sra()
+      check_sra()
       
       #prefetch the raw data
-      #download_raw(geo_id)
+      download_raw(geo_id)
       
       #download reference genome needed
       download_reference()
