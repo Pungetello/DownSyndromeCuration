@@ -83,7 +83,7 @@ download_raw = function(geo_id){
     srx = strsplit(link, '=')[[1]][2]
     srr = get_srr_from_srx(srx)
     
-    GSE_to_SRR[SRR][i] = srr
+    GSE_to_SRR[i, "SRR"] = srr
     
     #download raw data by SRR ID
     # system2(
