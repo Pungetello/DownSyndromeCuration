@@ -90,7 +90,6 @@ process_data = function(srr, index, annotation){
   counts_df$gene_id = rownames(counts_df)
   counts_df = rename(counts_df, !!srr := paste0(srr,"_AlignResults.BAM")) %>%
     select("gene_id", srr)
-  print(counts_df)
   
   write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
   
@@ -120,20 +119,20 @@ srrs = list.files("Data/RawRNA")
 print(srrs)
 
 #finish installation by converting to fastq format
-#for (srr in srrs){
-  print(srrs[1])
+for (srr in srrs){
+  print(srr)
   
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   index = "GRCm39_index"
   
-  install_raw(srrs[1])
+  install_raw(srr)
   
   build_index(index, ref)
   
-  process_data(srrs[1], index, annotation)
+  process_data(srr, index, annotation)
   
-#}
+}
 
 
 
