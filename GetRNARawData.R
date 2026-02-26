@@ -136,12 +136,12 @@ download_reference = function(){
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 #for (geo_id in names(platforms_list)){
-geo_id = names(platforms_list)[1]
+geo_id = names(platforms_list)[2]
   platform = platforms_list[[geo_id]]
   
   if(is.na(platform)){
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
-    if(!file.exists(destination)){
+    #if(!file.exists(destination)){
       
       #make sure SRA toolkit is downloaded
       check_sra()
@@ -152,6 +152,6 @@ geo_id = names(platforms_list)[1]
       #download reference genome needed
       download_reference()
 
-    }
+    #}
   }
 #}
