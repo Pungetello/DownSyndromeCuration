@@ -136,7 +136,7 @@ download_reference = function(){
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 #for (geo_id in names(platforms_list)){
-geo_id = platforms_list[1]
+geo_id = names(platforms_list)[1]
   platform = platforms_list[[geo_id]]
   
   if(is.na(platform)){
