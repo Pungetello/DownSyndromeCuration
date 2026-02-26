@@ -77,7 +77,7 @@ download_raw = function(geo_id){
   GSE_to_SRR = tibble(GSE = rep(geo_id, n), SRR = rep(NA, n))
   
   for(i in 1:length(srrs)){
-    link = srrs[i]
+    link = srrs[[i]]
     
     #extract SRX from line, convert to SRR
     srx = strsplit(link, '=')[[1]][2]
