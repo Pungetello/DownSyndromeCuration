@@ -64,7 +64,7 @@ download_raw = function(geo_id){
   
   gse = getGEO(geo_id, GSEMatrix = FALSE)
   print(geo_id)
-  #print(GSMList(gse))
+  print(GSMList(gse))
   
   #get SRA line for each GSM for the geo_id
   srrs = lapply(GSMList(gse), function(gsm) {
