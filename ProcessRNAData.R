@@ -69,6 +69,12 @@ process_data = function(srr, index, annotation){
   input_file = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   input_file_2 = paste0(getwd(), "/fastq/", srr, "_2.fastq")
   
+  #make sure data is downloaded
+  if (!file.exists(input_file)){
+    print(paste0("INPUT FILE NOT FOUND FOR ", srr))
+    return()
+  }
+  
   
   #map to reference genome and get feature counts
   if(file.exists(input_file_2)){
