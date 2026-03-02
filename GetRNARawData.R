@@ -78,10 +78,11 @@ download_raw = function(geo_id){
     }
     return(sra_line)
   })
+  print(GSE_to_SRR)
   
   n = length(srrs)
   
-  for(i in 1:length(srrs)){
+  for(i in 1:n){
     link = srrs[[i]]
     
     #extract SRX from line, convert to SRR
