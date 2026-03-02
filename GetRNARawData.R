@@ -71,11 +71,7 @@ download_raw = function(geo_id){
   srrs = lapply(GSMList(gse), function(gsm) {
     relations = Meta(gsm)$relation
     sra_line = grep("SRA", relations, value = TRUE)
-    print(sra_line)
-    print(Meta(gsm)$geo_accession)
-    GSE_to_SRR[length(GSE_to_SRR)+1, "GSE"] = geo_id
-    GSE_to_SRR[length(GSE_to_SRR), "GSM"] = Meta(gsm)$geo_accession
-    #add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=NA, SRR=NA)
+    GSE_to_SRR = add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=NA, SRR=NA)
     return(sra_line)
   })
   print(GSE_to_SRR)
