@@ -74,7 +74,7 @@ download_raw = function(geo_id){
     print(sra_line)
     for(sra in sra_line){
       print(Meta(gsm)$geo_accession)
-      GSE_to_SRR.append(geo_id, Meta(gsm)$geo_accession, NA, NA)
+      add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=NA, SRR=NA)
     }
     return(sra_line)
   })
