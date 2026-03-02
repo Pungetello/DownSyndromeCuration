@@ -63,7 +63,6 @@ get_srr_from_srx = function(srx_id) {
 download_raw = function(geo_id){
   
   gse = getGEO(geo_id, GSEMatrix = FALSE)
-  print(geo_id)
   
   GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
   
@@ -74,7 +73,6 @@ download_raw = function(geo_id){
     GSE_to_SRR <<- add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=NA, SRR=NA)
     return(sra_line)
   })
-  print(GSE_to_SRR)
   
   n = length(srrs)
   
@@ -93,14 +91,13 @@ download_raw = function(geo_id){
     #   prefetch,
     #   args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
   }
-  print(GSE_to_SRR)
   
   #append dataframe of GSE mapped to each SRR to file
-  # if (!file.exists("Data/RNA_GSE_to_SRR.tsv")) {
-  #   write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
-  # } else {
-  #   write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv", append = TRUE, col_names = FALSE)
-  # }
+  if (!file.exists("Data/RNA_GSE_to_SRR.tsv")) {
+    write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
+  } else {
+    write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv", append = TRUE, col_names = FALSE)
+  }
   
 }
 
@@ -138,8 +135,8 @@ download_reference = function(){
 #--------------Download_RNA_data-------------
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-#for (geo_id in names(platforms_list)){
-geo_id = names(platforms_list)[2]
+for (geo_id in names(platforms_list)){
+#geo_id = names(platforms_list)[2]
   platform = platforms_list[[geo_id]]
   
   if(is.na(platform)){
@@ -155,6 +152,6 @@ geo_id = names(platforms_list)[2]
       #download reference genome needed
       download_reference()
 
-    #}
+    }
   }
 #}
