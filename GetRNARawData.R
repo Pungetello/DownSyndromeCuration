@@ -72,10 +72,8 @@ download_raw = function(geo_id){
     relations = Meta(gsm)$relation
     sra_line = grep("SRA", relations, value = TRUE)
     print(sra_line)
-    for(sra in sra_line){
-      print(Meta(gsm)$geo_accession)
-      add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=NA, SRR=NA)
-    }
+    print(Meta(gsm)$geo_accession)
+    add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=NA, SRR=NA)
     return(sra_line)
   })
   print(GSE_to_SRR)
@@ -89,6 +87,7 @@ download_raw = function(geo_id){
     srx = strsplit(link, '=')[[1]][2]
     srr = get_srr_from_srx(srx)
     
+    GSE_to_SRR[i, "SRX"] = srx
     GSE_to_SRR[i, "SRR"] = srr
     
     #download raw data by SRR ID
