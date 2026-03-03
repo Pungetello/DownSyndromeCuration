@@ -126,9 +126,9 @@ for (geo_id in names(platforms_list)){
     #skip if normalized data already exists
     if (!file.exists(sprintf("%s/Data/NormalizedData/%s.tsv.gz", getwd(), geo_id))){
 
-      #file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
-      #file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
-      #filtered_file_list = quality_control_removal(file_list, platform, geo_id)
+      file_data = sprintf("%s/Data/Files/%s", getwd(), geo_id)
+      file_list = list.files(path = file_data, pattern="^[^.]*\\.CEL\\.gz$", full.names= TRUE, ignore.case = TRUE)
+      filtered_file_list = quality_control_removal(file_list, platform, geo_id)
       
       normalized = get_scan_upc_files(file_list, platform, geo_id)
       save_normalized_file(geo_id, normalized)

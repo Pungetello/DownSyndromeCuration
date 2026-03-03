@@ -60,7 +60,7 @@ process_data = function(srr, index, annotation){
   output_file = paste0(srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
   #check if alignment has already been done
-  if (file.exists(paste0(output_file, ".summary"))){
+  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))){
     print("OUTPUT ALREADY EXISTS, SKIPPING")
     return()
   }
@@ -118,6 +118,19 @@ process_data = function(srr, index, annotation){
 
 
 
+combine_results_per_GSE = function(){
+  path = paste0(getwd(), "/Data/NormalizedData")
+  gene_counts_files = list.files(path = path, pattern="\w*_gene_counts\\.csv", full.names= TRUE)
+  TPM_files = list.files(path = path, pattern="\w*_TPM\\.txt$", full.names= TRUE)
+  
+  print(gene_counts_files)
+  print(TPM_files)
+  
+  
+}
+
+
+
 #--------------process_RNA_data-------------
 
 #get list of all srr files prefetched by previous script
@@ -139,6 +152,8 @@ for (srr in srrs){
   process_data(srr, index, annotation)
   
 }
+
+combine_results_per_GSE()
 
 
 
