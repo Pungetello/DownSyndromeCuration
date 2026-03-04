@@ -44,7 +44,8 @@ install_raw = function(srr){
 
 #checks if index has already been built for given reference genome, builds it if not
 build_index = function(index_file, ref){
-  if (!file.exists(paste0(getwd(),"/",index_file,".00.b.array"))){ #add more to check for all of them?
+  #skip if already done
+  if (!file.exists(paste0(getwd(),"/",index_file,".00.b.array"))){
     print(paste0(getwd(),"/", index_file,".00.b.array"))
     print(paste0("INDEX FILES NOT FOUND FOR ", index_file, ", CREATING"))
     #build the index from reference genome file
@@ -154,6 +155,9 @@ combine_files = function(infiles, outfile){
       file_tibble = read_tsv(file)
       print(file_tibble)
       combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
+    } else{
+      print("FILE MISSING!")
+      print(file)
     }
   }
   #print(combined_tibble)#debug
