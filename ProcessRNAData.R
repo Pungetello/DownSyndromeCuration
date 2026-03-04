@@ -146,13 +146,13 @@ combine_results_per_GSE = function(){
 
 
 combine_files = function(infiles, outfile){
-  combined_tibble = read_tsv(infiles[1])
+  if(file.exists(infiles[1])){
+    combined_tibble = read_tsv(infiles[1])
+  }
   for (file in infiles){
-    if(file.exists(file)){
-      file_tibble = read_tsv(file)
-      print(file_tibble)
-      combined_tibble <<- full_join(combined_tibble, file_tibble)
-    }
+    file_tibble = read_tsv(file)
+    print(file_tibble)
+    combined_tibble <<- full_join(combined_tibble, file_tibble)
   }
   print(combined_tibble)#debug
   
