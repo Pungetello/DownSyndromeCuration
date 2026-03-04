@@ -120,22 +120,57 @@ process_data = function(srr, index, annotation){
 
 combine_results_per_GSE = function(){
   path = paste0(getwd(), "/Data/NormalizedData")
-  #gene_counts_files = list.files(path = path, pattern="\w*_gene_counts\\.csv", full.names= TRUE)
-  #TPM_files = list.files(path = path, pattern="\w*_TPM\\.txt$", full.names= TRUE)
+  #gene_counts_files = list.files(path = path, pattern="\\w*_gene_counts\\.csv", full.names= TRUE)
+  #TPM_files = list.files(path = path, pattern="\\w*_TPM\\.txt$", full.names= TRUE)
   
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   
-  print(gene_counts_files)
-  print(TPM_files)
+  print(gene_counts_files)#debug
+  print(TPM_files)#debug
   
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
+  print(gses)
+  
   for(gse in gses){
+    combined_gene_counts = tibble(gene_id = character(), count = numeric())
+    srrs = filter(GSE_to_SRR, GSE = gse)%>%
+      pull(srr)
+    print(srrs)#debug
     
     
+    gene_count_files = ""
+    TMP_files = ""
+    for (srr in srrs){
+      gene_count = paste0(getwd(), "Data/NormalizedData/", srr, "_gene_counts.csv")
+      gene_count_files = c(gene_count_files, gene_count)
+      
+      TPM = paste0(getwd(), "Data/NormalizedData/", srr, "_TMP.txt")
+      TPM_files = c(TPM_files, TPM)
+    }
+    
+    gene_counts_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_gene_counts.tsv")
+    combine_files(gene_count_files, gene_counts_filename)
+    
+    TPM_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_TMP.tsv")
+    combine_files(gene_count_files, gene_counts_filename)
   }
   
+}
+
+
+combine_files = function(infiles, outfile){
+  combined_tibble = tibble()
+  for (file in infiles){
+    if(file.exists(file)){
+      file_tibble = read_tsv(file)
+      combined_tibble <<- inner_join(combined_tibble, file_tibble)
+    }
+  }
+  print(combined_tibble)#debug
+  
+  write_tsv(combined_tibble, outfile)
 }
 
 
@@ -154,15 +189,15 @@ for (srr in srrs){
   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   index = "GRCm39_index"
   
-  install_raw(srr)
+  #install_raw(srr)
   
-  build_index(index, ref)
+  #build_index(index, ref)
   
-  process_data(srr, index, annotation)
+  #process_data(srr, index, annotation)
   
 }
 
-#combine_results_per_GSE()
+combine_results_per_GSE()
 
 
 
