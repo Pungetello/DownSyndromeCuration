@@ -133,8 +133,8 @@ combine_results_per_GSE = function(){
       pull(SRR)
     print(srrs)#debug
     
-    gene_count_files = paste0(getwd(), "Data/NormalizedData/", srrs, "_gene_counts.csv")
-    TPM_files = TPM = paste0(getwd(), "Data/NormalizedData/", srrs, "_TMP.txt")
+    gene_count_files = paste0(getwd(), "/Data/NormalizedData/", srrs, "_gene_counts.csv")
+    TPM_files = TPM = paste0(getwd(), "/Data/NormalizedData/", srrs, "_TMP.txt")
     
     print(gene_count_files[1])#debug
     if(file.exists(gene_count_files[1])){
