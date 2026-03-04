@@ -127,6 +127,7 @@ combine_results_per_GSE = function(){
   print(gses)#debug
   
   for(gse in gses){
+    print(gse)#debug
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
@@ -135,6 +136,7 @@ combine_results_per_GSE = function(){
     gene_count_files = paste0(getwd(), "Data/NormalizedData/", srrs, "_gene_counts.csv")
     TPM_files = TPM = paste0(getwd(), "Data/NormalizedData/", srrs, "_TMP.txt")
     
+    print(gene_count_files[1])#debug
     if(file.exists(gene_count_files[1])){
       gene_counts_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_gene_counts.tsv")
       combine_files(gene_count_files, gene_counts_filename)
