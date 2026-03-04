@@ -125,9 +125,6 @@ combine_results_per_GSE = function(){
   
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   
-  print(gene_counts_files)#debug
-  print(TPM_files)#debug
-  
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
@@ -182,20 +179,20 @@ srrs = list.files("Data/RawRNA")
 print(srrs)
 
 #finish installation by converting to fastq format
-for (srr in srrs){
-  print(srr)
-  
-  ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-  annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-  index = "GRCm39_index"
-  
-  #install_raw(srr)
-  
-  #build_index(index, ref)
-  
-  #process_data(srr, index, annotation)
-  
-}
+# for (srr in srrs){
+#   print(srr)
+#   
+#   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+#   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+#   index = "GRCm39_index"
+#   
+#   install_raw(srr)
+#   
+#   build_index(index, ref)
+#   
+#   process_data(srr, index, annotation)
+#   
+# }
 
 combine_results_per_GSE()
 
