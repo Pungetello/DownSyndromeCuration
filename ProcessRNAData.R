@@ -135,24 +135,27 @@ combine_results_per_GSE = function(){
     gene_count_files = paste0(getwd(), "Data/NormalizedData/", srrs, "_gene_counts.csv")
     TPM_files = TPM = paste0(getwd(), "Data/NormalizedData/", srrs, "_TMP.txt")
     
-    gene_counts_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_gene_counts.tsv")
-    combine_files(gene_count_files, gene_counts_filename)
-    
-    TPM_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_TMP.tsv")
-    combine_files(gene_count_files, gene_counts_filename)
+    if(file.exists(gene_count_files[1])){
+      gene_counts_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_gene_counts.tsv")
+      combine_files(gene_count_files, gene_counts_filename)
+    }
+    if(file.exists(TPM_files[1])){
+      TPM_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_TMP.tsv")
+      combine_files(TPM_files, TPM_filename)
+    }
   }
 }
 
 
 
 combine_files = function(infiles, outfile){
-  if(file.exists(infiles[1])){
-    combined_tibble = read_tsv(infiles[1])
-  }
+  combined_tibble = read_tsv(infiles[1])
   for (file in infiles){
-    file_tibble = read_tsv(file)
-    print(file_tibble)
-    combined_tibble <<- full_join(combined_tibble, file_tibble)
+    if(file.exists(file)){
+      file_tibble = read_tsv(file)
+      print(file_tibble)
+      combined_tibble <<- full_join(combined_tibble, file_tibble)
+    }
   }
   print(combined_tibble)#debug
   
