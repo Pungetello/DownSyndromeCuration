@@ -124,24 +124,20 @@ combine_results_per_GSE = function(){
   
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
-  print(gses)#debug
   
   for(gse in gses){
-    print(gse)#debug
+    #print(gse)#debug
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
-    print(srrs)#debug
     
     gene_count_files = paste0(getwd(), "/Data/NormalizedData/", srrs, "_gene_counts.csv")
     TPM_files = TPM = paste0(getwd(), "/Data/NormalizedData/", srrs, "_TPM.txt")
     
-    print(gene_count_files[1])#debug
     if(file.exists(gene_count_files[1])){
       gene_counts_filename = paste0(getwd(), "/Data/NormalizedData/", gse, "_gene_counts.tsv")
       combine_files(gene_count_files, gene_counts_filename)
     }
-    print(TPM_files[1])#debug
     if(file.exists(TPM_files[1])){
       TPM_filename = paste0(getwd(), "/Data/NormalizedData/", gse, "_TPM.tsv")
       combine_files(TPM_files, TPM_filename)
@@ -160,8 +156,7 @@ combine_files = function(infiles, outfile){
       combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
     }
   }
-  print(combined_tibble)#debug
-  
+  #print(combined_tibble)#debug
   write_tsv(combined_tibble, outfile)
 }
 
@@ -171,23 +166,23 @@ combine_files = function(infiles, outfile){
 
 #get list of all srr files prefetched by previous script
 srrs = list.files("Data/RawRNA")
-#print(srrs)
+print(srrs)
 
-#finish installation by converting to fastq format
-# for (srr in srrs){
-#   print(srr)
-#   
-#   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-#   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-#   index = "GRCm39_index"
-#   
-#   install_raw(srr)
-#   
-#   build_index(index, ref)
-#   
-#   process_data(srr, index, annotation)
-#   
-# }
+for (srr in srrs){
+  print(srr)
+
+  ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+  index = "GRCm39_index"
+
+  #finish installation by converting to fastq format
+  install_raw(srr)
+
+  build_index(index, ref)
+
+  process_data(srr, index, annotation)
+
+}
 
 combine_results_per_GSE()
 
