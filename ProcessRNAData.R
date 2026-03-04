@@ -156,7 +156,7 @@ combine_files = function(infiles, outfile){
     if(file.exists(file)){
       file_tibble = read_tsv(file)
       print(file_tibble)
-      combined_tibble <<- full_join(combined_tibble, file_tibble, by = "gene_id")
+      combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
     }
   }
   print(combined_tibble)#debug
