@@ -124,7 +124,6 @@ combine_results_per_GSE = function(){
   
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
-  
   print(gses)#debug
   
   for(gse in gses){
@@ -142,15 +141,16 @@ combine_results_per_GSE = function(){
     TPM_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_TMP.tsv")
     combine_files(gene_count_files, gene_counts_filename)
   }
-  
 }
 
 
+
 combine_files = function(infiles, outfile){
-  combined_tibble = tibble()
+  combined_tibble = read_tsv(infiles[1])
   for (file in infiles){
     if(file.exists(file)){
       file_tibble = read_tsv(file)
+      print(file_tibble)
       combined_tibble <<- full_join(combined_tibble, file_tibble)
     }
   }
