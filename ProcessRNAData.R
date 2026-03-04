@@ -128,12 +128,12 @@ combine_results_per_GSE = function(){
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
-  print(gses)
+  print(gses)#debug
   
   for(gse in gses){
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
-      pull(srr)
+      pull(SRR)
     print(srrs)#debug
     
     
