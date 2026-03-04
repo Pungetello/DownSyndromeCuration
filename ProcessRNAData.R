@@ -76,7 +76,6 @@ process_data = function(srr, index, annotation){
     return()
   }
   
-  
   #map to reference genome and get feature counts
   if(file.exists(input_file_2)){
     #paired end
@@ -119,6 +118,7 @@ process_data = function(srr, index, annotation){
 
 
 
+#For each GSE in the GSE_to_SRR file, combine all the result data from its SRR's into one file
 combine_results_per_GSE = function(){
   
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
@@ -148,6 +148,7 @@ combine_results_per_GSE = function(){
 
 
 
+#takes in a list of file paths, reads them in, full joins them, and writes them to the out file path.
 combine_files = function(infiles, outfile){
   combined_tibble = read_tsv(infiles[1])
   for (file in infiles[-1]){
@@ -160,6 +161,8 @@ combine_files = function(infiles, outfile){
       print(file)
     }
   }
+  #remove .num at the end of gene_id's
+  combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
   #print(combined_tibble)#debug
   write_tsv(combined_tibble, outfile)
 }
@@ -189,8 +192,4 @@ for (srr in srrs){
 }
 
 combine_results_per_GSE()
-
-
-
-
 
