@@ -120,12 +120,21 @@ process_data = function(srr, index, annotation){
 
 combine_results_per_GSE = function(){
   path = paste0(getwd(), "/Data/NormalizedData")
-  gene_counts_files = list.files(path = path, pattern="\w*_gene_counts\\.csv", full.names= TRUE)
-  TPM_files = list.files(path = path, pattern="\w*_TPM\\.txt$", full.names= TRUE)
+  #gene_counts_files = list.files(path = path, pattern="\w*_gene_counts\\.csv", full.names= TRUE)
+  #TPM_files = list.files(path = path, pattern="\w*_TPM\\.txt$", full.names= TRUE)
+  
+  GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   
   print(gene_counts_files)
   print(TPM_files)
   
+  gses = pull(GSE_to_SRR, GSE)%>%
+    unique()
+  
+  for(gse in gses){
+    
+    
+  }
   
 }
 
@@ -153,7 +162,7 @@ for (srr in srrs){
   
 }
 
-combine_results_per_GSE()
+#combine_results_per_GSE()
 
 
 
