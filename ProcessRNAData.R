@@ -132,7 +132,7 @@ combine_results_per_GSE = function(){
   
   for(gse in gses){
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
-    srrs = filter(GSE_to_SRR, GSE = gse)%>%
+    srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(srr)
     print(srrs)#debug
     
@@ -176,7 +176,7 @@ combine_files = function(infiles, outfile){
 
 #get list of all srr files prefetched by previous script
 srrs = list.files("Data/RawRNA")
-print(srrs)
+#print(srrs)
 
 #finish installation by converting to fastq format
 # for (srr in srrs){
