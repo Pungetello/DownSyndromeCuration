@@ -87,9 +87,9 @@ download_raw = function(geo_id){
     GSE_to_SRR[i, "SRR"] = srr
     
     #download raw data by SRR ID
-    # system2(
-    #   prefetch,
-    #   args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
+    system2(
+      prefetch,
+      args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
   }
   
   #append dataframe of GSE mapped to each SRR to file
@@ -136,7 +136,6 @@ download_reference = function(){
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in names(platforms_list)){
-#geo_id = names(platforms_list)[2]
   platform = platforms_list[[geo_id]]
   
   if(is.na(platform)){
