@@ -136,20 +136,11 @@ combine_results_per_GSE = function(){
       pull(SRR)
     print(srrs)#debug
     
-    test_gene_count_files = paste0(getwd(), "Data/NormalizedData/", srrs, "_gene_counts.csv")
-    print(test_gene_count_files)
+    gene_count_files = paste0(getwd(), "Data/NormalizedData/", srrs, "_gene_counts.csv")
+    TPM_files = TPM = paste0(getwd(), "Data/NormalizedData/", srrs, "_TMP.txt")
     
-    gene_count_files = c()
-    TMP_files = c()
-    for (srr in srrs){
-      gene_count = paste0(getwd(), "Data/NormalizedData/", srr, "_gene_counts.csv")
-      gene_count_files = c(gene_count_files, gene_count)
-      
-      TPM = paste0(getwd(), "Data/NormalizedData/", srr, "_TMP.txt")
-      TPM_files = c(TPM_files, TPM)
-    }
-    
-    print(gene_count_files)
+    print(gene_count_files)#debug
+    print(TPM_files)#debug
     
     gene_counts_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_gene_counts.tsv")
     combine_files(gene_count_files, gene_counts_filename)
