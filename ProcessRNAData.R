@@ -138,11 +138,11 @@ combine_results_per_GSE = function(){
     
     print(gene_count_files[1])#debug
     if(file.exists(gene_count_files[1])){
-      gene_counts_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_gene_counts.tsv")
+      gene_counts_filename = paste0(getwd(), "/Data/NormalizedData/", gse, "_gene_counts.tsv")
       combine_files(gene_count_files, gene_counts_filename)
     }
     if(file.exists(TPM_files[1])){
-      TPM_filename = paste0(getwd(), "Data/NormalizedData/", gse, "_TMP.tsv")
+      TPM_filename = paste0(getwd(), "/Data/NormalizedData/", gse, "_TMP.tsv")
       combine_files(TPM_files, TPM_filename)
     }
   }
@@ -156,7 +156,7 @@ combine_files = function(infiles, outfile){
     if(file.exists(file)){
       file_tibble = read_tsv(file)
       print(file_tibble)
-      combined_tibble <<- full_join(combined_tibble, file_tibble)
+      combined_tibble <<- full_join(combined_tibble, file_tibble, by = "gene_id")
     }
   }
   print(combined_tibble)#debug
