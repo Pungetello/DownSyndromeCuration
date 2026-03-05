@@ -11,6 +11,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 library(Rsubread)
 library(tidyverse)
 library(dplyr)
+library(edgeR)
 
 #----------functions-------------
 
@@ -79,12 +80,12 @@ process_data = function(srr, index, annotation){
   #map to reference genome and get feature counts
   if(file.exists(input_file_2)){
     #paired end
-    align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
+    #align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE, isPairedEnd = TRUE)
     
   }else{
     #not paired end
-    align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
+    #align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE)
   }
   #delete BAM files
@@ -99,21 +100,42 @@ process_data = function(srr, index, annotation){
   
   write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
   
-  #calculate tpm file
-  counts <- feature_counts$counts
-  gene_length <- feature_counts$annotation$Length
+  return(feature_counts)
+}
+
+
+
+#Use edgeR to calculate cpm and rpkm, calculate tpm manually
+calculate_data_files = function(feature_counts){
+  counts = feature_counts$counts
+  gene_length = feature_counts$annotation$Length
   
+  dge = DGEList(counts = counts, genes = data.frame(Length = gene_length))
+  
+  #calculate cpm
+  cpm = cpm(dge)
+  cpm_df = rownames_to_column(as.data.frame(cpm), "gene_id")
+  colnames(cpm_df)[2] <- srr
+  
+  write_tsv(cpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_CPM.tsv"))
+  
+  #calculate rpkm
+  rpkm = rpkm(dge, gene.length = dge$genes$Length)
+  
+  rpkm_df = rownames_to_column(as.data.frame(rpkm), "gene_id")
+  colnames(rpkm_df)[2] <- srr
+  
+  write_tsv(rpkm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_RPKM.tsv"))
+  
+  #calculate tpm
   length_kb <- gene_length / 1000
   rpk <- counts / length_kb
   tpm <- t( t(rpk) / colSums(rpk) ) * 1e6
   
-  tpm_df = as.data.frame(tpm)
-  tpm_df$gene_id = rownames(tpm_df)
-  tpm_df = rename(tpm_df, !!srr := paste0(srr,"_AlignResults.BAM")) %>%
-    select("gene_id", srr)
+  tpm_df = rownames_to_column(as.data.frame(tpm), "gene_id")
+  colnames(tpm_df)[2] <- srr
   
-  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))
-  
+  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.tsv"))
 }
 
 
@@ -132,39 +154,39 @@ combine_results_per_GSE = function(){
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
     
-    gene_count_files = paste0(getwd(), "/Data/NormalizedData/", srrs, "_gene_counts.csv")
-    TPM_files = TPM = paste0(getwd(), "/Data/NormalizedData/", srrs, "_TPM.txt")
     
-    if(file.exists(gene_count_files[1])){
-      gene_counts_filename = paste0(getwd(), "/Data/NormalizedData/", gse, "_gene_counts.tsv")
-      combine_files(gene_count_files, gene_counts_filename)
-    }
-    if(file.exists(TPM_files[1])){
-      TPM_filename = paste0(getwd(), "/Data/NormalizedData/", gse, "_TPM.tsv")
-      combine_files(TPM_files, TPM_filename)
-    }
+    combine_files(gse, srrs, "_gene_counts.csv")
+    combine_files(gse, srrs, "_TPM.tsv")
+    combine_files(gse, srrs, "_CPM.tsv")
+    combine_files(gse, srrs, "_RPKM.tsv")
+    
   }
 }
 
 
 
 #takes in a list of file paths, reads them in, full joins them, and writes them to the out file path.
-combine_files = function(infiles, outfile){
-  combined_tibble = read_tsv(infiles[1])
-  for (file in infiles[-1]){
-    if(file.exists(file)){
-      file_tibble = read_tsv(file)
-      print(file_tibble)
-      combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
-    } else{
-      print("FILE MISSING!")
-      print(file)
+combine_files = function(gse, srrs, suffix){
+  infiles = paste0(getwd(), "/Data/NormalizedData/", srrs, suffix)
+  if(file.exists(infiles[1])){
+    outfile = paste0(getwd(), "/Data/NormalizedData/", gse, suffix)
+    combined_tibble = read_tsv(infiles[1])
+    
+    for (file in infiles[-1]){
+      if(file.exists(file)){
+        file_tibble = read_tsv(file)
+        print(file_tibble)
+        combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
+      } else{
+        print("FILE MISSING!")
+        print(file)
+      }
     }
+    #remove .num at the end of gene_id's
+    combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
+    #print(combined_tibble)#debug
+    write_tsv(combined_tibble, outfile)
   }
-  #remove .num at the end of gene_id's
-  combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
-  #print(combined_tibble)#debug
-  write_tsv(combined_tibble, outfile)
 }
 
 
@@ -187,7 +209,9 @@ for (srr in srrs){
 
   build_index(index, ref)
 
-  process_data(srr, index, annotation)
+  feature_counts = process_data(srr, index, annotation)
+  
+  calculate_data_files(feature_counts)
 
 }
 
