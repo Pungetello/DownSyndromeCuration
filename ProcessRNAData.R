@@ -100,7 +100,7 @@ process_data = function(srr, index, annotation){
   
   write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.csv"))
   
-  return(feature_counts)
+  calculate_data_files(feature_counts)
 }
 
 
@@ -197,7 +197,9 @@ combine_files = function(gse, srrs, suffix){
 srrs = list.files("Data/RawRNA")
 print(srrs)
 
-for (srr in srrs){
+#for (srr in srrs){
+
+srr = srrs[1]#debug
   print(srr)
 
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
@@ -210,10 +212,8 @@ for (srr in srrs){
   build_index(index, ref)
 
   feature_counts = process_data(srr, index, annotation)
-  
-  calculate_data_files(feature_counts)
 
-}
+#}
 
 combine_results_per_GSE()
 
