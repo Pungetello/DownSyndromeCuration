@@ -148,8 +148,9 @@ combine_results_per_GSE = function(){
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
-  for(gse in gses){
+  #for(gse in gses){
     #print(gse)#debug
+  gse = "GSE184771"
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
@@ -160,7 +161,7 @@ combine_results_per_GSE = function(){
     combine_files(gse, srrs, "_CPM.tsv")
     combine_files(gse, srrs, "_RPKM.tsv")
     
-  }
+  #}
 }
 
 
