@@ -80,12 +80,12 @@ process_data = function(srr, index, annotation){
   #map to reference genome and get feature counts
   if(file.exists(input_file_2)){
     #paired end
-    #align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
+    align(index=index,readfile1=input_file,readfile2=input_file_2,output_file=output_file,phredOffset=33)
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE, isPairedEnd = TRUE)
     
   }else{
     #not paired end
-    #align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
+    align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE)
   }
   #delete BAM files
