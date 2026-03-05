@@ -25,7 +25,8 @@ BiocManager::install(c("tidyverse",
                        "biomaRt",
                        "RCurl",
                        "rentrez",
-                       "Rsubread"
+                       "Rsubread",
+                       "edgeR"
                        ), lib = user_lib
 )
 
