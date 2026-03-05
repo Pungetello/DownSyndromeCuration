@@ -156,7 +156,7 @@ combine_results_per_GSE = function(){
       pull(SRR)
     
     
-    combine_files(gse, srrs, "_gene_counts.csv")
+    #combine_files(gse, srrs, "_gene_counts.csv")
     combine_files(gse, srrs, "_TPM.tsv")
     combine_files(gse, srrs, "_CPM.tsv")
     combine_files(gse, srrs, "_RPKM.tsv")
@@ -185,7 +185,7 @@ combine_files = function(gse, srrs, suffix){
     }
     #remove .num at the end of gene_id's
     combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
-    #print(combined_tibble)#debug
+    print(combined_tibble)#debug
     write_tsv(combined_tibble, outfile)
   }
 }
