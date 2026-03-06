@@ -25,3 +25,6 @@ source("ProcessRNAData.R")
 
 #creates GeneMetadata by reading NormalizedData for affymetrix, gene_data for RNA.
 source("GeneMetadata.R")
+
+#runs differential expression analysis 
+source("DiffExpAnalysis.R")
