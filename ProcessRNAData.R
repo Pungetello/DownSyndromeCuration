@@ -62,7 +62,7 @@ process_data = function(srr, index, annotation){
   output_file = paste0(srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
   #check if alignment has already been done
-  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.txt"))){
+  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.tsv"))){
     print("OUTPUT ALREADY EXISTS, SKIPPING")
     return()
   }
