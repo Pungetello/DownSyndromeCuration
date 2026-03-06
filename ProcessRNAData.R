@@ -148,20 +148,20 @@ combine_results_per_GSE = function(){
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
-  #for(gse in gses){
+  for(gse in gses){
     #print(gse)#debug
-  gse = "GSE184771"
+  #gse = "GSE184771"
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
     
     
-    #combine_files(gse, srrs, "_gene_counts.csv")
+    combine_files(gse, srrs, "_gene_counts.csv")
     combine_files(gse, srrs, "_TPM.tsv")
     combine_files(gse, srrs, "_CPM.tsv")
     combine_files(gse, srrs, "_RPKM.tsv")
     
-  #}
+  }
 }
 
 
@@ -169,7 +169,6 @@ combine_results_per_GSE = function(){
 #takes in a list of file paths, reads them in, full joins them, and writes them to the out file path.
 combine_files = function(gse, srrs, suffix){
   infiles = paste0(getwd(), "/Data/NormalizedData/", srrs, suffix)
-  print(infiles)
   if(file.exists(infiles[1])){
     outfile = paste0(getwd(), "/Data/NormalizedData/", gse, suffix)
     combined_tibble = read_tsv(infiles[1])
@@ -177,7 +176,7 @@ combine_files = function(gse, srrs, suffix){
     for (file in infiles[-1]){
       if(file.exists(file)){
         file_tibble = read_tsv(file)
-        print(file_tibble)
+        #print(file_tibble)
         combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
       } else{
         print("FILE MISSING!")
@@ -186,7 +185,7 @@ combine_files = function(gse, srrs, suffix){
     }
     #remove .num at the end of gene_id's
     combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
-    print(combined_tibble)#debug
+    #print(combined_tibble)#debug
     write_tsv(combined_tibble, outfile)
   }
 }
@@ -199,9 +198,9 @@ combine_files = function(gse, srrs, suffix){
 srrs = list.files("Data/RawRNA")
 print(srrs)
 
-#for (srr in srrs){
+for (srr in srrs){
 
-srr = srrs[1]#debug
+#srr = srrs[1]#debug
   print(srr)
 
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
@@ -215,7 +214,7 @@ srr = srrs[1]#debug
 
   feature_counts = process_data(srr, index, annotation)
 
-#}
+}
 
 combine_results_per_GSE()
 
