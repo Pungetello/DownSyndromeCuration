@@ -161,7 +161,7 @@ combine_results_per_GSE = function(){
     combine_files(gse, srrs, "_CPM.tsv")
     combine_files(gse, srrs, "_RPKM.tsv")
     
-  }
+  #}
 }
 
 
