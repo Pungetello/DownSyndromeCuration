@@ -148,9 +148,9 @@ combine_results_per_GSE = function(){
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
-  for(gse in gses){
+  #for(gse in gses){
     #print(gse)#debug
-  #gse = "GSE184771"
+  gse = "GSE184771"
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
@@ -210,9 +210,9 @@ for (srr in srrs){
   #finish installation by converting to fastq format
   install_raw(srr)
 
-  build_index(index, ref)
+  #build_index(index, ref)
 
-  feature_counts = process_data(srr, index, annotation)
+  #feature_counts = process_data(srr, index, annotation)
 
 }
 
