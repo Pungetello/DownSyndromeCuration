@@ -208,7 +208,7 @@ for (srr in srrs){
   index = "GRCm39_index"
 
   #finish installation by converting to fastq format
-  install_raw(srr)
+  #install_raw(srr)
 
   #build_index(index, ref)
 
