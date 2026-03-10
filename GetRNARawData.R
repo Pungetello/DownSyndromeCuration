@@ -87,9 +87,9 @@ download_raw = function(geo_id){
     GSE_to_SRR[i, "SRR"] = srr
     
     #download raw data by SRR ID
-    system2(
-      prefetch,
-      args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
+    # system2(
+    #   prefetch,
+    #   args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
   }
   
   #append dataframe of GSE mapped to each SRR to file
