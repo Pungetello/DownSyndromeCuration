@@ -154,6 +154,8 @@ combine_results_per_GSE = function(){
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
+    print("SRR LIST:")
+    print(srrs)#debug
     
     
     #combine_files(gse, srrs, "_gene_counts.csv")
