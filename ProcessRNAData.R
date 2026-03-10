@@ -148,22 +148,22 @@ combine_results_per_GSE = function(){
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
-  #for(gse in gses){
+  for(gse in gses){
     #print(gse)#debug
-  gse = "GSE184771"
+  #gse = "GSE184771"
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
-    print("SRR LIST:")
-    print(srrs)#debug
+    #print("SRR LIST:")
+    #print(srrs)#debug
     
     
-    #combine_files(gse, srrs, "_gene_counts.csv")
+    combine_files(gse, srrs, "_gene_counts.csv")
     combine_files(gse, srrs, "_TPM.tsv")
-    #combine_files(gse, srrs, "_CPM.tsv")
-    #combine_files(gse, srrs, "_RPKM.tsv")
+    combine_files(gse, srrs, "_CPM.tsv")
+    combine_files(gse, srrs, "_RPKM.tsv")
     
-  #}
+  }
 }
 
 
@@ -174,19 +174,19 @@ combine_files = function(gse, srrs, suffix){
   if(file.exists(infiles[1])){
     outfile = paste0(getwd(), "/Data/NormalizedData/", gse, suffix)
     combined_tibble = read_tsv(infiles[1])
-    print("INITIAL TIBBLE")
-    print(combined_tibble)#debug
-    print("INFILES")
-    print(infiles)
+    #print("INITIAL TIBBLE")
+    #print(combined_tibble)#debug
+    #print("INFILES")
+    #print(infiles)
     
     for (file in infiles[-1]){
       if(file.exists(file)){
         file_tibble = read_tsv(file)
-        print("READ IN FILE")
-        print(file_tibble)#debug
+        #print("READ IN FILE")
+        #print(file_tibble)#debug
         combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
-        print("COMBINED TIBBLE")
-        print(combined_tibble)#debug
+        #print("COMBINED TIBBLE")
+        #print(combined_tibble)#debug
       } else{
         print("FILE MISSING!")
         print(file)
