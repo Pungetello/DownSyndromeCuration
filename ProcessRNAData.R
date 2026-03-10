@@ -172,7 +172,7 @@ combine_files = function(gse, srrs, suffix){
   if(file.exists(infiles[1])){
     outfile = paste0(getwd(), "/Data/NormalizedData/", gse, suffix)
     combined_tibble = read_tsv(infiles[1])
-    orint("INITIAL TIBBLE")
+    print("INITIAL TIBBLE")
     print(combined_tibble)#debug
     
     for (file in infiles[-1]){
