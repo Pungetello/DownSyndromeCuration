@@ -213,11 +213,11 @@ for (srr in srrs){
   index = "GRCm39_index"
 
   #finish installation by converting to fastq format
-  #install_raw(srr)
+  install_raw(srr)
 
-  #build_index(index, ref)
+  build_index(index, ref)
 
-  #feature_counts = process_data(srr, index, annotation)
+  feature_counts = process_data(srr, index, annotation)
 
 }
 
