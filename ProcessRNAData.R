@@ -174,6 +174,8 @@ combine_files = function(gse, srrs, suffix){
     combined_tibble = read_tsv(infiles[1])
     print("INITIAL TIBBLE")
     print(combined_tibble)#debug
+    print("INFILES")
+    print(infiles)
     
     for (file in infiles[-1]){
       if(file.exists(file)){
