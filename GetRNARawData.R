@@ -86,8 +86,8 @@ download_raw = function(geo_id){
     GSE_to_SRR[i, "SRX"] = srx
     GSE_to_SRR[i, "SRR"] = srr
     
-    if(!file.exists(paste0(getwd(), "/fastq/", srr, "_1.fastq"))){
-      print(paste0(getwd(), "/fastq/", srr, "_1.fastq NOT FOUND, DOWNLOADING RAW DATA FOR ", srr))
+    if(!file.exists(paste0(getwd(), "/Data/RawRNA/", srr))){
+      print(paste0(getwd(), "/Data/RawRNA/", srr, "NOT FOUND, DOWNLOADING RAW DATA FOR ", srr))
     
       #download raw data by SRR ID if not done already
       system2(
