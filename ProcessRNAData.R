@@ -35,6 +35,7 @@ install_raw = function(srr){
   
   #skip if file has already been downloaded
   if (!file.exists(out_path)){
+    print(paste0("NO INSTALLED DATA FOUND FOR ", srr))
     system2(
       fasterq,
       args = c(in_path, "--split-files", "--outdir fastq"))
@@ -148,14 +149,12 @@ combine_results_per_GSE = function(){
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
   
-  #for(gse in gses){
+  for(gse in gses){
     #print(gse)#debug
-  gse = "GSE184771"
+  #gse = "GSE184771"
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
-    #print("SRR LIST:")
-    #print(srrs)#debug
     
     
     combine_files(gse, srrs, "_gene_counts.csv")
@@ -163,7 +162,7 @@ combine_results_per_GSE = function(){
     combine_files(gse, srrs, "_CPM.tsv")
     combine_files(gse, srrs, "_RPKM.tsv")
     
-  #}
+  }
 }
 
 
@@ -174,19 +173,11 @@ combine_files = function(gse, srrs, suffix){
   if(file.exists(infiles[1])){
     outfile = paste0(getwd(), "/Data/NormalizedData/", gse, suffix)
     combined_tibble = read_tsv(infiles[1])
-    #print("INITIAL TIBBLE")
-    #print(combined_tibble)#debug
-    #print("INFILES")
-    #print(infiles)
     
     for (file in infiles[-1]){
       if(file.exists(file)){
         file_tibble = read_tsv(file)
-        #print("READ IN FILE")
-        #print(file_tibble)#debug
         combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
-        #print("COMBINED TIBBLE")
-        #print(combined_tibble)#debug
       } else{
         print("FILE MISSING!")
         print(file)
@@ -194,7 +185,6 @@ combine_files = function(gse, srrs, suffix){
     }
     #remove .num at the end of gene_id's
     combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
-    #print(combined_tibble)#debug
     write_tsv(combined_tibble, outfile)
   }
 }
@@ -207,9 +197,9 @@ combine_files = function(gse, srrs, suffix){
 srrs = list.files("Data/RawRNA")
 print(srrs)
 
-#for (srr in srrs){
+for (srr in srrs){
 
-srr = srrs[1]#debug
+#srr = srrs[1]#debug
   print(srr)
 
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
@@ -217,13 +207,13 @@ srr = srrs[1]#debug
   index = "GRCm39_index"
 
   #finish installation by converting to fastq format
-  # install_raw(srr)
+  install_raw(srr)
 
-  # build_index(index, ref)
+  build_index(index, ref)
 
-  # feature_counts = process_data(srr, index, annotation)
+  feature_counts = process_data(srr, index, annotation)
 
-# }
+}
 
 combine_results_per_GSE()
 
