@@ -86,10 +86,13 @@ download_raw = function(geo_id){
     GSE_to_SRR[i, "SRX"] = srx
     GSE_to_SRR[i, "SRR"] = srr
     
-    #download raw data by SRR ID
-    # system2(
-    #   prefetch,
-    #   args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
+    if(!file.exists(paste0(getwd(), "/fastq/", srr, "_1.fastq"))){
+    
+      #download raw data by SRR ID if not done already
+      system2(
+        prefetch,
+        args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA/", srr)))
+    }
   }
   
   #append dataframe of GSE mapped to each SRR to file
@@ -134,13 +137,19 @@ download_reference = function(){
 
 #--------------Download_RNA_data-------------
 
+#remove alignment file if it exists, since this script will just append to it.
+if(file.exists(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))){
+  file.remove(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
+}
+
+
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in names(platforms_list)){
   platform = platforms_list[[geo_id]]
   
   if(is.na(platform)){
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
-    #if(!file.exists(destination)){
+    #if(!file.exists(destination)){ #for filtering out human RNA
       
       #make sure SRA toolkit is downloaded
       check_sra()
