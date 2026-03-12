@@ -18,7 +18,7 @@ library(tidyverse)
 
 #creates a metadata file for deseq2 for the GSE given
 create_metadata = function(gse){
-  GSE_to_SRR = read.tsv("Data/RNA_GSE_to_SRR.tsv")
+  GSE_to_SRR = read_tsv("Data/RNA_GSE_to_SRR.tsv")
   sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
   metadata = filter(sample_metadata, Dataset_ID = gse)%>%
