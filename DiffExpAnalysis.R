@@ -43,7 +43,7 @@ file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
   #get gene_counts for the GRE
   counts = read_tsv(file)
   print(counts) #debug
-  counts = column_to_rownames(var = "gene_id")
+  counts = column_to_rownames(counts, var = "gene_id")
   print(counts) #debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
