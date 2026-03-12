@@ -26,6 +26,7 @@ create_metadata = function(gse){
     print()%>%
     rename(GSE = ID)%>%
     full_join(filter(GSE_to_SRR, GSE==gse), by = "GSE")%>%
+    print()%>%
     select(SRR, Value)%>%
     print()#debug
   
