@@ -23,6 +23,7 @@ create_metadata = function(gse){
   
   metadata = filter(sample_metadata, Dataset_ID == gse)%>%
     select(ID, Value)%>%
+    print()%>%
     rename(GSE, ID)%>%
     full_join(filter(GSE_to_SRR, GSE==gse), by = "GSE")%>%
     select(SRR, Value)%>%
