@@ -10,6 +10,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 #-----------loading_libraries-----------
 
 library(DESeq2)
+library(tidyverse)
 
 
 #----------functions-------------
@@ -18,7 +19,7 @@ library(DESeq2)
 #creates a metadata file for deseq2 for the GSE given
 create_metadata = function(gse){
   GSE_to_SRR = read.tsv("Data/RNA_GSE_to_SRR.tsv")
-  sample_metadata = read.tsv("Data/Metadata/SampleMetadata.tsv")
+  sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
   metadata = filter(sample_metadata, Dataset_ID = gse)%>%
     select(ID, Value)%>%
@@ -33,13 +34,13 @@ create_metadata = function(gse){
 
 #----------Differential Expression Analysis-------------
 
-files = list.files(path = "Data/NormalizedData", pattern = "GSE*_gene_counts.csv")
+files = list.files(path = "/Data/NormalizedData/", pattern = "GSE*_gene_counts.csv")
 print(files)#debug
 
 file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
 #for (file in files){
   #get gene_counts for the GRE
-  counts = read.csv(file)
+  counts = read_csv(file)
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]
