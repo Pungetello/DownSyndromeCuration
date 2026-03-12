@@ -23,10 +23,8 @@ create_metadata = function(gse){
   
   metadata = filter(sample_metadata, Dataset_ID == gse)%>%
     select(ID, Value)%>%
-    print()%>%
     rename(GSM = ID)%>%
     full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")%>%
-    print()%>%
     select(SRR, Value)%>%
     print()#debug
   
@@ -44,6 +42,7 @@ file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
 #for (file in files){
   #get gene_counts for the GRE
   counts = read_csv(file)
+  print(counts) #debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]
