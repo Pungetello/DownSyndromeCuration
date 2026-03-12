@@ -21,10 +21,10 @@ create_metadata = function(gse){
   GSE_to_SRR = read_tsv("Data/RNA_GSE_to_SRR.tsv")
   sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
-  metadata = filter(sample_metadata, Dataset_ID = gse)%>%
+  metadata = filter(sample_metadata, Dataset_ID == gse)%>%
     select(ID, Value)%>%
     rename(ID, GSE)%>%
-    full_join(filter(GSE_to_SRR, GSE=gse), by = "GSE")%>%
+    full_join(filter(GSE_to_SRR, GSE==gse), by = "GSE")%>%
     select(SRR, Value)%>%
     print()#debug
   
@@ -34,7 +34,7 @@ create_metadata = function(gse){
 
 #----------Differential Expression Analysis-------------
 
-files = list.files(path = "/Data/NormalizedData/", pattern = "GSE*_gene_counts.csv")
+files = list.files(path = "/Data/NormalizedData/", pattern = "GSE[0-9]+_gene_counts.csv")
 print(files)#debug
 
 file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
