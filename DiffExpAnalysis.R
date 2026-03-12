@@ -42,7 +42,7 @@ file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
 #for (file in files){
   #get gene_counts for the GRE
   counts = read_tsv(file)
-  print(counts) #debug
+  print(counts) #debug TOO LONG MAKE LESS ROWS
   counts = column_to_rownames(counts, var = "gene_id")
   print(counts) #debug
   
@@ -52,7 +52,8 @@ file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
   metadata = create_metadata(gse)
   
   #set up input
-  dds = DESeqDataSetFromMatrix(
+  dds = DESeqDataSetFromMatrix( # MOST RECENT ERROR: Error in DESeqDataSet(se, design = design, ignoreRank) :
+    #all variables in design formula must be columns in colData
     countData = counts,
     colData = metadata,
     design = ~ condition
