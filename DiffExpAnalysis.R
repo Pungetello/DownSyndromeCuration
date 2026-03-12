@@ -42,7 +42,7 @@ file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
   counts = read.csv(file)
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
-  gse = file.split('/')[3].split('.')[1]
+  gse = strsplit(strsplit(file, '/')[3], '.')[1]
   print(gse) #debug
   metadata = create_metadata(gse)
   
