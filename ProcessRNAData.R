@@ -147,10 +147,11 @@ combine_results_per_GSE = function(){
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   
   gses = pull(GSE_to_SRR, GSE)%>%
-    unique()
+    unique()%>%
+    print()
   
   for(gse in gses){
-    #print(gse)#debug
+    print(gse)#debug
   #gse = "GSE184771"
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
@@ -185,6 +186,8 @@ combine_files = function(gse, srrs, suffix){
     }
     #remove .num at the end of gene_id's
     combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
+    print("COMBINED! WRITING FILE")
+    print(outfile)
     write_tsv(combined_tibble, outfile)
   }
 }
@@ -195,8 +198,8 @@ combine_files = function(gse, srrs, suffix){
 
 #get list of all srr files prefetched by previous script
 srrs = list.files("Data/RawRNA")
-print(srrs)
-
+# print(srrs)
+#
 # for (srr in srrs){
 # 
 # #srr = srrs[1]#debug
