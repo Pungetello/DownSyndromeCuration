@@ -147,11 +147,10 @@ combine_results_per_GSE = function(){
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   
   gses = pull(GSE_to_SRR, GSE)%>%
-    unique()%>%
-    print()
+    unique()
   
   for(gse in gses){
-    print(gse)#debug
+    #print(gse)#debug
   #gse = "GSE184771"
     combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
@@ -171,7 +170,6 @@ combine_results_per_GSE = function(){
 #takes in a list of file paths, reads them in, full joins them, and writes them to the out file path.
 combine_files = function(gse, srrs, suffix){
   infiles = paste0(getwd(), "/Data/NormalizedData/", srrs, suffix)
-  print(infiles[1])#debug
   if(file.exists(infiles[1])){
     outfile = paste0(getwd(), "/Data/NormalizedData/", gse, suffix)
     combined_tibble = read_tsv(infiles[1])
@@ -187,8 +185,6 @@ combine_files = function(gse, srrs, suffix){
     }
     #remove .num at the end of gene_id's
     combined_tibble = mutate(combined_tibble, gene_id = str_remove(gene_id, "\\..*"))
-    print("COMBINED! WRITING FILE")
-    print(outfile)
     write_tsv(combined_tibble, outfile)
   }
 }
@@ -199,25 +195,25 @@ combine_files = function(gse, srrs, suffix){
 
 #get list of all srr files prefetched by previous script
 srrs = list.files("Data/RawRNA")
-# print(srrs)
-#
-# for (srr in srrs){
-# 
-# #srr = srrs[1]#debug
-#   print(srr)
-# 
-#   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-#   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-#   index = "GRCm39_index"
-# 
-#   #finish installation by converting to fastq format
-#   install_raw(srr)
-# 
-#   build_index(index, ref)
-# 
-#   feature_counts = process_data(srr, index, annotation)
-# 
-# }
+print(srrs)
+
+for (srr in srrs){
+
+#srr = srrs[1]#debug
+  print(srr)
+
+  ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+  index = "GRCm39_index"
+
+  #finish installation by converting to fastq format
+  install_raw(srr)
+
+  build_index(index, ref)
+
+  feature_counts = process_data(srr, index, annotation)
+
+}
 
 combine_results_per_GSE()
 
