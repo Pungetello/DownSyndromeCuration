@@ -60,8 +60,9 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   
   
   #set up input
-  dds = DESeqDataSetFromMatrix( # MOST RECENT ERROR: Error in DESeqDataSet(se, design = design, ignoreRank) :
-    #all variables in design formula must be columns in colData
+  dds = DESeqDataSetFromMatrix( # MOST RECENT ERROR: Error in relevel.default(dds$condition, ref = "control_group") :
+    #'relevel' only for (unordered) factors
+    #Calls: relevel -> relevel.default
     countData = counts,
     colData = metadata,
     design = ~ Value
