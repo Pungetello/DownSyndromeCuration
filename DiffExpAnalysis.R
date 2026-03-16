@@ -25,7 +25,13 @@ create_metadata = function(gse){
     select(ID, Value)%>%
     rename(GSM = ID)%>%
     full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")%>%
-    select(SRR, Value)
+    select(SRR, Value)%>%
+    as.data.frame()
+  
+  rownames(metadata) = metadata$SRR
+  metadata$SRR <- NULL
+  
+  metadata$Value <- factor(coldata$Value)
   
   return(metadata)
 }
@@ -41,7 +47,6 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
 #for (file in files){
   #get gene_counts for the GRE
   counts = read_tsv(file)
-  print(counts, n=10) #debug
   counts = as.data.frame(counts)
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
@@ -50,16 +55,16 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]
-  print(gse) #debug
   metadata = create_metadata(gse)
   print(metadata)#debug
+  
   
   #set up input
   dds = DESeqDataSetFromMatrix( # MOST RECENT ERROR: Error in DESeqDataSet(se, design = design, ignoreRank) :
     #all variables in design formula must be columns in colData
     countData = counts,
     colData = metadata,
-    design = ~ condition
+    design = ~ Value
   )
   dds$condition = relevel(dds$condition, ref="control_group")
   
