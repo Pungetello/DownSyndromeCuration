@@ -41,12 +41,12 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
 #for (file in files){
   #get gene_counts for the GRE
   counts = read_tsv(file)
-  print(counts, n=10) #debug TOO LONG MAKE LESS ROWS
+  print(counts, n=10) #debug
   counts = as.data.frame(counts)
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   counts = as.matrix(counts)
-  print(counts, n=10) #debug
+  print(head(counts, 10)) #debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]
