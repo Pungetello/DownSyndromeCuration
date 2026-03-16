@@ -42,6 +42,7 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   #get gene_counts for the GRE
   counts = read_tsv(file)
   print(counts, n=10) #debug TOO LONG MAKE LESS ROWS
+  counts = as.data.frame(counts)
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   print(counts, n=10) #debug
