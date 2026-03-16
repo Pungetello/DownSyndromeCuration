@@ -31,7 +31,7 @@ create_metadata = function(gse){
   rownames(metadata) = metadata$SRR
   metadata$SRR <- NULL
   
-  metadata$Value <- factor(coldata$Value)
+  metadata$Value <- factor(metadata$Value)
   
   return(metadata)
 }
