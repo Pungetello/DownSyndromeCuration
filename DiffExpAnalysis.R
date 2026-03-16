@@ -38,7 +38,7 @@ files = list.files(path = "/Data/NormalizedData/", pattern = "GSE[0-9]+_gene_cou
 print("FILES:")
 print(files)#debug
 
-file = "Data/NormalizedData/GSE184771_gene_counts.csv" #debug
+file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
 #for (file in files){
   #get gene_counts for the GRE
   counts = read_tsv(file)
