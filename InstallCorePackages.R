@@ -27,7 +27,8 @@ BiocManager::install(c("tidyverse",
                        "rentrez",
                        "Rsubread",
                        "edgeR",
-                       "DESeq2"
+                       "DESeq2",
+                       "ggrepel"
                        ), lib = user_lib
 )
 

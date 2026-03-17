@@ -11,7 +11,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 
 library(DESeq2)
 library(tidyverse)
-
+library(ggrepel)
 
 #----------functions-------------
 
@@ -39,8 +39,15 @@ create_metadata = function(gse){
 
 #create a volcano plot of the data
 volcano_plot = function(data, output_prefix){
+  top <- data[order(data$padj), ][1:10, ]
   
+  ggplot(data, aes(x = log2FoldChange, y = -log10(padj), color=significant)) +
+    geom_point(alpha = 0.5) +
+    scale_color_manual(values = c("grey", "blue")) +
+    geom_text_repel(data = top, aes(label = gene)) +
+    theme_minimal()
   
+  ggsave(filename = here("plots", paste0(output_prefix, "_Volcano.png")), width = 5, height = 5, units = "in")
   
   
 }
@@ -84,7 +91,7 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   
   #filter results to adjusted p-value < 0.05
   sig_genes = subset(results, padj < 0.05)%>%
-    as_tibble()%>%
+    as_tibble(rownames='gene')%>%
     arrange(padj)
   
   #write to file
