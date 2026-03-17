@@ -37,6 +37,15 @@ create_metadata = function(gse){
 }
 
 
+#create a volcano plot of the data
+volcano_plot = function(data, output_prefix){
+  
+  
+  
+  
+}
+
+
 #----------Differential Expression Analysis-------------
 
 files = list.files(path = "/Data/NormalizedData/", pattern = "GSE[0-9]+_gene_counts\\.csv")
@@ -51,12 +60,10 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   counts = as.matrix(counts)
-  print(head(counts, 10)) #debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]
   metadata = create_metadata(gse)
-  print(metadata)#debug
   
   
   #set up input
@@ -77,10 +84,13 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   
   #filter results to adjusted p-value < 0.05
   sig_genes = subset(results, padj < 0.05)%>%
+    as_tibble()%>%
     arrange(padj)
   
   #write to file
   write_tsv(sig_genes, file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
+  
+  volcano_plot(sig_genes, gse)
   
 #}
 
