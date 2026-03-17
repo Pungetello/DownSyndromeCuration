@@ -47,7 +47,7 @@ volcano_plot = function(data, output_prefix){
     geom_text_repel(data = top, aes(label = gene)) +
     theme_minimal()
   
-  ggsave(filename = here("plots", paste0(output_prefix, "_Volcano.png")), width = 5, height = 5, units = "in")
+  ggsave(filename = paste0(getwd(), "/Data/Plots/", output_prefix, "_Volcano.png"), width = 5, height = 5, units = "in")
   
   
 }
@@ -58,6 +58,9 @@ volcano_plot = function(data, output_prefix){
 files = list.files(path = "/Data/NormalizedData/", pattern = "GSE[0-9]+_gene_counts\\.csv")
 print("FILES:")
 print(files)#debug
+
+file_location = "Data/Plots/"
+if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
 file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
 #for (file in files){
