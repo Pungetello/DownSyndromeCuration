@@ -79,7 +79,7 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   sig_genes = subset(results, padj < 0.05)
   
   #write to file
-  write.tsv(as.data.frame(sig_genes), file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
+  write_tsv(as.data.frame(sig_genes), file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
   
 #}
 
