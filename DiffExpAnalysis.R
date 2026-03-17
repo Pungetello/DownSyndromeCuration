@@ -42,8 +42,9 @@ volcano_plot = function(data, output_prefix){
   
   top <- data[order(data$padj), ][1:10, ]
   
-  ggplot(data, aes(x = log2FoldChange, y = -log10(padj))) +
+  ggplot(data, aes(x = log2FoldChange, y = -log10(padj)))+ #, color=significant)) +
     geom_point(alpha = 0.5) +
+    #scale_color_manual(values = c("grey", "blue")) +
     geom_text_repel(data = top, aes(label = gene)) +
     theme_minimal()
   
