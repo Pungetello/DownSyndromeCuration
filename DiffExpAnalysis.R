@@ -67,8 +67,8 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
     colData = metadata,
     design = ~ Value
   )
-  dds$condition = as.factor(dds$condition)
-  dds$condition = relevel(dds$condition, ref="control_group")
+  dds$Value = as.factor(metadata$Value)
+  dds$Value = relevel(dds$Value, ref="control_group")
   
   #run the analysis
   dds = DESeq(dds)
