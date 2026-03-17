@@ -76,10 +76,11 @@ file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
   results = results(dds)
   
   #filter results to adjusted p-value < 0.05
-  sig_genes = subset(results, padj < 0.05)
+  sig_genes = subset(results, padj < 0.05)%>%
+    arrange(padj)
   
   #write to file
-  write_tsv(as.data.frame(sig_genes), file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
+  write_tsv(sig_genes, file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
   
 #}
 
