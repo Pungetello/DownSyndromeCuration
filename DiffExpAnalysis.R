@@ -56,14 +56,15 @@ volcano_plot = function(data, output_prefix){
 
 #----------Differential Expression Analysis-------------
 
-files = list.files(path = "/Data/NormalizedData/", pattern = "GSE[0-9]+_gene_counts\\.csv")
+print(dir.exists("Data/NormalizedData"))#debug
+files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+_gene_counts\\.csv")
 print("FILES:")
 print(files)#debug
 
 file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
-file = "Data/NormalizedData/GSE202938_gene_counts.csv" #debug
+file = "Data/NormalizedData/GSE210117_gene_counts.csv" #debug
 #for (file in files){
   #get gene_counts for the GRE
   counts = read_tsv(file)
