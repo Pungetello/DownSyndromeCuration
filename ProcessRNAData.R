@@ -198,8 +198,6 @@ srrs = list.files("Data/RawRNA")
 print(srrs)
 
 for (srr in srrs){
-
-#srr = srrs[1]#debug
   print(srr)
 
   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
@@ -209,9 +207,11 @@ for (srr in srrs){
   #finish installation by converting to fastq format
   install_raw(srr)
 
+  #build gene index if not already present
   build_index(index, ref)
 
-  feature_counts = process_data(srr, index, annotation)
+  #run alignment and save output files
+  process_data(srr, index, annotation)
 
 }
 

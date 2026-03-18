@@ -28,10 +28,10 @@ create_metadata = function(gse){
     select(SRR, Value)%>%
     as.data.frame()
   
+  #format correctly for deseq2
   rownames(metadata) = metadata$SRR
-  metadata$SRR <- NULL
-  
-  metadata$Value <- factor(metadata$Value)
+  metadata$SRR = NULL
+  metadata$Value = factor(metadata$Value)
   
   return(metadata)
 }
@@ -40,7 +40,7 @@ create_metadata = function(gse){
 #create a volcano plot of the data
 volcano_plot = function(data, output_prefix){
   
-  top <- data[order(data$padj), ][1:10, ]
+  top = data[order(data$padj), ][1:10, ]
   
   ggplot(data, aes(x = log2FoldChange, y = -log10(padj)))+ #, color=significant)) +
     geom_point(alpha = 0.5) +
@@ -63,7 +63,7 @@ if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
 file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
 #for (file in files){
-  #get gene_counts for the GRE
+  #get gene_counts for the GSE
   counts = read_tsv(file)
   counts = as.data.frame(counts)
   rownames(counts) = counts$gene_id
@@ -74,11 +74,8 @@ file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
   gse = strsplit(basename(file), "_")[[1]][1]
   metadata = create_metadata(gse)
   
-  
   #set up input
-  dds = DESeqDataSetFromMatrix( # MOST RECENT ERROR: Error in relevel.default(dds$condition, ref = "control_group") :
-    #'relevel' only for (unordered) factors
-    #Calls: relevel -> relevel.default
+  dds = DESeqDataSetFromMatrix(
     countData = counts,
     colData = metadata,
     design = ~ Value
@@ -91,7 +88,7 @@ file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
   
   results = results(dds)
   
-  #filter results to adjusted p-value < 0.05
+  #filter results to adjusted p-value < 0.05 and sort by padj
   sig_genes = subset(results, padj < 0.05)%>%
     as_tibble(rownames='gene')%>%
     arrange(padj)
@@ -99,13 +96,9 @@ file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
   #write to file
   write_tsv(sig_genes, file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
   
+  #create and save volcano plot
   volcano_plot(sig_genes, gse)
   
 #}
-
-
-
-
-
-
-
+  
+  
