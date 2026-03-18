@@ -197,23 +197,23 @@ combine_files = function(gse, srrs, suffix){
 srrs = list.files("Data/RawRNA")
 print(srrs)
 
-# for (srr in srrs){
-# 
-# #srr = srrs[1]#debug
-#   print(srr)
-# 
-#   ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-#   annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-#   index = "GRCm39_index"
-# 
-#   #finish installation by converting to fastq format
-#   install_raw(srr)
-# 
-#   build_index(index, ref)
-# 
-#   feature_counts = process_data(srr, index, annotation)
-# 
-# }
+for (srr in srrs){
+
+#srr = srrs[1]#debug
+  print(srr)
+
+  ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+  index = "GRCm39_index"
+
+  #finish installation by converting to fastq format
+  install_raw(srr)
+
+  build_index(index, ref)
+
+  feature_counts = process_data(srr, index, annotation)
+
+}
 
 combine_results_per_GSE()
 
