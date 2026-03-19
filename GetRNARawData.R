@@ -78,7 +78,7 @@ create_GSE_to_SRR = function(list){
         print(srx)#debug
         print(srr)#debug
         
-        GSE_to_SRR <<- add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=srx, SRR=srr)
+        GSE_to_SRR = add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=srx, SRR=srr)
         print(GSE_to_SRR)#debug
       }
     }
