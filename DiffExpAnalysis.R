@@ -74,6 +74,11 @@ for (file in files){
   gse = strsplit(basename(file), "_")[[1]][1]
   metadata = create_metadata(gse)
   
+  if(length(unique(metadata$Value)) < 2){
+    print("Only one variable, skipping dataset")
+    continue()
+  }
+  
   #set up input
   dds = DESeqDataSetFromMatrix(
     countData = counts,
