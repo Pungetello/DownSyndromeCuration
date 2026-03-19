@@ -76,7 +76,7 @@ for (file in files){
   
   if(length(unique(metadata$Value)) < 2){
     print("Only one variable, skipping dataset")
-    continue()
+    next()
   }
   
   #set up input
