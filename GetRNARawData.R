@@ -58,23 +58,25 @@ get_srr_from_srx = function(srx_id) {
 
 
 
-#creates the file mapping all GSE's to their GSM's, SRX's and SRR's. Assumes each GSM has 1 SRX and 1 SRR.
+#creates the file mapping all RNA GSE's to their GSM's, SRX's and SRR's. Assumes each GSM has 1 SRX and 1 SRR.
 create_GSE_to_SRR = function(list){
   GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
   
   for(geo_id in names(list)){
-    gse = getGEO(geo_id, GSEMatrix = FALSE)
-    
-    #get SRA line for each GSM for the geo_id
-    for(gsm in GSMList(gse)) {
-      relations = Meta(gsm)$relation
-      sra_line = grep("SRA", relations, value = TRUE)
+    if(is.na(list[geo_id])){
+      gse = getGEO(geo_id, GSEMatrix = FALSE)
       
-      #extract SRX from line, convert to SRR
-      srx = strsplit(sra_line, '=')[[1]][2]
-      srr = get_srr_from_srx(srx)
-      
-      GSE_to_SRR <<- add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=srx, SRR=srr)
+      #get SRA line for each GSM for the geo_id
+      for(gsm in GSMList(gse)) {
+        relations = Meta(gsm)$relation
+        sra_line = grep("SRA", relations, value = TRUE)
+        
+        #extract SRX from line, convert to SRR
+        srx = strsplit(sra_line, '=')[[1]][2]
+        srr = get_srr_from_srx(srx)
+        
+        GSE_to_SRR <<- add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=srx, SRR=srr)
+      }
     }
   }
   
