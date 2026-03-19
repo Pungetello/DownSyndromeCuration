@@ -62,7 +62,7 @@ get_srr_from_srx = function(srx_id) {
 create_GSE_to_SRR = function(list){
   GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
   
-  for(geoid in names(list)){
+  for(geo_id in names(list)){
     gse = getGEO(geo_id, GSEMatrix = FALSE)
     
     #get SRA line for each GSM for the geo_id
