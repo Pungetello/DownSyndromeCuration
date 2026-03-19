@@ -70,16 +70,12 @@ create_GSE_to_SRR = function(list){
       for(gsm in GSMList(gse)) {
         relations = Meta(gsm)$relation
         sra_line = grep("SRA", relations, value = TRUE)
-        print(sra_line)#debug
         
         #extract SRX from line, convert to SRR
         srx = strsplit(sra_line, '=')[[1]][2]
         srr = get_srr_from_srx(srx)
-        print(srx)#debug
-        print(srr)#debug
         
         GSE_to_SRR = add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=srx, SRR=srr)
-        print(GSE_to_SRR)#debug
       }
     }
   }
