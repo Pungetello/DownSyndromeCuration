@@ -31,7 +31,6 @@ prefetch = "prefetch"
 #TODO: add script to download and install SRA toolkit in location used.
 
 
-
 #make sure the SRA toolkit has been downloaded by the user
 check_sra = function(){
   if (Sys.which("fasterq-dump") == "") {
@@ -59,32 +58,41 @@ get_srr_from_srx = function(srx_id) {
 
 
 
+#creates the file mapping all GSE's to their GSM's, SRX's and SRR's. Assumes each GSM has 1 SRX and 1 SRR.
+create_GSE_to_SRR = function(list){
+  GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
+  
+  for(geoid in names(list)){
+    gse = getGEO(geo_id, GSEMatrix = FALSE)
+    
+    #get SRA line for each GSM for the geo_id
+    for(gsm in GSMList(gse)) {
+      relations = Meta(gsm)$relation
+      sra_line = grep("SRA", relations, value = TRUE)
+      
+      #extract SRX from line, convert to SRR
+      srx = strsplit(sra_line, '=')[[1]][2]
+      srr = get_srr_from_srx(srx)
+      
+      GSE_to_SRR <<- add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=srx, SRR=srr)
+    }
+  }
+  
+  #write dataframe of GSE mapped to each SRR to file
+  write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
+}
+
+
+
 #get the true raw data using the SRA toolkit
 download_raw = function(geo_id){
   
-  gse = getGEO(geo_id, GSEMatrix = FALSE)
+  GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   
-  GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
+  srrs = filter(GSE_to_SRR, GSE==geo_id)%>%
+    pull(SRR)
   
-  #get SRA line for each GSM for the geo_id
-  srrs = lapply(GSMList(gse), function(gsm) {
-    relations = Meta(gsm)$relation
-    sra_line = grep("SRA", relations, value = TRUE)
-    GSE_to_SRR <<- add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=NA, SRR=NA)
-    return(sra_line)
-  })
-  
-  n = length(srrs)
-  
-  for(i in 1:n){
-    link = srrs[[i]]
-    
-    #extract SRX from line, convert to SRR
-    srx = strsplit(link, '=')[[1]][2]
-    srr = get_srr_from_srx(srx)
-    
-    GSE_to_SRR[i, "SRX"] = srx
-    GSE_to_SRR[i, "SRR"] = srr
+  for(srr in srrs){
     
     if(!file.exists(paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sra"))){
       print(paste0(getwd(), "/Data/RawRNA/", srr, "NOT FOUND, DOWNLOADING RAW DATA FOR ", srr))
@@ -95,14 +103,6 @@ download_raw = function(geo_id){
         args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA")))
     }
   }
-  
-  #append dataframe of GSE mapped to each SRR to file
-  if (!file.exists("Data/RNA_GSE_to_SRR.tsv")) {
-    write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
-  } else {
-    write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv", append = TRUE, col_names = FALSE)
-  }
-  
 }
 
 
@@ -138,10 +138,8 @@ download_reference = function(){
 
 #--------------Download_RNA_data-------------
 
-#remove alignment file if it exists, since this script will just append to it.
-if(file.exists(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))){
-  file.remove(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
-}
+#create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
+create_GSE_to_SRR(platforms_list)
 
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
