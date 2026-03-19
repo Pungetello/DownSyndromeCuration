@@ -61,8 +61,8 @@ files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+_gene_count
 file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
-file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
-#for (file in files){
+#file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
+for (file in files){
   #get gene_counts for the GSE
   counts = read_tsv(file)
   counts = as.data.frame(counts)
@@ -99,6 +99,6 @@ file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
   #create and save volcano plot
   volcano_plot(sig_genes, gse)
   
-#}
+}
   
   
