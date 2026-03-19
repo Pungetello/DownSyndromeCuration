@@ -64,7 +64,6 @@ create_GSE_to_SRR = function(list){
   
   for(geo_id in names(list)){
     if(is.na(list[geo_id])){
-      print(geo_id)#debug
       gse = getGEO(geo_id, GSEMatrix = FALSE)
       
       #get SRA line for each GSM for the geo_id
@@ -76,6 +75,8 @@ create_GSE_to_SRR = function(list){
         #extract SRX from line, convert to SRR
         srx = strsplit(sra_line, '=')[[1]][2]
         srr = get_srr_from_srx(srx)
+        print(srx)#debug
+        print(srr)#debug
         
         GSE_to_SRR <<- add_row(GSE_to_SRR, GSE=geo_id, GSM=Meta(gsm)$geo_accession, SRX=srx, SRR=srr)
         print(GSE_to_SRR)#debug
