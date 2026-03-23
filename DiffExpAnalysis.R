@@ -96,6 +96,7 @@ for (file in files){
   #filter results to adjusted p-value < 0.05 and sort by padj
   #sig_genes = subset(results, padj < 0.05)%>%
   sig_genes = as_tibble(results, rownames='gene')%>%
+    drop_na()%>%
     arrange(padj)
   
   #write to file
