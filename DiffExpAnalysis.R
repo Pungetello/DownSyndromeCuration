@@ -94,8 +94,8 @@ for (file in files){
   results = results(dds)
   
   #filter results to adjusted p-value < 0.05 and sort by padj
-  sig_genes = subset(results, padj < 0.05)%>%
-    as_tibble(rownames='gene')%>%
+  #sig_genes = subset(results, padj < 0.05)%>%
+  sig_genes = as_tibble(results, rownames='gene')%>%
     arrange(padj)
   
   #write to file
