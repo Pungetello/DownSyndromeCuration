@@ -75,6 +75,7 @@ if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
 #file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
 for (file in files){
+  print(file) #debug
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
   counts = as.data.frame(counts)
@@ -86,6 +87,7 @@ for (file in files){
   gse = strsplit(basename(file), "_")[[1]][1]
   metadata = create_metadata(gse, "gsm")
   
+  print(metadata)#debug
   if(length(unique(metadata$Value)) < 2){
     print("Only one variable, skipping dataset")
     next()
