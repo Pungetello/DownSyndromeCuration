@@ -18,18 +18,17 @@ library(ggrepel)
 
 #creates a metadata file for deseq2 for the GSE given
 create_metadata = function(gse, column_type){
-  GSE_to_SRR = read_tsv("Data/RNA_GSE_to_SRR.tsv")
   sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
   metadata = filter(sample_metadata, Dataset_ID == gse)%>%
     print()%>%#debug
     select(ID, Value)%>%
-    rename(GSM = ID)%>%
-    full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")%>%
-    print()#debug
+    rename(GSM = ID)
   
   if(column_type=="srr"){
-    metadata = select(metadata, SRR, Value)%>%
+    GSE_to_SRR = read_tsv("Data/RNA_GSE_to_SRR.tsv")
+    metadata = full_join(metadata, filter(GSE_to_SRR, GSE==gse), by = "GSM")%>%
+      select(SRR, Value)%>%
       as.data.frame()
     
     #format correctly for deseq2
@@ -85,6 +84,7 @@ for (file in files){
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   counts = as.matrix(counts)
+  print(counts)#debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "\\.")[[1]][1]
