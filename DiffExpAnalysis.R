@@ -17,21 +17,32 @@ library(ggrepel)
 
 
 #creates a metadata file for deseq2 for the GSE given
-create_metadata = function(gse){
+create_metadata = function(gse, column_type){
   GSE_to_SRR = read_tsv("Data/RNA_GSE_to_SRR.tsv")
   sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
   metadata = filter(sample_metadata, Dataset_ID == gse)%>%
     select(ID, Value)%>%
     rename(GSM = ID)%>%
-    full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")%>%
-    select(SRR, Value)%>%
-    as.data.frame()
+    full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")
   
-  #format correctly for deseq2
-  rownames(metadata) = metadata$SRR
-  metadata$SRR = NULL
-  metadata$Value = factor(metadata$Value)
+  if(column_type=="srr"){
+    metadata = select(metadata, SRR, Value)%>%
+      as.data.frame()
+    
+    #format correctly for deseq2
+    rownames(metadata) = metadata$SRR
+    metadata$SRR = NULL
+    metadata$Value = factor(metadata$Value)
+  }else{
+    metadata = select(metadata, GSM, Value)%>%
+      as.data.frame()
+    
+    #format correctly for deseq2
+    rownames(metadata) = metadata$SRR
+    metadata$GSM = NULL
+    metadata$Value = factor(metadata$Value)
+  }
   
   return(metadata)
 }
@@ -56,7 +67,8 @@ volcano_plot = function(data, output_prefix){
 
 #----------Differential Expression Analysis-------------
 
-files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+_gene_counts\\.csv")
+#files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+_gene_counts\\.csv")
+files = c("GSE101942.tsv.gz", "GSE190053.tsv.gz")
 
 file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
@@ -72,7 +84,7 @@ for (file in files){
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]
-  metadata = create_metadata(gse)
+  metadata = create_metadata(gse, "gsm")
   
   if(length(unique(metadata$Value)) < 2){
     print("Only one variable, skipping dataset")
