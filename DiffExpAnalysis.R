@@ -88,8 +88,8 @@ file = files[1]
   print(head(counts))#debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
-  gse = strsplit(basename(file), "\\.")[[1]][1]
-  metadata = create_metadata(gse, "gsm")
+  gse = strsplit(basename(file), "_")[[1]][1]
+  metadata = create_metadata(gse, "srr")
   
   print(metadata)#debug
   if(length(unique(metadata$Value)) < 2){
