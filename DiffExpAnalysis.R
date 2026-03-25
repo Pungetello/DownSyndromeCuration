@@ -21,7 +21,6 @@ create_metadata = function(gse, column_type){
   sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
   metadata = filter(sample_metadata, Dataset_ID == gse)%>%
-    print()%>%#debug
     select(ID, Value)%>%
     rename(GSM = ID)
   
@@ -38,7 +37,6 @@ create_metadata = function(gse, column_type){
   }else{
     metadata = select(metadata, GSM, Value)%>%
       as.data.frame()%>%
-      print()#debug
     
     #format correctly for deseq2
     rownames(metadata) = metadata$GSM
@@ -82,8 +80,8 @@ for (file in files){
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
   counts = as.data.frame(counts)
-  rownames(counts) = counts$gene_id
-  counts$gene_id = NULL
+  rownames(counts) = counts$GeneID
+  counts$GeneID = NULL
   counts = as.matrix(counts)
   print(head(counts))#debug
   
