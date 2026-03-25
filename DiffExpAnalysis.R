@@ -36,7 +36,7 @@ create_metadata = function(gse, column_type){
     metadata$Value = factor(metadata$Value)
   }else{
     metadata = select(metadata, GSM, Value)%>%
-      as.data.frame()%>%
+      as.data.frame()
     
     #format correctly for deseq2
     rownames(metadata) = metadata$GSM
