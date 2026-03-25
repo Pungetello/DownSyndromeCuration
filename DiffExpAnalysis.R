@@ -88,7 +88,8 @@ for (file in files){
   counts = as.matrix(counts)
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
-  gse = basename(file)#strsplit(basename(file), "_")[[1]][1]
+  gse = strsplit(basename(file), ".")[[1]][1]
+  print(strsplit(basename(file), "."))#debug
   metadata = create_metadata(gse, "gsm")
   
   print(metadata)#debug
