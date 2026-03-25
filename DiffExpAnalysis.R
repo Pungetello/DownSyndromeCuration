@@ -24,7 +24,8 @@ create_metadata = function(gse, column_type){
   metadata = filter(sample_metadata, Dataset_ID == gse)%>%
     select(ID, Value)%>%
     rename(GSM = ID)%>%
-    full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")
+    full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")%>%
+    print()#debug
   
   if(column_type=="srr"){
     metadata = select(metadata, SRR, Value)%>%
@@ -36,7 +37,8 @@ create_metadata = function(gse, column_type){
     metadata$Value = factor(metadata$Value)
   }else{
     metadata = select(metadata, GSM, Value)%>%
-      as.data.frame()
+      as.data.frame()%>%
+      print()#debug
     
     #format correctly for deseq2
     rownames(metadata) = metadata$SRR
