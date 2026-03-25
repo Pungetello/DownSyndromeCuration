@@ -18,10 +18,12 @@ library(ggrepel)
 
 #creates a metadata file for deseq2 for the GSE given
 create_metadata = function(gse, column_type){
+  print(gse)#debug
   GSE_to_SRR = read_tsv("Data/RNA_GSE_to_SRR.tsv")
   sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
   metadata = filter(sample_metadata, Dataset_ID == gse)%>%
+    print()%>%#debug
     select(ID, Value)%>%
     rename(GSM = ID)%>%
     full_join(filter(GSE_to_SRR, GSE==gse), by = "GSM")%>%
