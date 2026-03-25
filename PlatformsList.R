@@ -1,11 +1,11 @@
 platforms_list = list(
   
   #RNA datasets
-  #"GSE101942" = NA, #downloadable
+  "GSE101942" = NA, #human
   "GSE109293" = NA,
   "GSE109294" = NA,
-  "GSE184771" = NA, #
-  #"GSE190053" = NA, #downloadable
+  "GSE184771" = NA, #no test group
+  "GSE190053" = NA, #human
   "GSE202938" = NA, #
   "GSE210117" = NA, #big, finish prefetch for later
   
