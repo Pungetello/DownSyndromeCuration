@@ -85,7 +85,7 @@ file = files[1]
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   counts = as.matrix(counts)
-  print(counts)#debug
+  print(head(counts))#debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "\\.")[[1]][1]
