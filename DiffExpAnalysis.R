@@ -18,7 +18,6 @@ library(ggrepel)
 
 #creates a metadata file for deseq2 for the GSE given
 create_metadata = function(gse, column_type){
-  print(gse)#debug
   GSE_to_SRR = read_tsv("Data/RNA_GSE_to_SRR.tsv")
   sample_metadata = read_tsv("Data/Metadata/SampleMetadata.tsv")
   
@@ -43,7 +42,7 @@ create_metadata = function(gse, column_type){
       print()#debug
     
     #format correctly for deseq2
-    rownames(metadata) = metadata$SRR
+    rownames(metadata) = metadata$GSM
     metadata$GSM = NULL
     metadata$Value = factor(metadata$Value)
   }
@@ -89,7 +88,6 @@ for (file in files){
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "\\.")[[1]][1]
-  print(strsplit(basename(file), "\\."))#debug
   metadata = create_metadata(gse, "gsm")
   
   print(metadata)#debug
