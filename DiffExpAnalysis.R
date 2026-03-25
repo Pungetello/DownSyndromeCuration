@@ -69,15 +69,15 @@ volcano_plot = function(data, output_prefix){
 
 #----------Differential Expression Analysis-------------
 
-files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+_gene_counts\\.csv")
-#files = c("GSE101942.tsv.gz", "GSE190053.tsv.gz")
+#files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+_gene_counts\\.csv")
+files = c("GSE101942.tsv.gz", "GSE190053.tsv.gz")
 
 file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
 #file = "Data/NormalizedData/GSE109294_gene_counts.csv" #debug
-#for (file in files){
-file = files[1]
+for (file in files){
+#file = files[1]
   print(file) #debug
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
@@ -88,8 +88,8 @@ file = files[1]
   print(head(counts))#debug
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
-  gse = strsplit(basename(file), "_")[[1]][1]
-  metadata = create_metadata(gse, "srr")
+  gse = strsplit(basename(file), "\\.")[[1]][1]
+  metadata = create_metadata(gse, "gsm")
   
   print(metadata)#debug
   if(length(unique(metadata$Value)) < 2){
@@ -123,6 +123,6 @@ file = files[1]
   #create and save volcano plot
   volcano_plot(sig_genes, gse)
   
-#}
+}
   
   
