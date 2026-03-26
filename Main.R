@@ -28,3 +28,6 @@ source("GeneMetadata.R")
 
 #runs differential expression analysis 
 source("DiffExpAnalysis.R")
+
+#makes metadata tables
+source("MetadataTables.R")

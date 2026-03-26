@@ -145,22 +145,22 @@ create_GSE_to_SRR(platforms_list)
 
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-# for (geo_id in names(platforms_list)){
-#   platform = platforms_list[[geo_id]]
-#   
-#   if(is.na(platform)){
-#     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
-#     #if(!file.exists(destination)){ #for filtering out human RNA
-#       
-#       #make sure SRA toolkit is downloaded
-#       check_sra()
-#       
-#       #prefetch the raw data
-#       download_raw(geo_id)
-#       
-#       #download reference genome needed
-#       download_reference()
-# 
-#     }
-#   }
+for (geo_id in names(platforms_list)){
+  platform = platforms_list[[geo_id]]
+
+  if(is.na(platform)){
+    destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
+    #if(!file.exists(destination)){ #for filtering out human RNA
+
+      #make sure SRA toolkit is downloaded
+      check_sra()
+
+      #prefetch the raw data
+      download_raw(geo_id)
+
+      #download reference genome needed
+      download_reference()
+
+    }
+  }
 #}
