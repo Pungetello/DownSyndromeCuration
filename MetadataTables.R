@@ -5,6 +5,7 @@ library(tidyverse)
 library(readxl)
 library(janitor)
 library(DBI)
+library(GEOquery)
 
 #----------functions-------------
 
@@ -38,35 +39,44 @@ get_gse_metadata = function(gse_id) {
 
 make_sample_metadata = function(geo_id, sample_metadata, model){
 
+  #make results table
   attributes = filter(model,`Attribute tier`=="Tier1 (applies to all dataset)")%>%
     filter(!endsWith(`Required`, "Optional"))%>%
     pull(`Attribute name`)
-  
-  #DE_file = read_tsv(DE_filename)
-  metadata = get_metadata(geo_id)
-  #print(metadata, width=Inf)#debug
-  #more_metadata = get_gse_metadata(geo_id)
-  #print(more_metadata, width=Inf)
-  
-  #same for all GSMs
-  Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
-  Data_contact = "Katherine_McKinney"
   
   table = tibble::as_tibble(setNames(rep(list(character()), length(attributes)), attributes))
   
   GSMs = filter(sample_metadata, Dataset_ID == geo_id)%>%
     pull(ID)
   
+  #get geo_id specific sources
+  #DE_file = read_tsv(DE_filename)
+  metadata = get_metadata(geo_id)
+  #print(metadata, width=Inf)#debug
+  #more_metadata = get_gse_metadata(geo_id)
+  #print(more_metadata, width=Inf)
   
-  for(GSM in GSMs){
+  
+  #define variables for columns that are the same in all rows
+  Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
+  Data_contact = "Katherine_McKinney"
+  
+  
+  for(i in 1:length(GSMs)){
+    GSM = GSMs[i]
     DatasetID = geo_id #table says get EMODS ID and name, but chat says NCBI doesn't have one, so from where?
     Dataset_name = NA #how is this different from the id?
     SampleID = GSM
     Data_model_version = NA #Where to find this?
     Script = NA #hwat
     
+    #add values for other tibble's genotype columns
     if(has_name(metadata, "strain_ch1")){
-      X__Sample_Genotype = metadata["strain_ch1"][[1]]
+      X__Sample_Genotype = metadata["strain_ch1"][[1]][i]#GSE109293&4
+    }else if(has_name(metadata, "genotype_ch1")){
+      X__Sample_Genotype = metadata["genotype_ch1"][[1]] #GSE202938
+    }else if(has_name(metadata, "background_strain_ch1")){
+      X__Sample_Genotype = metadata["background_strain_ch1"][[1]][i] #GSE210117
     }else{
       X__Sample_Genotype = NA
     }
@@ -92,58 +102,72 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
 
 make_abundance_data = function(geo_id, model){
   
+  #make results table
   attributes = filter(model,`Attribute tier`=="Tier1 (applies to all dataset)")%>%
     filter(!endsWith(`Required`, "Optional"))%>%
     pull(`Attribute name`)
   
   table = tibble::as_tibble(setNames(rep(list(character()), length(attributes)), attributes))
+  table$Value = as.double(table$Value)
   
   GSMs = filter(sample_metadata, Dataset_ID == geo_id)%>%
     pull(ID)
   
+  #get geo_id specific sources
+  gene_counts_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.csv")
+  gene_counts = read_tsv(gene_counts_file)
+  SRRs = colnames(gene_counts)[-1]
+  
+  #define variables for columns that are the same in all rows
   Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
   Data_contact = "Katherine_McKinney"
+  FeatureID_type = "Ensembl"#Identifier type - Entity|Database
+  DatasetID = geo_id #table says get EMODS ID and name, but chat says NCBI doesn't have one, so from where?
+  Dataset_name = NA #how is this different from the id?
+  Data_model_version = NA
+  Script = NA
   
-  for(GSM in GSMs){
-    DatasetID = geo_id #table says get EMODS ID and name, but chat says NCBI doesn't have one, so from where?
-    Dataset_name = NA #how is this different from the id?
-    SampleID = GSM
+  for(SRR in SRRs){
+    SampleID = SRR#should I convert these all to the GSMs to make it consistent?
     
-    #Do I need a row for each gene and its count for each GSM?
-    FeatureID = NA#Gene/protein/metab identifier
-    FeatureID_type = NA#Identifier type - Entity|Database
-    Feature_name = NA#Feature name/symbol
-    Value = NA#Feature abundance in sample
-    Units = NA#Feature abundance metric unit
+    #Do I need a row for each gene and its count for each GSM? This will be very big.
+    FeatureID = pull(gene_counts, "gene_id") #Gene/protein/metab identifier. Vector!
     
-    Data_model_version = NA
-    Script = NA
+    Feature_name = NA #Feature name/symbol. How is this different from the geneID?
+    Value = pull(gene_counts, SRR)#Feature abundance in sample. Should be vector of same length!
+    Units = NA #Feature abundance metric unit
     
-    table = add_row(table, DatasetID=DatasetID, Dataset_name=Dataset_name, SampleID=SampleID, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, Value = Value, Units = Units, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
+    SRR_tibble = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, SampleID=SampleID, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, Value = Value, Units = Units, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
+    table = bind_rows(table, SRR_tibble)
   }
+  
   #print(table)
-  write_tsv(table, paste0(getwd(), "/Data/Metadata/", geo_id, "_Sample_metadata.tsv"))
+  write_tsv(table, paste0(getwd(), "/Data/Metadata/", geo_id, "_Abundance_data.tsv"))
 }
 
 
 
 make_differential_analysis_results = function(geo_id, model){
-  #will this table just be one row for the one GSE?
   
+  #make results table
   attributes = filter(model,`Attribute tier`=="Tier1 (applies to all dataset)")%>%
     filter(!endsWith(`Required`, "Optional"))%>%
     pull(`Attribute name`)
   
   table = tibble::as_tibble(setNames(rep(list(character()), length(attributes)), attributes))
   
+  #get geo_id specific sources
+  DE_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")
+  DE_results = read_tsv(DE_file)
+  
+  #define variables for columns that are the same in all rows
   Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
   Data_contact = "Katherine_McKinney"
-  
-    DatasetID = geo_id #table says get EMODS ID and name, but chat says NCBI doesn't have one, so from where?
-    Dataset_name = NA #how is this different from the id?
-    SampleID = GSM
+  DatasetID = geo_id #table says get EMODS ID and name, but chat says NCBI doesn't have one, so from where?
+  Dataset_name = NA #how is this different from the id?
     
-    #Do I need a row for each gene and its count for each GSM?
+    
+    #Do I need a row for each gene and its count?
     FeatureID = NA#Gene/protein/metab identifier
     FeatureID_type = NA#Identifier type - Entity|Database
     Feature_name = NA#Feature name/symbol
@@ -153,21 +177,21 @@ make_differential_analysis_results = function(geo_id, model){
     Data_model_version = NA
     Script = NA
     
-    Statistical_method
-    Comparison
-    Model_specification
-    FeatureID
-    FeatureID_type
-    Feature_name
-    FoldChange
-    pvalue
-    padj
-    padj_type
+    Statistical_method = NA
+    Comparison = NA
+    Model_specification = NA
+    FeatureID = pull(DE_results, "gene")
+    FeatureID_type = "Ensembl"
+    Feature_name = NA#?
+    FoldChange = NA
+    pvalue = pull(DE_results, "pvalue")
+    padj = pull(DE_results, "padj")
+    padj_type = NA#?
 
-    
-    table = add_row(table, DatasetID=DatasetID, Dataset_name=Dataset_name, Statistical_method=Statistical_method, Comparison=Comparison, Model_specification=Model_specification, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, FoldChange=FoldChange, pvalue=pvalue, padj=padj, padj_type=padj_type, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
+    table = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, Statistical_method=Statistical_method, Comparison=Comparison, Model_specification=Model_specification, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, FoldChange=FoldChange, pvalue=pvalue, padj=padj, padj_type=padj_type, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
+
   #print(table)
-  write_tsv(table, paste0(getwd(), "/Data/Metadata/", geo_id, "_Sample_metadata.tsv"))
+  write_tsv(table, paste0(getwd(), "/Data/Metadata/", geo_id, "_differential_analysis_results.tsv"))
 }
 
 
@@ -181,24 +205,25 @@ sample_metadata = read_tsv(paste0(getwd(), "/Data/Metadata/SampleMetadata.tsv"))
 SM_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=1, skip=2)
 AD_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=2, skip=2)
 DAR_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=3, skip=2)
-print(AD_model)#debug
+#print(AD_model)#debug
 
 for (geo_id in names(platforms_list)) {
+  #geo_id = "GSE109293"
   DE_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")
   if(!file.exists(DE_filename)){
     print("NO DifExpAnalysis RESULTS")
     next()
   }
-  #geo_id = "GSE109293"
+  
   
   #make Sample_metadata
   make_sample_metadata(geo_id, sample_metadata, SM_model)
   
   #make Abundance_data
-  make_abundance_data(geo_id, AD_model)
+  #make_abundance_data(geo_id, AD_model)
   
   #make Differential_analysis_results
-  make_differential_analysis_results(geo_id, DAR_model)
+  #make_differential_analysis_results(geo_id, DAR_model)
   
   
 }
