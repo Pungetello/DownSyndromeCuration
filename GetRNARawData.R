@@ -134,6 +134,10 @@ download_reference = function(){
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
   destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
   safe_download(link, destination)
+  
+  #human files
+  #https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz
+  #https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz
 }
 
 

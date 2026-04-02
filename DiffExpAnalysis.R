@@ -47,7 +47,7 @@ create_metadata = function(gse, column_type){
   return(metadata)
 }
 
-
+#TODO: use white background and highlight genes on anomalous chormosome
 #create a volcano plot of the data
 volcano_plot = function(data, output_prefix){
   
