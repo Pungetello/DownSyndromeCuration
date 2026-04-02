@@ -114,9 +114,9 @@ make_abundance_data = function(geo_id, model){
     pull(ID)
   
   #get geo_id specific sources
-  gene_counts_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.csv")
-  gene_counts = read_tsv(gene_counts_file)
-  SRRs = colnames(gene_counts)[-1]
+  RPKM_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
+  RPKM = read_tsv(RPKM_file)
+  SRRs = colnames(RPKM)[-1]
   
   #define variables for columns that are the same in all rows
   Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
@@ -131,10 +131,10 @@ make_abundance_data = function(geo_id, model){
     SampleID = SRR#should I convert these all to the GSMs to make it consistent?
     
     #Do I need a row for each gene and its count for each GSM? This will be very big.
-    FeatureID = pull(gene_counts, "gene_id") #Gene/protein/metab identifier. Vector!
+    FeatureID = pull(RPKM, "gene_id") #Gene/protein/metab identifier. Vector!
     
     Feature_name = NA #Feature name/symbol. How is this different from the geneID?
-    Value = pull(gene_counts, SRR)#Feature abundance in sample. Should be vector of same length!
+    Value = pull(RPKM, SRR)#Feature abundance in sample. Should be vector of same length!
     Units = NA #Feature abundance metric unit
     
     SRR_tibble = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, SampleID=SampleID, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, Value = Value, Units = Units, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
@@ -209,9 +209,10 @@ DAR_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk
 
 for (geo_id in names(platforms_list)) {
   #geo_id = "GSE109293"
+  RPKM_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
   DE_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")
-  if(!file.exists(DE_filename)){
-    print("NO DifExpAnalysis RESULTS")
+  if(!file.exists(RPKM_filename) || !file.exists(DE_filename)){
+    print("NO RPKM or NO DE RESULTS")
     next()
   }
   
@@ -220,10 +221,10 @@ for (geo_id in names(platforms_list)) {
   make_sample_metadata(geo_id, sample_metadata, SM_model)
   
   #make Abundance_data
-  #make_abundance_data(geo_id, AD_model)
+  make_abundance_data(geo_id, AD_model)
   
   #make Differential_analysis_results
-  #make_differential_analysis_results(geo_id, DAR_model)
+  make_differential_analysis_results(geo_id, DAR_model)
   
   
 }
