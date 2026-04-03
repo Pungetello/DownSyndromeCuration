@@ -1,32 +1,37 @@
-platforms_list = list(
-  
-  #RNA datasets
-  "GSE101942" = NA, #human
-  "GSE109293" = NA,
-  "GSE109294" = NA,
-  "GSE184771" = NA, #no test group
-  "GSE190053" = NA, #human
-  "GSE202938" = NA, #
-  "GSE210117" = NA, #big, finish prefetch for later
-  
-  #Affymetrix datasets
-  "GSE110064" = "hgu133plus2hsentrezgprobe", #change names
-  "GSE48611"= "hgu133plus2hsentrezgprobe",
-  "GSE1789" = "hgu133ahsentrezgprobe",
-  # #"GSE11877" = "hgu133plus2hsensgprobe", #the big one
-  "GSE16176" = "hgu133plus2hsentrezgprobe"
-  # "GSE16677" = "hgu133plus2hsensgprobe",
-  # #"GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"), #does indeed need both, if we use this we'll need to redo stuff
-  # "GSE19680" = "hgu133plus2hsensgprobe",
-  # "GSE19681" = "hgu133plus2hsensgprobe",
-  # "GSE20910" = "hgu133plus2hsensgprobe",
-  # "GSE30517"= "hgu133ahsensgprobe",
-  # "GSE138861" = "clariomshumanhsensgprobe", #"[Clariom_S_Human] Affymetrix Clariom S Assay, Human (Includes Pico Assay) (GPL23159)",
-  # "GSE143885" = "clariomshumanhsensgprobe", #"[Clariom_S_Human] Affymetrix Clariom S Assay, Human (Includes Pico Assay) (GPL23159)",
-  # #"GSE149464" = "mogene10stmmensgprobe",
-  # #"GSE149465" = "mogene10stmmensgprobe"
-  # "GSE16676" = "mouse4302mmensgprobe"
-)
+# platforms_list = list(
+#   
+#   #RNA datasets
+#   "GSE101942" = NA, #human
+#   "GSE109293" = NA,
+#   "GSE109294" = NA,
+#   "GSE184771" = NA, #no test group
+#   "GSE190053" = NA, #human
+#   "GSE202938" = NA, #
+#   "GSE210117" = NA, #big, finish prefetch for later
+#   
+#   #Affymetrix datasets
+#   "GSE110064" = "hgu133plus2hsentrezgprobe", #change names
+#   "GSE48611"= "hgu133plus2hsentrezgprobe",
+#   "GSE1789" = "hgu133ahsentrezgprobe",
+#   # #"GSE11877" = "hgu133plus2hsensgprobe", #the big one
+#   "GSE16176" = "hgu133plus2hsentrezgprobe"
+#   # "GSE16677" = "hgu133plus2hsensgprobe",
+#   # #"GSE17459" = "hgu133plus2hsensgprobe", #c("GPL570", "GPL96"), #does indeed need both, if we use this we'll need to redo stuff
+#   # "GSE19680" = "hgu133plus2hsensgprobe",
+#   # "GSE19681" = "hgu133plus2hsensgprobe",
+#   # "GSE20910" = "hgu133plus2hsensgprobe",
+#   # "GSE30517"= "hgu133ahsensgprobe",
+#   # "GSE138861" = "clariomshumanhsensgprobe", #"[Clariom_S_Human] Affymetrix Clariom S Assay, Human (Includes Pico Assay) (GPL23159)",
+#   # "GSE143885" = "clariomshumanhsensgprobe", #"[Clariom_S_Human] Affymetrix Clariom S Assay, Human (Includes Pico Assay) (GPL23159)",
+#   # #"GSE149464" = "mogene10stmmensgprobe",
+#   # #"GSE149465" = "mogene10stmmensgprobe"
+#   # "GSE16676" = "mouse4302mmensgprobe"
+# )
+library(readxl)
+
+platforms_list = read_excel(paste0(getwd(), "/datasets_info.xlsx"), sheet=1, skip=1)
+#TODO: refactor every reference to this list 0_0
+
 
 #Populated by InstallArrayPackages
 platforms_to_package_list = list(
