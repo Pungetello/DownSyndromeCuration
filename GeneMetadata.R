@@ -1,8 +1,7 @@
 #-----------loading_libraries-----------
 library(tidyverse)
 library(biomaRt)
-
-source("PlatformsList.R")
+source("Datasets.R")
 
 
 
@@ -81,8 +80,8 @@ if (!dir.exists(output_file_location)){
   dir.create(output_file_location, recursive = TRUE)
 }
 
-for (geo_id in names(platforms_list)){
-  print(geo_id)
+for (geo_id in pull(Datasets, Name)){
+  #print(geo_id) #debug
   destination = paste0(getwd(), "/Data/Metadata/GeneMetadata/", geo_id, ".tsv.gz")
   
   #makes sure it doesn't redownload
@@ -95,9 +94,8 @@ for (geo_id in names(platforms_list)){
     next
   }
   
-  platform = platforms_list[[geo_id]]
   
-  if (!is.na(platform)){
+  if(Datasets$Type[Datasets$Name == geo_id] == "affymetrix"){
     #Affymetrix
     save_metadata_file(in_file, destination, "Sample_ID", "ensembl_gene_id")
     

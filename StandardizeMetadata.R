@@ -11,7 +11,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 library(GEOquery)
 library(tidyverse)
 library(janitor)
-source("PlatformsList.R")
+source("Datasets.R")
 source("MetadataAttributes.R")
 
 
@@ -177,7 +177,7 @@ if (!dir.exists(file_location)){
 
 
 # loop through all series IDs
-for (geo_id in names(platforms_list)) {
+for (geo_id in pull(Datasets, Name)) {
   
   # read metadata into a variable, drop unneeded columns, split into same and diff
   metadata = get_metadata(geo_id)

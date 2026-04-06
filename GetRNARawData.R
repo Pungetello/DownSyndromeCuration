@@ -11,8 +11,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 library(GEOquery)
 library(rentrez)
 library(tidyverse)
-
-source("PlatformsList.R")
+source("Datasets.R")
 #source ~/.bashrc
 
 
@@ -59,11 +58,11 @@ get_srr_from_srx = function(srx_id) {
 
 
 #creates the file mapping all RNA GSE's to their GSM's, SRX's and SRR's. Assumes each GSM has 1 SRX and 1 SRR.
-create_GSE_to_SRR = function(list){
+create_GSE_to_SRR = function(datasets_table){
   GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
   
-  for(geo_id in names(list)){
-    if(is.na(list[geo_id])){
+  for (geo_id in pull(datasets_table, Name)){
+    if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){
       gse = getGEO(geo_id, GSEMatrix = FALSE)
       
       #get SRA line for each GSM for the geo_id
@@ -145,14 +144,12 @@ download_reference = function(){
 #--------------Download_RNA_data-------------
 
 #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-create_GSE_to_SRR(platforms_list)
+create_GSE_to_SRR(Datasets)
 
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-for (geo_id in names(platforms_list)){
-  platform = platforms_list[[geo_id]]
-
-  if(is.na(platform)){
+for (geo_id in pull(Datasets, Name)){
+  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     #if(!file.exists(destination)){ #for filtering out human RNA
 

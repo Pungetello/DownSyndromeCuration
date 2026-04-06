@@ -11,8 +11,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 library(tidyverse)
 library(RCurl)
 library(biomaRt)
-
-source("PlatformsList.R")
+source("Datasets.R")
 
 #-----------functions------------------
 
@@ -59,8 +58,8 @@ if (!dir.exists("Data/NormalizedData")){
 }
 
 # download data for all RNAsec in platforms list
-for (geo_id in names(platforms_list)){
-  platform = platforms_list[[geo_id]]
+for (geo_id in pull(Datasets, Name)){
+  platform = Datasets$Platform[Datasets$Name == geo_id]
   if (is.na(platform)){
     download_quality_output(geo_id)
   }

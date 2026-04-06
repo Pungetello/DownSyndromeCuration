@@ -6,6 +6,7 @@ library(readxl)
 library(janitor)
 library(DBI)
 library(GEOquery)
+source("Datasets.R")
 
 #----------functions-------------
 
@@ -283,7 +284,7 @@ AD_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_
 DAR_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=3, skip=2)
 #print(AD_model)#debug
 
-for (geo_id in names(platforms_list)) {
+for (geo_id in pull(Datasets, Name)){
   #geo_id = "GSE109293"
   RPKM_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
   DE_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")

@@ -1,5 +1,5 @@
 #-----------loading_libraries-----------
-source("PlatformsList.R")
+source("Datasets.R")
 library(arrayQualityMetrics)
 library(SCAN.UPC)
 library(tidyverse)
@@ -118,11 +118,10 @@ remove_fails_from_metadata = function(pass_reject_tibble){
 
 #-----------run statistical tests-----------
 
-for (geo_id in names(platforms_list)){
-  platform = platforms_list[[geo_id]]
+for (geo_id in pull(Datasets, Name)){
+  platform = Datasets$Platform[Datasets$Name == geo_id]
   #skip if RNA
   if (!is.na(platform)){
-    
     #skip if normalized data already exists
     if (!file.exists(sprintf("%s/Data/NormalizedData/%s.tsv.gz", getwd(), geo_id))){
 
