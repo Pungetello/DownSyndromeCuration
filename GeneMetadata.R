@@ -21,13 +21,22 @@ get_genes_from_quality_output = function(in_file, column) {
 
 
 #use biomaRt to get corresponding data
-get_gene_metadata = function(values, filters){
+get_gene_metadata = function(values, filters, organism){
   
-  mart = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+  if(organism == "hs"){
+    mart = useEnsembl(biomart = "genes",
+                      dataset = "hsapiens_gene_ensembl",
+                      mirror = "uswest")
+  }else{
+    mart = useEnsembl(biomart = "genes",
+                      dataset = "mmusculus_gene_ensembl",
+                      mirror = "uswest")
+  }
+  
   
   if(length(values) > 0){
     gene_metadata = getBM(
-      attributes = c("entrezgene_id", "hgnc_symbol", "ensembl_gene_id", "chromosome_name", "start_position", "end_position"),
+      attributes = c("entrezgene_id","hgnc_symbol","ensembl_gene_id","chromosome_name","start_position","end_position"),
       filters = filters,
       values = values,
       mart = mart
@@ -39,13 +48,18 @@ get_gene_metadata = function(values, filters){
 
 
 #get gene ID's from file, get metadata, combine and save
-save_metadata_file = function(in_file, destination, column_title, id_type){
+save_metadata_file = function(in_file, destination, column_title, id_type, organism){
+  if (!file.exists(in_file)){
+    print(paste0("NORMALIZED DATA FILE NOT FOUND"))
+    return()
+  }
+  
   #get vector of all Gene ID's from that file
   gene_ids = get_genes_from_quality_output(in_file, column_title)
   
   if(length(gene_ids) > 0){
     
-    gene_metadata = get_gene_metadata(gene_ids, id_type)
+    gene_metadata = get_gene_metadata(gene_ids, id_type, organism)
     write_tsv(gene_metadata, destination)
     
   } else {
@@ -81,30 +95,26 @@ if (!dir.exists(output_file_location)){
 }
 
 for (geo_id in pull(Datasets, Name)){
-  #print(geo_id) #debug
+  print(geo_id) #debug
   destination = paste0(getwd(), "/Data/Metadata/GeneMetadata/", geo_id, ".tsv.gz")
   
-  #makes sure it doesn't redownload
+  #makes sure it doesn't remake it
   if (file.exists(destination)){next}
   
-  in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
   
-  if (!file.exists(in_file)){
-    print(paste0("NORMALIZED DATA FILE NOT FOUND FOR ", geo_id))
-    next
-  }
-  
-  
-  if(Datasets$Type[Datasets$Name == geo_id] == "affymetrix"){
-    #Affymetrix
-    save_metadata_file(in_file, destination, "Sample_ID", "ensembl_gene_id")
+  if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+    #Human
+    in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
+    
+    save_metadata_file(in_file, destination, "Sample_ID", "ensembl_gene_id", "hs")
     
 
   }else{
-    #RNA Sec
-    save_metadata_file(in_file, destination, "GeneID", "entrezgene_id")
-    
-    replace_id_col(in_file, destination)
+    #Mouse
+    in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.csv")#could also use DE or RPKM or any of the others
+    save_metadata_file(in_file, destination, "gene_id", "ensembl_gene_id", "mm")
+
+    #replace_id_col(in_file, destination)
 
   }
 }

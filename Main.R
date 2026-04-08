@@ -16,7 +16,7 @@ source("StandardizeMetadata.R")
 #creates NormalizedData for Affymetrix
 source("QualityControlTests.R")
 
-#downloads gene_data for RNA
+#downloads data for human RNA and gene_tables for RNA (might no longer be necessary)
 source("GetRNASecData.R")
 
 #processes mouse RNA data that is not downloadable

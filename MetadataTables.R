@@ -163,7 +163,7 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
 
 
 
-make_abundance_data = function(geo_id, model, rna_genes){
+make_abundance_data = function(geo_id, model, mouse_genes){
   
   #make results table
   attributes = filter(model,`Attribute tier`=="Tier1 (applies to all dataset)")%>%

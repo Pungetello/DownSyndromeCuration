@@ -37,10 +37,8 @@ download_quality_output = function(geo_id){
 }
 
 
-download_gene_data = function(){ #maybe add some parameters
-  #download the human one  
-  link = "https://www.ncbi.nlm.nih.gov/geo/download/?format=file&type=rnaseq_counts&file=Human.GRCh38.p13.annot.tsv.gz"
-  destination = file.path(getwd(), "Data/rna_gene_data.tsv.gz")
+download_gene_data = function(link, organism){
+  destination = paste0(getwd(), "/Data/rna_", organism, "_genes.tsv.gz")
   if(!file.exists(destination)){
     #check if link exists
     options(timeout = Inf)
@@ -57,13 +55,17 @@ if (!dir.exists("Data/NormalizedData")){
   dir.create("Data/NormalizedData", recursive = TRUE)
 }
 
-# download data for all RNAsec in platforms list
-for (geo_id in pull(Datasets, Name)){
-  platform = Datasets$Platform[Datasets$Name == geo_id]
-  if (is.na(platform)){
-    download_quality_output(geo_id)
-  }
-}
+# # download data for all RNAsec in platforms list
+# for (geo_id in pull(Datasets, Name)){
+#   platform = Datasets$Platform[Datasets$Name == geo_id]
+#   if (is.na(platform)){
+#     download_quality_output(geo_id)
+#   }
+# }
 
 # download the genes needed
-download_gene_data()
+human_link = "https://www.ncbi.nlm.nih.gov/geo/download/?format=file&type=rnaseq_counts&file=Human.GRCh38.p13.annot.tsv.gz"
+mouse_link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
+
+download_gene_data(human_link, "human")
+download_gene_data(mouse_link, "mouse")
