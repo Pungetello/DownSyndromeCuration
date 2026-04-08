@@ -47,20 +47,20 @@ create_metadata = function(gse, column_type){
   return(metadata)
 }
 
-#TODO: use white background and highlight genes on anomalous chormosome
+#TODO: highlight genes on anomalous chormosome
 #create a volcano plot of the data
 volcano_plot = function(data, output_prefix){
   
   top = data[order(data$padj), ][1:10, ]
   
   ggplot(data, aes(x = log2FoldChange, y = -log10(padj)))+ #, color=significant)) +
+    theme(plot.background = element_rect(fill = "white"))+
     geom_point(alpha = 0.5) +
     #scale_color_manual(values = c("grey", "blue")) +
     geom_text_repel(data = top, aes(label = gene)) +
     theme_minimal()
   
   ggsave(filename = paste0(getwd(), "/Data/Plots/", output_prefix, "_Volcano.png"), width = 5, height = 5, units = "in")
-  
   
 }
 
