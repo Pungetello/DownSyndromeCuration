@@ -26,17 +26,17 @@ get_gene_metadata = function(values, filters, organism){
   if(organism == "hs"){
     mart = useEnsembl(biomart = "genes",
                       dataset = "hsapiens_gene_ensembl",
-                      mirror = "uswest")
+                      mirror = "useast")
   }else{
     mart = useEnsembl(biomart = "genes",
                       dataset = "mmusculus_gene_ensembl",
-                      mirror = "uswest")
+                      mirror = "useast")
   }
   
   
   if(length(values) > 0){
     gene_metadata = getBM(
-      attributes = c("entrezgene_id","hgnc_symbol","ensembl_gene_id","chromosome_name","start_position","end_position"),
+      attributes = c("entrezgene_id","hgnc_symbol","ensembl_gene_id","chromosome_name","start_position","end_position","gene_biotype"),
       filters = filters,
       values = values,
       mart = mart
@@ -105,8 +105,11 @@ for (geo_id in pull(Datasets, Name)){
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
     #Human
     in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
-    
-    save_metadata_file(in_file, destination, "Sample_ID", "ensembl_gene_id", "hs")
+    if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){
+      save_metadata_file(in_file, destination, "SampleID", "ensembl_gene_id", "hs")
+    }else{
+      save_metadata_file(in_file, destination, "Sample_ID", "ensembl_gene_id", "hs")
+    }
     
 
   }else{

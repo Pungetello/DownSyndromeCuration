@@ -180,6 +180,7 @@ make_abundance_data = function(geo_id, model, mouse_genes){
   RPKM_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
   RPKM = read_tsv(RPKM_file)
   SRRs = colnames(RPKM)[-1]
+  gene_metadata_file = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", geo_id, ".tsv.gz")) #from GeneMetadata.R
   
   #define variables for columns that are the same in all rows
   Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
@@ -195,22 +196,14 @@ make_abundance_data = function(geo_id, model, mouse_genes){
     
     #Do I need a row for each gene and its count for each GSM? This will be very big.
     FeatureID = pull(RPKM, "gene_id") #Gene/protein/metab identifier. Vector!
-    
-    # print(tibble::as.tibble(FeatureID))
-    # print(pull(rna_genes, EnsemblGeneID))
-    # 
-    # Feature_name = inner_join(tibble::as.tibble(FeatureID), rna_genes, by=join_by("value"=="EnsemblGeneID"))%>%
-    #   print()%>%
-    #   pull("Symbol")%>%
-    #   print()
-    # stop()
-      #Feature name/symbol. Use gene_data file #TODO: 
     Value = pull(RPKM, SRR)#Feature abundance in sample. Should be vector of same length!
     Units = "RPKM"
-    X__Feature_chromosome = NA#also in gene file, ChrAcc
-    X__Feature_gene_type = NA#also in gene file, GeneType
     
-    SRR_tibble = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, SampleID=SampleID, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, Value = Value, Units = Units, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
+    SRR_tibble = inner_join(tibble(DatasetID,Dataset_name,SampleID,FeatureID,FeatureID_type,Value,Units,Data_model_version,Date_exported,Data_contact,Script), gene_metadata_file, by=join_by("FeatureID"=="ensembl_gene_id"))%>%
+      rename("X__Feature_chromosome"="chromosome_name", "X__Feature_gene_type"="gene_biotype", "Feature_name"="hgnc_symbol")%>%
+      dplyr::select(!c("entrezgene_id","start_position","end_position"))
+    
+    #SRR_tibble = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, SampleID=SampleID, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, Value = Value, Units = Units, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
     table = bind_rows(table, SRR_tibble)
   }
   
@@ -277,7 +270,7 @@ make_differential_analysis_results = function(geo_id, model){
 #read in sample and dataset metadata, along with RPKM files, to make the tables
 
 sample_metadata = read_tsv(paste0(getwd(), "/Data/Metadata/SampleMetadata.tsv"))
-rna_genes = read_tsv(paste0(getwd(), "/Data/rna_gene_data.tsv.gz"))#TODO: this is human one, need to get mouse
+#rna_genes = read_tsv(paste0(getwd(), "/Data/rna_gene_data.tsv.gz"))#TODO: this is human one, need to get mouse
 
 SM_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=1, skip=2)
 AD_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=2, skip=2)
@@ -298,7 +291,7 @@ for (geo_id in pull(Datasets, Name)){
   #make_sample_metadata(geo_id, sample_metadata, SM_model)
   
   #make Abundance_data
-  make_abundance_data(geo_id, AD_model, rna_genes)
+  make_abundance_data(geo_id, AD_model)
   
   #make Differential_analysis_results
   #make_differential_analysis_results(geo_id, DAR_model)
