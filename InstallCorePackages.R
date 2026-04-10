@@ -28,7 +28,8 @@ BiocManager::install(c("tidyverse",
                        "Rsubread",
                        "edgeR",
                        "DESeq2",
-                       "ggrepel"
+                       "ggrepel",
+                       "Rsamtools"
                        ), lib = user_lib
 )
 

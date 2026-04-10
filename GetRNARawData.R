@@ -12,7 +12,11 @@ library(GEOquery)
 library(rentrez)
 library(tidyverse)
 source("Datasets.R")
-#source ~/.bashrc
+
+library(GenomicRanges)
+library(Biostrings)
+#library(GenomeInfoDb)
+library(Rsamtools)
 
 
 #----------functions-------------
@@ -146,13 +150,57 @@ download_reference = function(){
 
 
 
+create_mac_reference = function(){
+  #get coords of needed sequences within human genome
+  gene_mapping = read_tsv(paste0(getwd(), "/MouseModel_GeneMapping_v0.6_ZS_TcMAC21_genes.txt"))
+  region_coords = filter(gene_mapping, region_type == "MAC HSA21q")%>%
+    select(start, end)
+  print(region_coords)
+  
+  deletion_coords = filter(gene_mapping, region_type == "deletion")%>%
+    select(start, end)
+  
+  #create ranges
+  mac_full = GRanges(seqnames = "chr21", ranges = IRanges(start = region_coords$start[1], end = region_coords$end[1]))
+  deletions = GRanges(seqnames = "chr21", ranges = IRanges(start = pull(deletion_coords, start), end = pull(deletion_coords, end)))
+  mac_fragments = setdiff(mac_full, deletions)
+  print(mac_fragments)
+  
+  #extract sequences
+  #genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
+  indexFa("RefGenomes/GRCh38_ref.fna")
+  fa = FaFile("RefGenomes/GRCh38_ref.fna")
+  open(fa)
+  
+  seqs = getSeq(fa, mac_fragments)
+  
+  # Extract sequences manually
+  # seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i) {
+  #   chr <- as.character(seqnames(mac_fragments)[i])
+  #   start <- start(mac_fragments)[i]
+  #   end <- end(mac_fragments)[i]
+  #   
+  #   subseq(genome[[chr]], start = start, end = end)
+  # }))
+  
+  names(seqs) = paste0("MAC_", c("1","2","3","4"))
+  writeXStringSet(seqs, paste0(getwd(), "/RefGenomes/mac_sequences.fa"))
+  
+  #append to copy of mouse reference genome
+  #system("cat mouse.fa mac_sequences.fa > mouse_plus_mac.fa")
+  
+  
+}
+
+
+
 #--------------Download_RNA_data-------------
 
-#create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-#create_GSE_to_SRR(Datasets)
-
-
-#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
+# #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
+# create_GSE_to_SRR(Datasets)
+# 
+# 
+# #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 # for (geo_id in pull(Datasets, Name)){
 #   if(Datasets$Type[Datasets$Name == geo_id] == "RNA" && Datasets$Organism[Datasets$Name == geo_id] == "human"){
 #     print(geo_id)
@@ -166,7 +214,10 @@ download_reference = function(){
 #       download_raw(geo_id)
 #     }
 #   }
-#}
+# #}
 
 #download reference genomes needed
 download_reference()
+
+#create MAC combined reference genome
+create_mac_reference()
