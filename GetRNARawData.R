@@ -135,8 +135,13 @@ download_reference = function(){
   safe_download(link, destination)
   
   #human files
-  #https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz
-  #https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz
+  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz"
+  destination = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
+  safe_download(link, destination)
+  
+  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
+  safe_download(link, destination)
 }
 
 
