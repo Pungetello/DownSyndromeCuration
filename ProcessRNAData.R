@@ -204,7 +204,7 @@ for (srr in srrs){
   geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
   print(geo_id)
   
-  if(Datasets$Name[geo_id] == "human"){
+  if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
 
     #mouse stuff
   #ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
