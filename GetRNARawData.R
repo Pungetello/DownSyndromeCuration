@@ -154,7 +154,7 @@ create_GSE_to_SRR(Datasets)
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
-  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){
+  if(Datasets$Type[Datasets$Name == geo_id] == "RNA" && Datasets$Organism[Datasets$Name == geo_id] == "Human"){
     print(geo_id)
     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     #if(!file.exists(destination)){ #for filtering out human RNA
