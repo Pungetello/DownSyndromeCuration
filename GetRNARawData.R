@@ -168,9 +168,26 @@ create_mac_reference = function(){
   
   #extract sequences
   #genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
+  # indexFa("RefGenomes/GRCh38_ref.fna")
+  # fa = FaFile("RefGenomes/GRCh38_ref.fna")
+  # open(fa)
+  # print(head(scanFaIndex(fa)))
+  
+  # Close anything lingering
+  try(close(fa), silent = TRUE)
+  
+  # Recreate index from scratch
+  file.remove("RefGenomes/GRCh38_ref.fna.fai")
   indexFa("RefGenomes/GRCh38_ref.fna")
+  
+  # Recreate FaFile object fresh
   fa = FaFile("RefGenomes/GRCh38_ref.fna")
   open(fa)
+  
+  print("file opened")
+  
+  print(seqlengths(scanFaIndex("RefGenomes/GRCh38_ref.fna"))["chr21"])
+  print(max(end(mac_fragments)))
   
   seqs = getSeq(fa, mac_fragments)
   
@@ -217,7 +234,7 @@ create_mac_reference = function(){
 # #}
 
 #download reference genomes needed
-download_reference()
+#download_reference()
 
 #create MAC combined reference genome
 create_mac_reference()
