@@ -205,17 +205,26 @@ for (srr in srrs){
   geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
   print(geo_id)
   
+  if(length(geo_id)==0){
+    print("NO GEOID FOUND")
+    next()
+  }
+  
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
 
-    #mouse stuff
-  #ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-  #annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-  #index = "GRCm39_index"
-    
     #human stuff
     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
     annotation = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
     index = "GRCh38_index"
+  }
+  
+  else if(Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+    
+    #mouse stuff
+    ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+    annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+    index = "GRCm39_index"
+  }
 
   #finish installation by converting to fastq format
   install_raw(srr)
@@ -225,9 +234,8 @@ for (srr in srrs){
 
   #run alignment and save output files
   process_data(srr, index, annotation)
-  }
-
 }
+
 
 combine_results_per_GSE()
 
