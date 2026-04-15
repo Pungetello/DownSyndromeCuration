@@ -196,6 +196,7 @@ combine_files = function(gse, srrs, suffix){
 
 #get list of all srr files prefetched by previous script
 srrs = list.files("Data/RawRNA")
+print(srrs)
 
 GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
