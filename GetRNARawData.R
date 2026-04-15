@@ -16,7 +16,7 @@ source("Datasets.R")
 library(GenomicRanges)
 library(Biostrings)
 #library(GenomeInfoDb)
-library(Rsamtools)
+#library(Rsamtools)
 
 
 #----------functions-------------
@@ -168,45 +168,29 @@ create_mac_reference = function(){
   
   #extract sequences
   #genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
-  # indexFa("RefGenomes/GRCh38_ref.fna")
-  # fa = FaFile("RefGenomes/GRCh38_ref.fna")
-  # open(fa)
-  # print(head(scanFaIndex(fa)))
-  
-  # Close anything lingering
-  try(close(fa), silent = TRUE)
-  
-  # Recreate index from scratch
-  file.remove("RefGenomes/GRCh38_ref.fna.fai")
   indexFa("RefGenomes/GRCh38_ref.fna")
-  
-  # Recreate FaFile object fresh
   fa = FaFile("RefGenomes/GRCh38_ref.fna")
   open(fa)
+  # print(head(scanFaIndex(fa)))
   
   print("file opened")
-  
-  print(seqlengths(scanFaIndex("RefGenomes/GRCh38_ref.fna"))["chr21"])
-  print(max(end(mac_fragments)))
   
   seqs = getSeq(fa, mac_fragments)
   
   # Extract sequences manually
-  # seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i) {
+  # seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
   #   chr <- as.character(seqnames(mac_fragments)[i])
   #   start <- start(mac_fragments)[i]
   #   end <- end(mac_fragments)[i]
-  #   
+  # 
   #   subseq(genome[[chr]], start = start, end = end)
   # }))
   
-  names(seqs) = paste0("MAC_", c("1","2","3","4"))
+  names(seqs) = paste0("MAC_", c("1","2","3","4","5"))
   writeXStringSet(seqs, paste0(getwd(), "/RefGenomes/mac_sequences.fa"))
   
   #append to copy of mouse reference genome
   #system("cat mouse.fa mac_sequences.fa > mouse_plus_mac.fa")
-  
-  
 }
 
 
@@ -214,7 +198,7 @@ create_mac_reference = function(){
 #--------------Download_RNA_data-------------
 
 # #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-# create_GSE_to_SRR(Datasets)
+create_GSE_to_SRR(Datasets)
 # 
 # 
 # #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
@@ -237,4 +221,4 @@ create_mac_reference = function(){
 #download_reference()
 
 #create MAC combined reference genome
-create_mac_reference()
+#create_mac_reference()
