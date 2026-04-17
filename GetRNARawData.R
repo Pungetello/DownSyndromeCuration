@@ -15,8 +15,8 @@ source("Datasets.R")
 
 library(GenomicRanges)
 library(Biostrings)
-#library(GenomeInfoDb)
-#library(Rsamtools)
+library(GenomeInfoDb)
+library(Rsamtools)
 
 
 #----------functions-------------
@@ -132,20 +132,20 @@ download_reference = function(){
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/GRCm39.primary_assembly.genome.fa.gz"
   destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   safe_download(link, destination)
+  # 
+  # #download annotation table
+  # link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
+  # destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+  # safe_download(link, destination)
   
-  #download annotation table
-  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
-  destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-  safe_download(link, destination)
+  # #human files
+  # link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz"
+  # destination = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
+  # safe_download(link, destination)
   
-  #human files
-  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz"
-  destination = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
-  safe_download(link, destination)
-  
-  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz"
-  destination = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
-  safe_download(link, destination)
+  # link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz"
+  # destination = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
+  # safe_download(link, destination)
 }
 
 
@@ -167,30 +167,68 @@ create_mac_reference = function(){
   print(mac_fragments)
   
   #extract sequences
-  #genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
-  indexFa("RefGenomes/GRCh38_ref.fna")
-  fa = FaFile("RefGenomes/GRCh38_ref.fna")
-  open(fa)
-  # print(head(scanFaIndex(fa)))
+  genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna"))
+  # if(!file.exists("RefGenomes/GRCh38_ref.fna.fai")){
+  #   indexFa("RefGenomes/GRCh38_ref.fna")
+  #   }
+  # fa = FaFile("RefGenomes/GRCh38_ref.fna")
+  # open(fa)
+  # # print(head(scanFaIndex(fa)))
+  print(head(names(genome), 5))
+  names(genome) <- sub(" .*", "", names(genome))
+  print(head(names(genome), 5))
+  
   
   print("file opened")
   
-  seqs = getSeq(fa, mac_fragments)
+  # seqlevels(mac_fragments) <- seqlevels(fa)
+  # seqinfo(mac_fragments) <- seqinfo(fa)
+  # print("info coppied")
   
-  # Extract sequences manually
-  # seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
-  #   chr <- as.character(seqnames(mac_fragments)[i])
-  #   start <- start(mac_fragments)[i]
-  #   end <- end(mac_fragments)[i]
-  # 
-  #   subseq(genome[[chr]], start = start, end = end)
-  # }))
+  # print("lengths okay?")
+  # print(all(end(mac_fragments) <= seqlengths(fa)[as.character(seqnames(mac_fragments))]))
+  
+  # print("names okay?")
+  # print(seqlevels(fa))
+  # print(seqlevels(mac_fragments))
+  
+  # getSeq(fa, GRanges("chr21", IRanges(13000000, 13001000)))
+  # scanFaIndex(fa)["chr21"]
+  # print("tests worked")
+  
+  #seqs = getSeq(fa, mac_fragments)
+  # seqs <- scanFa(fa, param = mac_fragments)
+  
+  # # Extract sequences manually
+  seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
+    chr <- as.character(seqnames(mac_fragments)[i])
+    start <- start(mac_fragments)[i]
+    end <- end(mac_fragments)[i]
+
+    subseq(genome[[chr]], start = start, end = end)
+  }))
+  print("got sequences manually")
+  # close(fa)
   
   names(seqs) = paste0("MAC_", c("1","2","3","4","5"))
-  writeXStringSet(seqs, paste0(getwd(), "/RefGenomes/mac_sequences.fa"))
+  
+  mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
+  mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+  combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+  
+  writeXStringSet(seqs, mac_file)
   
   #append to copy of mouse reference genome
-  #system("cat mouse.fa mac_sequences.fa > mouse_plus_mac.fa")
+  
+  # system(paste0("cat ",mouse_file," ",mac_file," > ", combined_file))
+  
+  system(paste(
+    "zcat", shQuote(mouse_file),
+    shQuote(mac_file),
+    ">", shQuote(combined_file)
+  ))
+  
+  print("combined!")
 }
 
 
@@ -198,7 +236,7 @@ create_mac_reference = function(){
 #--------------Download_RNA_data-------------
 
 # #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-create_GSE_to_SRR(Datasets)
+# create_GSE_to_SRR(Datasets)
 # 
 # 
 # #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
@@ -218,7 +256,7 @@ create_GSE_to_SRR(Datasets)
 # #}
 
 #download reference genomes needed
-#download_reference()
+download_reference()
 
 #create MAC combined reference genome
-#create_mac_reference()
+create_mac_reference()
