@@ -17,6 +17,7 @@ library(GenomicRanges)
 library(Biostrings)
 library(GenomeInfoDb)
 library(Rsamtools)
+library(rtracklayer)
 
 
 #----------functions-------------
@@ -165,39 +166,60 @@ create_mac_reference = function(){
   deletions = GRanges(seqnames = "chr21", ranges = IRanges(start = pull(deletion_coords, start), end = pull(deletion_coords, end)))
   mac_fragments = setdiff(mac_full, deletions)
   
-  #read in human reference genome
-  genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
-  names(genome) <- sub(" .*", "", names(genome))
+  #make sure it doesn't already exist
+  if(!file.exists(paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa"))){
   
-  #extract sequences
-  seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
-    chr <- as.character(seqnames(mac_fragments)[i])
-    start <- start(mac_fragments)[i]
-    end <- end(mac_fragments)[i]
-
-    subseq(genome[[chr]], start = start, end = end)
-  }))
+    #read in human reference genome
+    genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
+    names(genome) <- sub(" .*", "", names(genome))
+    
+    #extract sequences
+    seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
+      chr <- as.character(seqnames(mac_fragments)[i])
+      start <- start(mac_fragments)[i]
+      end <- end(mac_fragments)[i]
   
-  names(seqs) = paste0("MAC_", c("1","2","3","4","5"))
+      subseq(genome[[chr]], start = start, end = end)
+    }))
+    
+    names(seqs) = paste0("MAC_", c("1","2","3","4","5"))
+    
+    #append to copy of mouse reference genome
+    mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
+    mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+    
+    writeXStringSet(seqs, mac_file)
+    
+    mouse <- readDNAStringSet(mouse_file)
+    mac <- readDNAStringSet(mac_file)
+    
+    combined <- c(mouse, mac)
+    
+    writeXStringSet(combined, combined_file)
+  }
   
-  #append to copy of mouse reference genome
-  mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
-  mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-  combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
-  
-  writeXStringSet(seqs, mac_file)
-  
-  mouse <- readDNAStringSet(mouse_file)
-  mac <- readDNAStringSet(mac_file)
-  
-  combined <- c(mouse, mac)
-  
-  writeXStringSet(combined, combined_file)
+  return(mac_fragments)
 }
 
 
 
-create_mac_annotation = function(){}
+#append relevant human genes in mac to the mouse annotation file
+create_mac_annotation = function(mac_fragments){
+  
+  #read in mouse and human annotation tables
+  mouse_gtf <- import(paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz"))
+  human_gtf <- import(paste0(getwd(), "/RefGenomes/49_ann.gtf.gz"))
+  
+  #extract MAC sections of human annotation table
+  human_subset <- subsetByOverlaps(human_gtf, mac_fragments)
+  seqlevels(human_subset) <- paste0("MAC_", seqlevels(human_subset))
+  
+  #combine
+  combined_gtf <- c(mouse_gtf, human_subset)
+  
+  export(combined_gtf, paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz"))
+}
 
 
 
@@ -227,5 +249,5 @@ create_mac_annotation = function(){}
 download_reference()
 
 #create MAC combined reference genome
-create_mac_reference()
-create_mac_annotation()
+mac_fragments = create_mac_reference()
+create_mac_annotation(mac_fragments)
