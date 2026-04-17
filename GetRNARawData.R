@@ -122,7 +122,7 @@ safe_download = function(link, destination){
 
 
 
-#download reference genomes for GRCm39, C57BL_6J, and DBA_2J
+#download reference genomes for GRCm39 and human
 download_reference = function(){
   if (!dir.exists("RefGenomes")){
     dir.create("RefGenomes", recursive = TRUE)
@@ -132,30 +132,30 @@ download_reference = function(){
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/GRCm39.primary_assembly.genome.fa.gz"
   destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   safe_download(link, destination)
-  # 
-  # #download annotation table
-  # link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
-  # destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-  # safe_download(link, destination)
+
+  #download annotation table
+  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+  safe_download(link, destination)
   
-  # #human files
-  # link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz"
-  # destination = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
-  # safe_download(link, destination)
-  
-  # link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz"
-  # destination = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
-  # safe_download(link, destination)
+  #human files
+  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz"
+  destination = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
+  safe_download(link, destination)
+
+  link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz"
+  destination = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
+  safe_download(link, destination)
 }
 
 
 
+#append necessary sections of human chr21 to the mouse refrence genome
 create_mac_reference = function(){
   #get coords of needed sequences within human genome
   gene_mapping = read_tsv(paste0(getwd(), "/MouseModel_GeneMapping_v0.6_ZS_TcMAC21_genes.txt"))
   region_coords = filter(gene_mapping, region_type == "MAC HSA21q")%>%
     select(start, end)
-  print(region_coords)
   
   deletion_coords = filter(gene_mapping, region_type == "deletion")%>%
     select(start, end)
@@ -165,14 +165,11 @@ create_mac_reference = function(){
   deletions = GRanges(seqnames = "chr21", ranges = IRanges(start = pull(deletion_coords, start), end = pull(deletion_coords, end)))
   mac_fragments = setdiff(mac_full, deletions)
   
-  #extract sequences
-  genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna"))
-
+  #read in human reference genome
+  genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
   names(genome) <- sub(" .*", "", names(genome))
   
-  print("file opened")
-  
-  # Extract sequences manually
+  #extract sequences
   seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
     chr <- as.character(seqnames(mac_fragments)[i])
     start <- start(mac_fragments)[i]
@@ -180,28 +177,27 @@ create_mac_reference = function(){
 
     subseq(genome[[chr]], start = start, end = end)
   }))
-  print("got sequences manually")
   
   names(seqs) = paste0("MAC_", c("1","2","3","4","5"))
   
+  #append to copy of mouse reference genome
   mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
   mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
   
   writeXStringSet(seqs, mac_file)
   
-  #append to copy of mouse reference genome
+  mouse <- readDNAStringSet(mouse_file)
+  mac <- readDNAStringSet(mac_file)
   
-  # system(paste0("cat ",mouse_file," ",mac_file," > ", combined_file))
+  combined <- c(mouse, mac)
   
-  system(paste(
-    "zcat", shQuote(mouse_file),
-    shQuote(mac_file),
-    ">", shQuote(combined_file)
-  ))
-  
-  print("combined!")
+  writeXStringSet(combined, combined_file)
 }
+
+
+
+create_mac_annotation = function(){}
 
 
 
@@ -232,3 +228,4 @@ download_reference()
 
 #create MAC combined reference genome
 create_mac_reference()
+create_mac_annotation()
