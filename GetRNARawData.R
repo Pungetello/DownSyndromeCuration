@@ -164,42 +164,15 @@ create_mac_reference = function(){
   mac_full = GRanges(seqnames = "chr21", ranges = IRanges(start = region_coords$start[1], end = region_coords$end[1]))
   deletions = GRanges(seqnames = "chr21", ranges = IRanges(start = pull(deletion_coords, start), end = pull(deletion_coords, end)))
   mac_fragments = setdiff(mac_full, deletions)
-  print(mac_fragments)
   
   #extract sequences
   genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna"))
-  # if(!file.exists("RefGenomes/GRCh38_ref.fna.fai")){
-  #   indexFa("RefGenomes/GRCh38_ref.fna")
-  #   }
-  # fa = FaFile("RefGenomes/GRCh38_ref.fna")
-  # open(fa)
-  # # print(head(scanFaIndex(fa)))
-  print(head(names(genome), 5))
+
   names(genome) <- sub(" .*", "", names(genome))
-  print(head(names(genome), 5))
-  
   
   print("file opened")
   
-  # seqlevels(mac_fragments) <- seqlevels(fa)
-  # seqinfo(mac_fragments) <- seqinfo(fa)
-  # print("info coppied")
-  
-  # print("lengths okay?")
-  # print(all(end(mac_fragments) <= seqlengths(fa)[as.character(seqnames(mac_fragments))]))
-  
-  # print("names okay?")
-  # print(seqlevels(fa))
-  # print(seqlevels(mac_fragments))
-  
-  # getSeq(fa, GRanges("chr21", IRanges(13000000, 13001000)))
-  # scanFaIndex(fa)["chr21"]
-  # print("tests worked")
-  
-  #seqs = getSeq(fa, mac_fragments)
-  # seqs <- scanFa(fa, param = mac_fragments)
-  
-  # # Extract sequences manually
+  # Extract sequences manually
   seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
     chr <- as.character(seqnames(mac_fragments)[i])
     start <- start(mac_fragments)[i]
@@ -208,7 +181,6 @@ create_mac_reference = function(){
     subseq(genome[[chr]], start = start, end = end)
   }))
   print("got sequences manually")
-  # close(fa)
   
   names(seqs) = paste0("MAC_", c("1","2","3","4","5"))
   
