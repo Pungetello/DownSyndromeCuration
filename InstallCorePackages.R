@@ -11,7 +11,7 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
   .libPaths(c(user_lib, .libPaths()))
 }
 
-# options(repos = c(CRAN = "https://cloud.r-project.org"))
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 # options(download.file.method = "libcurl")
 # options(repos = BiocManager::repositories())
 options(download.file.method = "wininet")  # on Windows
