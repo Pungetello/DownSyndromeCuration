@@ -202,9 +202,6 @@ GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (srr in srrs){
   print(srr)
-  if(!startsWith(srr, "SRR5")){
-    next()
-  }
   
   geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
   print(geo_id)
@@ -215,6 +212,8 @@ for (srr in srrs){
   }
   
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+    
+    next()
 
     #human stuff
     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
@@ -224,10 +223,15 @@ for (srr in srrs){
   
   else if(Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
     
-    #mouse stuff
-    ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-    annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-    index = "GRCm39_index"
+    # #normal mouse stuff
+    # ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+    # annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+    # index = "GRCm39_index"
+    
+    #mouse with MAC
+    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
+    index = "mouse_plus_mac_index"
   }
 
   #finish installation by converting to fastq format
@@ -241,5 +245,5 @@ for (srr in srrs){
 }
 
 
-#combine_results_per_GSE()
+combine_results_per_GSE()
 
