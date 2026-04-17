@@ -145,7 +145,7 @@ calculate_data_files = function(feature_counts){
 #For each GSE in the GSE_to_SRR file, combine all the result data from its SRR's into one file
 combine_results_per_GSE = function(){
   
-  GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
+  GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"), show_col_types=False)
   
   gses = pull(GSE_to_SRR, GSE)%>%
     unique()
@@ -177,7 +177,7 @@ combine_files = function(gse, srrs, suffix){
     
     for (file in infiles[-1]){
       if(file.exists(file)){
-        file_tibble = read_tsv(file)
+        file_tibble = read_tsv(file, show_col_types=False)
         combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
       } else{
         print("FILE MISSING!")
@@ -241,5 +241,5 @@ for (srr in srrs){
 }
 
 
-combine_results_per_GSE()
+#combine_results_per_GSE()
 
