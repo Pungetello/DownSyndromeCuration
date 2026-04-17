@@ -60,7 +60,7 @@ build_index = function(index_file, ref){
 
 #runs alignment, gets feature counts, and makes tpm file
 process_data = function(srr, index, annotation){
-  
+  print(paste0("PROCESSING ", srr))
   output_file = paste0(srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
   #check if alignment has already been done
