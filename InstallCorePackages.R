@@ -23,7 +23,7 @@ BiocManager::install(version = "3.22", lib = user_lib)
 BiocManager::install(c("tidyverse",
                        "SCAN.UPC",
                        "GEOquery",
-                       "arrayQualityMetrics",
+                       #"arrayQualityMetrics",
                        "janitor",
                        "biomaRt",
                        "RCurl",
