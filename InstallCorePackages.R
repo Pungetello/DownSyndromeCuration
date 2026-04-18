@@ -15,6 +15,7 @@ options(repos = c(CRAN = "https://cloud.r-project.org"))
 # options(download.file.method = "libcurl")
 # options(repos = BiocManager::repositories())
 # options(download.file.method = "wininet")  # on Windows
+#TODO: add switch here so it only does wininet on Optimus Prime
 
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager", lib = user_lib)
@@ -32,6 +33,7 @@ BiocManager::install(c("tidyverse",
                        "DESeq2",
                        "ggrepel",
                        "Rsamtools",
+                       "GenomeInfoDb",
                        "rtracklayer"
                        ), lib = user_lib
 )
