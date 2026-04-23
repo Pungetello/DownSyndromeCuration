@@ -37,13 +37,10 @@ get_gse_metadata = function(gse_id) {
 }
 
 
-find_value_from_keys = function(metadata, i, keys){
+find_value_from_keys = function(metadata, i, key){
   result = NA
-  for (k in keys) {
-    if (has_name(metadata, k)) {
-      result = metadata[[k]][[i]]
-      break
-    }
+  if (has_name(metadata, key)) {
+      result = metadata[[key]][[i]]
   }
   return(result)
 }
@@ -76,6 +73,18 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
   Data_contact = "Stephen Piccolo"
   Additional_details = NA
   
+  if(geo_id == "GSE109293"){
+    match_index = 1
+  }else if(geo_id == "GSE109294"){
+    match_index = 2
+  }else if(geo_id == "GSE202938"){
+    match_index = 3
+  }else if(geo_id == "GSE210117"){
+    match_index = 4
+  }else{
+    print("NO METADATA MATCHES CODED FOR GSE")
+  }
+  
   
   for(i in 1:length(GSMs)){
     GSM = GSMs[i]
@@ -87,7 +96,7 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
     
     
     #add values for other tibble's genotype columns
-    X__Sample_Genotype = find_value_from_keys(metadata, i, c("strain_ch1", "genotype_ch1", "background_strain_ch1"))#GSE109293&4, GSE202938, GSE210117
+    X__Sample_Genotype = find_value_from_keys(metadata, i, c("strain_ch1", "strain_ch1", "genotype_ch1", "background_strain_ch1")[match_index])#GSE109293&4, GSE202938, GSE210117
     
     status = filter(sample_metadata, ID==GSM)%>%
       pull(Value)
@@ -99,27 +108,27 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
       X__Sample_Karyotype = NA
     }
     
-    X__Sample_Treatment = find_value_from_keys(metadata, i, c())#GSE109293&4, GSE202938, GSE210117
-    X__Sample_Sex = find_value_from_keys(metadata, i, c())
-    X__Sample_Age_group = find_value_from_keys(metadata, i, c())
-    X__Sample_age_in_days_post_birth = find_value_from_keys(metadata, i, c())
-    X__Sample_age_in_days_post_conception = find_value_from_keys(metadata, i, c("source_name_ch1"))
-    X__Sample_Age_in_weeks = find_value_from_keys(metadata, i, c())
-    X__Sample_Harvest_batch = find_value_from_keys(metadata, i, c())
-    X__Sample_Cell_type = find_value_from_keys(metadata, i, c("cell_type_ch1"))
-    X__Sample_Cell_line = find_value_from_keys(metadata, i, c())
-    X__Sample_DonorID = find_value_from_keys(metadata, i, c())
-    X__Sample_Batch = find_value_from_keys(metadata, i, c())
-    X__Sample_Comparison_group = find_value_from_keys(metadata, i, c())#is this anything?
-    X__Sample_tatoo = find_value_from_keys(metadata, i, c())
-    X__Sample_CageID = find_value_from_keys(metadata, i, c())
-    X__Sample_Donor_cell_type = find_value_from_keys(metadata, i, c())
-    X__Sample_Pre_differentation_passage_number = find_value_from_keys(metadata, i, c())
-    X__Sample_Post_differentation_passage_number = find_value_from_keys(metadata, i, c())
-    X__Sample_Differentiation_factors = find_value_from_keys(metadata, i, c())
-    X__Sample_Days_in_differentiation = find_value_from_keys(metadata, i, c())
-    X__Sample_Oxygen_percent = find_value_from_keys(metadata, i, c())
-    X__Sample_Coating_matrix = find_value_from_keys(metadata, i, c())
+    X__Sample_Treatment = NA #find_value_from_keys(metadata, i, c()), GSE109293&4, GSE202938, GSE210117
+    X__Sample_Sex = NA
+    X__Sample_Age_group = NA
+    X__Sample_age_in_days_post_birth = find_value_from_keys(metadata, i, c(NA, NA, "age_ch1", NA)[match_index])
+    X__Sample_age_in_days_post_conception = find_value_from_keys(metadata, i, c("source_name_ch1", NA, NA, "age_ch1")[match_index])
+    X__Sample_Age_in_weeks = find_value_from_keys(metadata, i, c("age_ch1", NA, NA, NA)[match_index])
+    X__Sample_Harvest_batch = NA
+    X__Sample_Cell_type = find_value_from_keys(metadata, i, c("cell_type_ch1", "tissue_ch1", "source_name_ch1", "tissue_ch1")[match_index])
+    X__Sample_Cell_line = NA
+    X__Sample_DonorID = NA
+    X__Sample_Batch = NA
+    X__Sample_Comparison_group = NA #is this anything?
+    X__Sample_tatoo = NA
+    X__Sample_CageID = NA
+    X__Sample_Donor_cell_type = NA
+    X__Sample_Pre_differentation_passage_number = NA
+    X__Sample_Post_differentation_passage_number = NA
+    X__Sample_Differentiation_factors = NA
+    X__Sample_Days_in_differentiation = NA
+    X__Sample_Oxygen_percent = NA
+    X__Sample_Coating_matrix = NA
     
     
     table = add_row(table, DatasetID = DatasetID,
@@ -279,6 +288,7 @@ DAR_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk
 
 for (geo_id in pull(Datasets, Name)){
   #geo_id = "GSE109293"
+  print(geo_id)
   RPKM_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
   DE_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")
   if(!file.exists(RPKM_filename) || !file.exists(DE_filename)){
@@ -288,10 +298,10 @@ for (geo_id in pull(Datasets, Name)){
   
   
   #make Sample_metadata
-  #make_sample_metadata(geo_id, sample_metadata, SM_model)
+  make_sample_metadata(geo_id, sample_metadata, SM_model)
   
   #make Abundance_data
-  make_abundance_data(geo_id, AD_model)
+  #make_abundance_data(geo_id, AD_model)
   
   #make Differential_analysis_results
   #make_differential_analysis_results(geo_id, DAR_model)
