@@ -151,9 +151,8 @@ combine_results_per_GSE = function(){
     unique()
   
   for(gse in gses){
-    #print(gse)#debug
+    print(gse)#debug
   #gse = "GSE184771"
-    combined_gene_counts = tibble(gene_id = character(), count = numeric())
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
     
