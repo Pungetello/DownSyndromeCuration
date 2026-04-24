@@ -157,10 +157,10 @@ combine_results_per_GSE = function(){
       pull(SRR)
     
     
-    combine_files(gse, srrs, "_MAC_gene_counts.tsv")
-    combine_files(gse, srrs, "_MAC_TPM.tsv")
-    combine_files(gse, srrs, "_MAC_CPM.tsv")
-    combine_files(gse, srrs, "_MAC_RPKM.tsv")
+    combine_files(gse, srrs, "_gene_counts.tsv")
+    combine_files(gse, srrs, "_TPM.tsv")
+    combine_files(gse, srrs, "_CPM.tsv")
+    combine_files(gse, srrs, "_RPKM.tsv")
     
   }
 }
@@ -170,7 +170,6 @@ combine_results_per_GSE = function(){
 #takes in a list of file paths, reads them in, full joins them, and writes them to the out file path.
 combine_files = function(gse, srrs, suffix){
   infiles = paste0(getwd(), "/Data/NormalizedData/", srrs, suffix)
-  print(infiles)
   if(file.exists(infiles[1])){
     outfile = paste0(getwd(), "/Data/NormalizedData/", gse, suffix)
     combined_tibble = read_tsv(infiles[1])
