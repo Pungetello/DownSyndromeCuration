@@ -83,8 +83,6 @@ create_GSE_to_SRR = function(datasets_table){
       }
     }
   }
-  SRRs = select(filter(GSE_to_SRR, GSE=="GSE202938"), SRR)
-  print(sort(pull(SRRs, SRR)))
   
   #write dataframe of GSE mapped to each SRR to file
   write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
