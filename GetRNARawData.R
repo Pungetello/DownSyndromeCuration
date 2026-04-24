@@ -55,14 +55,14 @@ get_srr_from_srx = function(srx_id) {
   search_result = entrez_search(db = "sra", term = srx_id)
   summary_metadata = entrez_summary(db = "sra", id = search_result$ids)
   
-  srr = regmatches(summary_metadata$runs, regexpr("SRR\\d+", summary_metadata$runs))
+  srr = regmatches(summary_metadata$runs, gregexpr("SRR\\d+", summary_metadata$runs))
   
-  return(srr)
+  return(unlist(srr))
 }
 
 
 
-#creates the file mapping all RNA GSE's to their GSM's, SRX's and SRR's. Assumes each GSM has 1 SRX and 1 SRR.
+#creates the file mapping all RNA GSE's to their GSM's, SRX's and SRR's. Assumes each GSM has 1 SRX, but SRX can have many SRR.
 create_GSE_to_SRR = function(datasets_table){
   GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
   
@@ -83,6 +83,8 @@ create_GSE_to_SRR = function(datasets_table){
       }
     }
   }
+  SRRs = select(filter(GSE_to_SRR, GSE=="GSE202938"), SRR)
+  print(sort(pull(SRRs, SRR)))
   
   #write dataframe of GSE mapped to each SRR to file
   write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
@@ -226,7 +228,7 @@ create_mac_annotation = function(mac_fragments){
 #--------------Download_RNA_data-------------
 
 # #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-# create_GSE_to_SRR(Datasets)
+create_GSE_to_SRR(Datasets)
 # 
 # 
 # #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
@@ -244,10 +246,10 @@ create_mac_annotation = function(mac_fragments){
 #     }
 #   }
 # #}
-
-#download reference genomes needed
-download_reference()
-
-#create MAC combined reference genome
-mac_fragments = create_mac_reference()
-create_mac_annotation(mac_fragments)
+# 
+# #download reference genomes needed
+# download_reference()
+# 
+# #create MAC combined reference genome
+# mac_fragments = create_mac_reference()
+# create_mac_annotation(mac_fragments)
