@@ -177,7 +177,7 @@ combine_files = function(gse, srrs, suffix){
     
     for (file in infiles[-1]){
       if(file.exists(file)){
-        file_tibble = read_tsv(file, show_col_types=False)
+        file_tibble = read_tsv(file, show_col_types=FALSE)
         combined_tibble = full_join(combined_tibble, file_tibble, by = "gene_id")
       } else{
         print("FILE MISSING!")
