@@ -225,29 +225,29 @@ create_mac_annotation = function(mac_fragments){
 
 #--------------Download_RNA_data-------------
 
-# #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
+#create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
 create_GSE_to_SRR(Datasets)
-# 
-# 
-# #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-# for (geo_id in pull(Datasets, Name)){
-#   if(Datasets$Type[Datasets$Name == geo_id] == "RNA" && Datasets$Organism[Datasets$Name == geo_id] == "human"){
-#     print(geo_id)
-#     destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
-#     #if(!file.exists(destination)){ #for filtering out human RNA
-# 
-#       #make sure SRA toolkit is downloaded
-#       check_sra()
-# 
-#       #prefetch the raw data
-#       download_raw(geo_id)
-#     }
-#   }
-# #}
-# 
-# #download reference genomes needed
-# download_reference()
-# 
-# #create MAC combined reference genome
-# mac_fragments = create_mac_reference()
-# create_mac_annotation(mac_fragments)
+
+
+#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
+for (geo_id in pull(Datasets, Name)){
+  if(Datasets$Type[Datasets$Name == geo_id] == "RNA" && Datasets$Organism[Datasets$Name == geo_id] == "human"){
+    print(geo_id)
+    destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
+    #if(!file.exists(destination)){ #for filtering out human RNA
+
+      #make sure SRA toolkit is downloaded
+      check_sra()
+
+      #prefetch the raw data
+      download_raw(geo_id)
+    }
+  }
+#}
+
+#download reference genomes needed
+download_reference()
+
+#create MAC combined reference genome
+mac_fragments = create_mac_reference()
+create_mac_annotation(mac_fragments)
