@@ -110,9 +110,9 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
     
     X__Sample_Treatment = NA #find_value_from_keys(metadata, i, c()), GSE109293&4, GSE202938, GSE210117
     X__Sample_Sex = NA
-    X__Sample_Age_group = NA
+    X__Sample_Age_group = find_value_from_keys(metadata, i, c(NA, NA, NA, "age_ch1")[match_index])
     X__Sample_age_in_days_post_birth = find_value_from_keys(metadata, i, c(NA, NA, "age_ch1", NA)[match_index])
-    X__Sample_age_in_days_post_conception = find_value_from_keys(metadata, i, c("source_name_ch1", NA, NA, "age_ch1")[match_index])
+    X__Sample_age_in_days_post_conception = find_value_from_keys(metadata, i, c("source_name_ch1", NA, NA, NA)[match_index])
     X__Sample_Age_in_weeks = find_value_from_keys(metadata, i, c("age_ch1", NA, NA, NA)[match_index])
     X__Sample_Harvest_batch = NA
     X__Sample_Cell_type = find_value_from_keys(metadata, i, c("cell_type_ch1", "tissue_ch1", "source_name_ch1", "tissue_ch1")[match_index])
