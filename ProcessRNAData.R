@@ -102,7 +102,7 @@ process_data = function(srr, index, annotation, mac){
 
 
 #Use edgeR to calculate cpm and rpkm, calculate tpm manually
-calculate_data_files = function(feature_counts){
+calculate_data_files = function(feature_counts, mac){
   counts = feature_counts$counts
   gene_length = feature_counts$annotation$Length
   
