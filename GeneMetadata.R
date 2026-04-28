@@ -33,14 +33,12 @@ get_gene_metadata = function(values, filters, organism){
   
   if(organism == "hs"){
     mart = useEnsembl(biomart = "genes",
-                      dataset = "hsapiens_gene_ensembl",
-                      version = 110)
-                      # mirror = "www")
+                      dataset = "hsapiens_gene_ensembl"
+                      )#mirror = "www")
   }else{
     mart = useEnsembl(biomart = "genes",
-                      dataset = "mmusculus_gene_ensembl",
-                      version = 110)
-                      # mirror = "www")
+                      dataset = "mmusculus_gene_ensembl"
+                      )#mirror = "www")
   }
   
   
