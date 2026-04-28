@@ -163,10 +163,10 @@ combine_results_per_GSE = function(){
       pull(SRR)
     
     
-    combine_files(gse, srrs, mac, "_gene_counts.tsv")
-    combine_files(gse, srrs, mac, "_TPM.tsv")
-    combine_files(gse, srrs, mac, "_CPM.tsv")
-    combine_files(gse, srrs, mac, "_RPKM.tsv")
+    combine_files(gse, srrs, paste0(mac, "_gene_counts.tsv"))
+    combine_files(gse, srrs, paste0(mac, "_TPM.tsv"))
+    combine_files(gse, srrs, paste0(mac, "_CPM.tsv"))
+    combine_files(gse, srrs, paste0(mac, "_RPKM.tsv"))
     
   }
 }
