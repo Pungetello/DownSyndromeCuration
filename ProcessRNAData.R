@@ -63,12 +63,6 @@ process_data = function(srr, index, annotation, mac){
   print(paste0("PROCESSING ", srr))
   output_file = paste0(srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
-  #check if alignment has already been done
-  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_TPM.tsv"))){
-    print("OUTPUT ALREADY EXISTS, SKIPPING")
-    return()
-  }
-  
   #designate the files
   input_file = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   input_file_2 = paste0(getwd(), "/fastq/", srr, "_2.fastq")
@@ -243,6 +237,12 @@ for (srr in srrs){
     ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
     annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
     index = "mouse_plus_mac_index"
+  }
+  
+  #check if alignment has already been done
+  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
+    print("OUTPUT ALREADY EXISTS, SKIPPING")
+    next()
   }
 
   #finish installation by converting to fastq format
