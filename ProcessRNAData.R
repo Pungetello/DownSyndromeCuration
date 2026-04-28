@@ -201,7 +201,7 @@ GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (srr in srrs){
   print(srr)
-  if(startsWith(srr, "SRR17")||starsWith(srr, "SRR16")){#skip two mouse datasets previously done
+  if(startsWith(srr, "SRR17")||startsWith(srr, "SRR16")){#skip two mouse datasets previously done
     next()
   }
 
