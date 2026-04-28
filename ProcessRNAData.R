@@ -153,7 +153,7 @@ combine_results_per_GSE = function(){
   for(gse in gses){
     print(gse)#debug
   #gse = "GSE184771"
-    if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+    if(Datasets$Organism[Datasets$Name == gse] == "human"){
       mac = ""
     }else{
       mac = "_MAC"
