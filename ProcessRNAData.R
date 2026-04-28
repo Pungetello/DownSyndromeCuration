@@ -59,12 +59,12 @@ build_index = function(index_file, ref){
 
 
 #runs alignment, gets feature counts, and makes tpm file
-process_data = function(srr, index, annotation){
+process_data = function(srr, index, annotation, mac){
   print(paste0("PROCESSING ", srr))
   output_file = paste0(srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
   #check if alignment has already been done
-  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.tsv"))){
+  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_TPM.tsv"))){
     print("OUTPUT ALREADY EXISTS, SKIPPING")
     return()
   }
@@ -100,7 +100,7 @@ process_data = function(srr, index, annotation){
   counts_df = rename(counts_df, !!srr := paste0(srr,"_AlignResults.BAM")) %>%
     select("gene_id", srr)
   
-  write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.tsv"))
+  write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_gene_counts.tsv"))
   
   calculate_data_files(feature_counts)
 }
@@ -119,7 +119,7 @@ calculate_data_files = function(feature_counts){
   cpm_df = rownames_to_column(as.data.frame(cpm), "gene_id")
   colnames(cpm_df)[2] <- srr
   
-  write_tsv(cpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_CPM.tsv"))
+  write_tsv(cpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_CPM.tsv"))
   
   #calculate rpkm
   rpkm = rpkm(dge, gene.length = dge$genes$Length)
@@ -127,7 +127,7 @@ calculate_data_files = function(feature_counts){
   rpkm_df = rownames_to_column(as.data.frame(rpkm), "gene_id")
   colnames(rpkm_df)[2] <- srr
   
-  write_tsv(rpkm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_RPKM.tsv"))
+  write_tsv(rpkm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_RPKM.tsv"))
   
   #calculate tpm
   length_kb <- gene_length / 1000
@@ -137,7 +137,7 @@ calculate_data_files = function(feature_counts){
   tpm_df = rownames_to_column(as.data.frame(tpm), "gene_id")
   colnames(tpm_df)[2] <- srr
   
-  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.tsv"))
+  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_TPM.tsv"))
 }
 
 
@@ -153,14 +153,20 @@ combine_results_per_GSE = function(){
   for(gse in gses){
     print(gse)#debug
   #gse = "GSE184771"
+    if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+      mac = ""
+    }else{
+      mac = "_MAC"
+    }
+    
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
       pull(SRR)
     
     
-    combine_files(gse, srrs, "_gene_counts.tsv")
-    combine_files(gse, srrs, "_TPM.tsv")
-    combine_files(gse, srrs, "_CPM.tsv")
-    combine_files(gse, srrs, "_RPKM.tsv")
+    combine_files(gse, srrs, mac, "_gene_counts.tsv")
+    combine_files(gse, srrs, mac, "_TPM.tsv")
+    combine_files(gse, srrs, mac, "_CPM.tsv")
+    combine_files(gse, srrs, mac, "_RPKM.tsv")
     
   }
 }
@@ -212,6 +218,8 @@ for (srr in srrs){
     print("NO GEOID FOUND")
     next()
   }
+  
+  MAC = ""
 
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
 
@@ -230,6 +238,7 @@ for (srr in srrs){
     # annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
     # index = "GRCm39_index"
 
+    MAC = "_MAC"
     #mouse with MAC
     ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
     annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
@@ -243,7 +252,7 @@ for (srr in srrs){
   build_index(index, ref)
 
   #run alignment and save output files
-  process_data(srr, index, annotation)
+  process_data(srr, index, annotation, MAC)
 }
 
 
