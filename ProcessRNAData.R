@@ -218,7 +218,7 @@ for (srr in srrs){
 
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
 
-    next()
+    #next()
 
     #human stuff
     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
