@@ -102,9 +102,15 @@ if (!dir.exists(output_file_location)){
   dir.create(output_file_location, recursive = TRUE)
 }
 
-for (geo_id in pull(Datasets, Name)){
-  print(geo_id) #debug
-  destination = paste0(getwd(), "/Data/Metadata/GeneMetadata/", geo_id, ".tsv.gz")
+infiles = list.files("Data/RawRNA", pattern = "GSE\\d+\\w*_RPKM\\.tsv")#find all the RPKM files, MAC or not
+
+for (in_file in infiles){
+  print(in_file) #debug
+  file_stem = substr(in_file, 1, nchar(x) - 9)
+  geo_id = strsplit(file_stem, "_")[1]
+  print(file_stem)
+  print(geo_id)
+  destination = paste0(getwd(), "/Data/Metadata/GeneMetadata/", file_stem, ".tsv.gz")
   
   #makes sure it doesn't remake it
   if (file.exists(destination)){next}
@@ -112,17 +118,17 @@ for (geo_id in pull(Datasets, Name)){
   
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
     #Human
-    in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
+    #in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){
-      save_metadata_file(in_file, destination, "SampleID", "ensembl_gene_id", "hs")
+      save_metadata_file(in_file, destination, "gene_id", "ensembl_gene_id", "hs")
     }else{
-      save_metadata_file(in_file, destination, "Sample_ID", "ensembl_gene_id", "hs")
+      save_metadata_file(in_file, destination, "Sample_ID", "ensembl_gene_id", "hs")#might need tweaking
     }
     
 
   }else{
     #Mouse
-    in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.csv")#could also use DE or RPKM or any of the others
+    #in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.csv")#could also use DE or RPKM or any of the others
     save_metadata_file(in_file, destination, "gene_id", "ensembl_gene_id", "mm")
 
     #replace_id_col(in_file, destination)
