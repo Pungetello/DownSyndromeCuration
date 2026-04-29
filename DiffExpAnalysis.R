@@ -72,9 +72,8 @@ volcano_plot = function(data, output_prefix){
 
 #TODO: maybe reimplement this to itterate over Datasets list instead of the files in the folder, so other traits can be found
 files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.tsv")
-#files = c("GSE101942.tsv.gz", "GSE190053.tsv.gz")
+files = c("GSE190053_gene_counts.csv")
 print(files)
-stop()
 
 file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
@@ -95,6 +94,8 @@ for (file in files){
     print("Only one variable, skipping dataset")
     next()
   }
+  print(metadata)
+  stop()
   
   #set up input
   dds = DESeqDataSetFromMatrix(
