@@ -96,7 +96,7 @@ process_data = function(srr, index, annotation, mac){
   
   write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_gene_counts.tsv"))
   
-  calculate_data_files(feature_counts)
+  calculate_data_files(feature_counts, mac)
 }
 
 
@@ -201,8 +201,8 @@ GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (srr in srrs){
   print(srr)
-  if(!startsWith(srr, "SRR5")){
-  #if(startsWith(srr, "SRR16")||startsWith(srr, "SRR17")){
+  #if(!startsWith(srr, "SRR5")){
+  if(startsWith(srr, "SRR16")||startsWith(srr, "SRR17")){
     next()
   }
 
@@ -218,7 +218,7 @@ for (srr in srrs){
 
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
 
-    #next()
+    next()
 
     #human stuff
     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
