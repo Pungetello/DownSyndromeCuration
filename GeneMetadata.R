@@ -105,6 +105,7 @@ if (!dir.exists(output_file_location)){
 infiles = list.files("Data/NormalizedData", pattern = "GSE\\d+\\w*_RPKM\\.tsv")#find all the RPKM files, MAC or not
 
 for (in_file in infiles){
+  in_file = paste0(getwd(), "/Data/NormalizedData/", in_file)
   print(in_file) #debug
   file_stem = substr(in_file, 1, nchar(in_file) - 9)
   geo_id = strsplit(file_stem, "_")[[1]][1]
