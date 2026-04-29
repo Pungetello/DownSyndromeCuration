@@ -53,6 +53,9 @@ volcano_plot = function(data, output_prefix){
   
   top = data[order(data$padj), ][1:10, ]
   
+  #genes = read.tsv("INSERT FILE")
+  #data = inner_join(data, filter(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
+  
   ggplot(data, aes(x = log2FoldChange, y = -log10(padj)))+ #, color=significant)) +
     theme(plot.background = element_rect(fill = "white"))+
     geom_point(alpha = 0.5) +
@@ -68,8 +71,10 @@ volcano_plot = function(data, output_prefix){
 #----------Differential Expression Analysis-------------
 
 #TODO: maybe reimplement this to itterate over Datasets list instead of the files in the folder, so other traits can be found
-files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+_gene_counts\\.csv")
+files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.csv")
 #files = c("GSE101942.tsv.gz", "GSE190053.tsv.gz")
+print(files)
+stop()
 
 file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
