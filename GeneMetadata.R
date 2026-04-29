@@ -107,7 +107,7 @@ infiles = list.files("Data/NormalizedData", pattern = "GSE\\d+\\w*_RPKM\\.tsv")#
 for (in_file in infiles){
   print(in_file) #debug
   file_stem = substr(in_file, 1, nchar(in_file) - 9)
-  geo_id = strsplit(file_stem, "_")[1]
+  geo_id = strsplit(file_stem, "_")[[1]]
   print(file_stem)
   print(geo_id)
   destination = paste0(getwd(), "/Data/Metadata/GeneMetadata/", file_stem, ".tsv.gz")
