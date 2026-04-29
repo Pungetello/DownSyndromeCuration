@@ -101,19 +101,12 @@ process_data = function(srr, index, annotation, mac){
 
 
 
-#Use edgeR to calculate cpm and rpkm, calculate tpm manually
+#Use edgeR to calculate rpkm, calculate tpm manually
 calculate_data_files = function(feature_counts, mac){
   counts = feature_counts$counts
   gene_length = feature_counts$annotation$Length
   
   dge = DGEList(counts = counts, genes = data.frame(Length = gene_length))
-  
-  #calculate cpm
-  cpm = cpm(dge)
-  cpm_df = rownames_to_column(as.data.frame(cpm), "gene_id")
-  colnames(cpm_df)[2] <- srr
-  
-  write_tsv(cpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_CPM.tsv"))
   
   #calculate rpkm
   rpkm = rpkm(dge, gene.length = dge$genes$Length)
@@ -159,7 +152,6 @@ combine_results_per_GSE = function(){
     
     combine_files(gse, srrs, paste0(mac, "_gene_counts.tsv"))
     combine_files(gse, srrs, paste0(mac, "_TPM.tsv"))
-    combine_files(gse, srrs, paste0(mac, "_CPM.tsv"))
     combine_files(gse, srrs, paste0(mac, "_RPKM.tsv"))
     
   }
