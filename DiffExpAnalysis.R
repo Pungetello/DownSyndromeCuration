@@ -53,10 +53,10 @@ volcano_plot = function(data, output_prefix){
   
   top = data[order(data$padj), ][1:10, ]
   
-  #genes = read.tsv("INSERT FILE")
-  #data = inner_join(data, filter(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
+  genes = read.tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/"))
+  data = inner_join(data, filter(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
-  ggplot(data, aes(x = log2FoldChange, y = -log10(padj)))+ #, color=significant)) +
+  ggplot(data, aes(x = log2FoldChange, y = -log10(padj), color=chromosome_name=="chr21")) +
     theme(plot.background = element_rect(fill = "white"))+
     geom_point(alpha = 0.5) +
     #scale_color_manual(values = c("grey", "blue")) +
@@ -95,7 +95,6 @@ for (file in files){
     next()
   }
   print(metadata)
-  stop()
   
   #set up input
   dds = DESeqDataSetFromMatrix(
