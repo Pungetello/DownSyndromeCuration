@@ -57,6 +57,7 @@ get_gene_metadata = function(values, filters, organism){
 
 #get gene ID's from file, get metadata, combine and save
 save_metadata_file = function(in_file, destination, column_title, id_type, organism){
+  print("GETTING METADATA")
   if (!file.exists(in_file)){
     print(paste0("NORMALIZED DATA FILE NOT FOUND"))
     return()
@@ -108,13 +109,14 @@ for (in_file in infiles){
   file_stem = substr(in_file, 1, nchar(in_file) - 9)
   geo_id = strsplit(file_stem, "_")[[1]][1]
   print(file_stem)
-  print(geo_id)
   in_file = paste0(getwd(), "/Data/NormalizedData/", in_file)
-  print(in_file) #debug
   destination = paste0(getwd(), "/Data/Metadata/GeneMetadata/", file_stem, ".tsv.gz")
   
   #makes sure it doesn't remake it
-  if (file.exists(destination)){next}
+  if (file.exists(destination)){
+    print("ALREADY EXISTS")
+    next
+    }
   
   
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
