@@ -71,7 +71,7 @@ volcano_plot = function(data, output_prefix){
 #----------Differential Expression Analysis-------------
 
 #TODO: maybe reimplement this to itterate over Datasets list instead of the files in the folder, so other traits can be found
-files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.csv")
+files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.tsv")
 #files = c("GSE101942.tsv.gz", "GSE190053.tsv.gz")
 print(files)
 stop()
