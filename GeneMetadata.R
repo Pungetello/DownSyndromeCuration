@@ -102,7 +102,7 @@ if (!dir.exists(output_file_location)){
   dir.create(output_file_location, recursive = TRUE)
 }
 
-infiles = list.files("Data/RawRNA", pattern = "GSE\\d+\\w*_RPKM\\.tsv")#find all the RPKM files, MAC or not
+infiles = list.files("Data/NormalizedData", pattern = "GSE\\d+\\w*_RPKM\\.tsv")#find all the RPKM files, MAC or not
 
 for (in_file in infiles){
   print(in_file) #debug
