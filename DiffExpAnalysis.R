@@ -51,7 +51,7 @@ create_metadata = function(gse, column_type){
 #create a volcano plot of the data
 volcano_plot = function(graph_data, output_prefix){
   
-  top = graph_data[order(data$padj), ][1:10, ]
+  top = graph_data[order(graph_data$padj), ][1:10, ]
   
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
@@ -61,7 +61,7 @@ volcano_plot = function(graph_data, output_prefix){
   print(str(graph_data))
   print(with(graph_data, chromosome_name[1:5]))
   
-  ggplot(data=graph_data, aes(x = log2FoldChange, y = -log10(padj), color = .graph_data$chromosome_name == "21")) +
+  ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = .graph_data$chromosome_name == "21")) +
     theme(plot.background = element_rect(fill = "white"))+
     geom_point(alpha = 0.5) +
     #scale_color_manual(values = c("grey", "blue")) +
