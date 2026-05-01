@@ -49,19 +49,19 @@ create_metadata = function(gse, column_type){
 
 #TODO: highlight genes on anomalous chormosome
 #create a volcano plot of the data
-volcano_plot = function(data, output_prefix){
+volcano_plot = function(graph_data, output_prefix){
   
-  top = data[order(data$padj), ][1:10, ]
+  top = graph_data[order(data$padj), ][1:10, ]
   
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
-  data = inner_join(data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
+  graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
-  print(head(data))
-  print(colnames(data))
-  print(str(data))
-  print(with(data, chromosome_name[1:5]))
+  print(head(graph_data))
+  print(colnames(graph_data))
+  print(str(graph_data))
+  print(with(graph_data, chromosome_name[1:5]))
   
-  ggplot(data=data, aes(x = log2FoldChange, y = -log10(padj), color = .data$chromosome_name == "21")) +
+  ggplot(data=graph_data, aes(x = log2FoldChange, y = -log10(padj), color = .graph_data$chromosome_name == "21")) +
     theme(plot.background = element_rect(fill = "white"))+
     geom_point(alpha = 0.5) +
     #scale_color_manual(values = c("grey", "blue")) +
