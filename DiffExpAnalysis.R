@@ -56,6 +56,8 @@ volcano_plot = function(data, output_prefix){
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
   data = inner_join(data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
+  print(head(data))
+  
   ggplot(data, aes(x = log2FoldChange, y = -log10(padj), color=chromosome_name=="chr21")) +
     theme(plot.background = element_rect(fill = "white"))+
     geom_point(alpha = 0.5) +
