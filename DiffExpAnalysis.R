@@ -57,8 +57,9 @@ volcano_plot = function(data, output_prefix){
   data = inner_join(data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
   print(head(data))
+  print(colnames(data))
   
-  ggplot(data, aes(x = log2FoldChange, y = -log10(padj), color = factor(chromosome_name == "21",
+  ggplot(data=data, aes(x = log2FoldChange, y = -log10(padj), color = factor(chromosome_name == "21",
                                                                         labels = c("Other", "Chr21")))) +
     theme(plot.background = element_rect(fill = "white"))+
     geom_point(alpha = 0.5) +
