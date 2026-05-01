@@ -95,7 +95,7 @@ for (file in files){
     next()
   }
   print(metadata)
-  print(counts)
+  print(head(counts))
   
   #set up input
   dds = DESeqDataSetFromMatrix(
