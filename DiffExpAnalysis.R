@@ -83,8 +83,8 @@ for (file in files){
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
   counts = as.data.frame(counts)
-  rownames(counts) = counts$GeneID
-  counts$GeneID = NULL
+  rownames(counts) = counts$gene_id
+  counts$gene_id = NULL
   counts = as.matrix(counts)
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
@@ -95,8 +95,8 @@ for (file in files){
     print("Only one variable, skipping dataset")
     next()
   }
-  print(metadata)
-  print(head(counts))
+  #print(metadata)
+  #print(head(counts))
   
   #set up input
   dds = DESeqDataSetFromMatrix(
