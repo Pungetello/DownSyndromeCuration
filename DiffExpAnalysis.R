@@ -87,9 +87,6 @@ for (file in files){
   counts$GeneID = NULL
   counts = as.matrix(counts)
   
-  print(head(counts))
-  stop()
-  
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]#"\\." for human
   metadata = create_metadata(gse, "srr")#"gsm" for human
