@@ -56,12 +56,13 @@ volcano_plot = function(graph_data, output_prefix){
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
+  graph_data$chr21_flag = graph_data$chromosome_name == "21"
+  
   print(head(graph_data))
   print(colnames(graph_data))
   print(str(graph_data))
   print(with(graph_data, chromosome_name[1:5]))
   
-  #graph_data$chr21_flag = graph_data$chromosome_name == "21"
   graph_data %>%
     mutate(chr21_flag = chromosome_name == "21") %>%
   ggplot(aes(x = log2FoldChange, y = -log10(padj), color = chr21_flag)) +
