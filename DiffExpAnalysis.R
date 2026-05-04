@@ -57,11 +57,12 @@ volcano_plot = function(graph_data, output_prefix){
   top = graph_data[order(graph_data$padj), ][1:10, ]
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chromosome_name == "21")) +
-    theme(plot.background = element_rect(fill = "white"))+
+    #theme(plot.background = element_rect(fill = "white"))+
+    p + labs(color = "Chr21")
     geom_point(alpha = 0.5) +
     #scale_color_manual(values = c("grey", "blue")) +
     geom_text_repel(data = top, aes(label = gene)) +
-    theme_minimal()
+    theme_bw()
   
   ggsave(filename = paste0(getwd(), "/Data/Plots/", output_prefix, "_Volcano.png"), width = 5, height = 5, units = "in")
   
@@ -71,11 +72,10 @@ volcano_plot = function(graph_data, output_prefix){
 #----------Differential Expression Analysis-------------
 
 #TODO: maybe reimplement this to itterate over Datasets list instead of the files in the folder, so other traits can be found
-files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.tsv")
-#files = c("GSE190053_gene_counts.csv")
+#files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.tsv")
+files = c("GSE190053_gene_counts.tsv")
 #files = c("GSE101942_old.tsv.gz", "GSE190053_old.tsv.gz")
 print(files)
-stop()
 
 file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
