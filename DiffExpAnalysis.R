@@ -58,7 +58,7 @@ volcano_plot = function(graph_data, output_prefix){
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chromosome_name == "21")) +
     #theme(plot.background = element_rect(fill = "white"))+
-    p + labs(color = "Chr21")
+    labs(color = "Chr21") +
     geom_point(alpha = 0.5) +
     #scale_color_manual(values = c("grey", "blue")) +
     geom_text_repel(data = top, aes(label = gene)) +
