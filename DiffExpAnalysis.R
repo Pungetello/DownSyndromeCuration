@@ -96,8 +96,8 @@ for (file in files){
     print("Only one variable, skipping dataset")
     next()
   }
-  #print(metadata)
-  #print(head(counts))
+  print(metadata)
+  print(head(counts))
   
   #set up input
   dds = DESeqDataSetFromMatrix(
