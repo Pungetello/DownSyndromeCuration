@@ -54,6 +54,8 @@ volcano_plot = function(graph_data, output_prefix){
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
+  print(pull(graph_data, "chromosome_name"))
+  
   top = graph_data[order(graph_data$padj), ][1:10, ]
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chromosome_name == "21")) +
@@ -100,8 +102,8 @@ for (file in files){
     print("Only one variable, skipping dataset")
     next()
   }
-  print(metadata)
-  print(head(counts))
+  # print(metadata)
+  # print(head(counts))
   
   #set up input
   dds = DESeqDataSetFromMatrix(
