@@ -55,15 +55,17 @@ volcano_plot = function(graph_data, output_prefix){
   #print(head(genes))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
-  print(head(graph_data))
-  print(tail(graph_data))
+  #print(head(graph_data))
+  #print(tail(graph_data))
   print(output_prefix)
+  print("HUMAN GENES IN GRAPH DATA:")
+  print(head(filter(graph_data, startsWith(gene, "ENSG"))))
   print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   top = graph_data[order(graph_data$padj), ][1:10, ]
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chromosome_name == "21")) +
-    #theme(plot.background = element_rect(fill = "white"))+
+    #theme(plot.background = element_rect(fill = "white")) +
     labs(color = "Chr21") +
     geom_point(alpha = 0.2) +
     scale_color_manual(values = c("black", "blue")) +
@@ -93,12 +95,19 @@ for (file in files){
   
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
+  
+  print("HUMAN GENES IN COUNTS:")
+  counts%>%
+    filter(startsWith(gene, "ENSG"))%>%
+    head()%>%
+    print()
+  
+  
   counts = as.data.frame(counts)
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   counts = as.matrix(counts)
   
-  print(tail(counts))
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]#"\\." for human
