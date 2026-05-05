@@ -98,7 +98,7 @@ for (file in files){
   
   print("HUMAN GENES IN COUNTS:")
   counts%>%
-    filter(startsWith(gene, "ENSG"))%>%
+    #filter(startsWith(gene, "ENSG"))%>%
     head()%>%
     print()
   
