@@ -99,6 +99,7 @@ for (file in files){
   print("HUMAN GENES IN COUNTS:")
   counts%>%
     filter(startsWith(gene_id, "ENSG"))%>%
+    arrange(across(2), decreasing = TRUE)%>%
     head()%>%
     print()
   
