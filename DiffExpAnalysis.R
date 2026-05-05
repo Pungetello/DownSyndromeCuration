@@ -52,12 +52,12 @@ create_metadata = function(gse, column_type){
 volcano_plot = function(graph_data, output_prefix){
   
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
-  print(head(genes))
+  #print(head(genes))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
-  print(head(graph_data))
+  #print(head(graph_data))
   print(output_prefix)
-  print(unique(pull(graph_data, "chromosome_name")))
+  print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   top = graph_data[order(graph_data$padj), ][1:10, ]
   
@@ -96,6 +96,8 @@ for (file in files){
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   counts = as.matrix(counts)
+  
+  print(head(counts))
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]#"\\." for human
