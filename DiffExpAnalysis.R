@@ -55,7 +55,8 @@ volcano_plot = function(graph_data, output_prefix){
   #print(head(genes))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
   
-  #print(head(graph_data))
+  print(head(graph_data))
+  print(tail(graph_data))
   print(output_prefix)
   print(sort(unique(pull(graph_data, "chromosome_name"))))
   
@@ -97,7 +98,7 @@ for (file in files){
   counts$gene_id = NULL
   counts = as.matrix(counts)
   
-  print(head(counts))
+  print(tail(counts))
   
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]#"\\." for human
