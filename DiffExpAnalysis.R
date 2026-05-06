@@ -62,20 +62,23 @@ volcano_plot = function(graph_data, output_prefix){
   print(head(filter(graph_data, startsWith(gene, "ENSG"))))
   print(sort(unique(pull(graph_data, "chromosome_name"))))
   
+  graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21",
+                                  "Chr-21", ifelse(graph_data$chromosome_name == "16", "Chr-16", "Other"))
+  
   graph_data = graph_data[order(graph_data$chromosome_name == "21"), ]
   
   top = rbind(
     filter(graph_data, chromosome_name == "21")[order(graph_data$padj), ][1:5, ], 
     filter(graph_data, chromosome_name != "21")[order(graph_data$padj), ][1:5, ])
   
-  ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chromosome_name == "21")) +
+  ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chr21_flag)) +
     labs(color = "Chr21") +
-    geom_point(alpha = 0.1) +
-    scale_color_manual(values = c("black", "blue"), labels = c("non-chr21", "chr21")) +
+    geom_point(alpha = 0.2) +
+    scale_color_manual(values = c("black","green", "blue")) +
     geom_text_repel(data = top, aes(label = gene), show.legend = FALSE) +
     theme_bw()
   
-  ggsave(filename = paste0(getwd(), "/Data/Plots/", output_prefix, "_Volcano.png"), width = 5, height = 5, units = "in")
+  ggsave(filename = paste0(getwd(), "/Data/Plots/", output_prefix, "_Volcano.png"), width = 10, height = 5, units = "in")
   
 }
 
