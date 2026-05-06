@@ -121,6 +121,7 @@ for (in_file in infiles){
   
   if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
     #Human
+    print("THIS IS HUMAN")
     #in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
     if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){
       save_metadata_file(in_file, destination, "gene_id", "ensembl_gene_id", "hs")
@@ -131,6 +132,7 @@ for (in_file in infiles){
 
   }else{
     #Mouse
+    print("THIS IS MOUSE")
     #in_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.csv")#could also use DE or RPKM or any of the others
     save_metadata_file(in_file, destination, "gene_id", "ensembl_gene_id", "mm")
 
