@@ -36,6 +36,7 @@ install_raw = function(srr){
   
   #skip if file has already been downloaded
   if (!file.exists(out_path)){
+    print(in_path)
     print(paste0("NO INSTALLED DATA FOUND FOR ", srr))
     system2(
       fasterq,
@@ -196,7 +197,7 @@ for (srr in srrs){
   }
 
   geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
-  print(geo_id)
+  #print(geo_id)
 
   if(length(geo_id)==0){
     print("NO GEOID FOUND")
@@ -229,7 +230,7 @@ for (srr in srrs){
 
   #check if alignment has already been done
   if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
-    print("OUTPUT ALREADY EXISTS, SKIPPING")
+    #print("OUTPUT ALREADY EXISTS, SKIPPING")
     next()
   }
 
@@ -244,5 +245,5 @@ for (srr in srrs){
 }
 
 
-combine_results_per_GSE()
+#combine_results_per_GSE()
 
