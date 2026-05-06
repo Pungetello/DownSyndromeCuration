@@ -31,7 +31,7 @@ prefetch = "prefetch"
 
 #install the raw data using the SRA toolkit
 install_raw = function(srr){
-  in_path = paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sra")
+  in_path = paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sralite")
   out_path = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   
   #skip if file has already been downloaded
@@ -245,5 +245,5 @@ for (srr in srrs){
 }
 
 
-#combine_results_per_GSE()
+combine_results_per_GSE()
 
