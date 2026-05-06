@@ -58,12 +58,18 @@ volcano_plot = function(graph_data, output_prefix){
   #print(head(graph_data))
   #print(tail(graph_data))
   print(output_prefix)
-  print("HUMAN GENES IN GRAPH DATA:")
-  print(head(filter(graph_data, startsWith(gene, "ENSG"))))
+  # print("HUMAN GENES IN GRAPH DATA:")
+  # print(head(filter(graph_data, startsWith(gene, "ENSG"))))
   print(sort(unique(pull(graph_data, "chromosome_name"))))
   
-  graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21",
+  
+  if(grepl("MAC", output_prefix)){
+    graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21",
                                   "Chr-21", ifelse(graph_data$chromosome_name == "16", "Chr-16", "Other"))
+  }else{
+    graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21",
+                                   "Chr-21", "Other")
+  }
   
   graph_data = graph_data[order(graph_data$chromosome_name == "21"), ]
   
@@ -74,7 +80,7 @@ volcano_plot = function(graph_data, output_prefix){
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chr21_flag)) +
     labs(color = "Chr21") +
     geom_point(alpha = 0.2) +
-    scale_color_manual(values = c("black","green", "blue")) +
+    #scale_color_manual(values = c("black","green", "blue")) +
     geom_text_repel(data = top, aes(label = gene), show.legend = FALSE) +
     theme_bw()
   
