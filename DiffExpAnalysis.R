@@ -65,8 +65,8 @@ volcano_plot = function(graph_data, output_prefix){
   graph_data = graph_data[order(graph_data$chromosome_name == "21"), ]
   
   top = rbind(
-    select(graph_data, chromosome_name == "21")[order(graph_data$padj), ][1:5, ], 
-    select(graph_data, chromosome_name != "21")[order(graph_data$padj), ][1:5, ])
+    filter(graph_data, chromosome_name == "21")[order(graph_data$padj), ][1:5, ], 
+    filter(graph_data, chromosome_name != "21")[order(graph_data$padj), ][1:5, ])
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chromosome_name == "21")) +
     labs(color = "Chr21") +
