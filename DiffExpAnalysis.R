@@ -62,12 +62,15 @@ volcano_plot = function(graph_data, output_prefix){
   print(head(filter(graph_data, startsWith(gene, "ENSG"))))
   print(sort(unique(pull(graph_data, "chromosome_name"))))
   
-  top = graph_data[order(graph_data$padj), ][1:10, ]
+  graph_data = graph_data[order(graph_data$chromosome_name == "21"), ]
+  
+  top = rbind(
+    select(graph_data, chromosome_name == "21")[order(graph_data$padj), ][1:5, ], 
+    select(graph_data, chromosome_name != "21")[order(graph_data$padj), ][1:5, ])
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chromosome_name == "21")) +
-    #theme(plot.background = element_rect(fill = "white")) +
     labs(color = "Chr21") +
-    geom_point(alpha = 0.02) +
+    geom_point(alpha = 0.1) +
     scale_color_manual(values = c("black", "blue"), labels = c("non-chr21", "chr21")) +
     geom_text_repel(data = top, aes(label = gene), show.legend = FALSE) +
     theme_bw()

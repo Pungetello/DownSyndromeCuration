@@ -69,6 +69,7 @@ save_metadata_file = function(in_file, destination, column_title, id_type, organ
   if(length(gene_ids) > 0){
     
     gene_metadata = get_gene_metadata(gene_ids, id_type, organism)
+    print(head(gene_metadata))
     write_tsv(gene_metadata, destination)
     
   } else {
