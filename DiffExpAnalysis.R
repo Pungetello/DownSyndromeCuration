@@ -67,6 +67,8 @@ volcano_plot = function(graph_data, output_prefix){
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21", "Chr-21", 
                                    ifelse(graph_data$chromosome_name == "16", "Chr-16", 
                                           "Other"))
+    print("GENES ON CHR16:")
+    print(head(filter(graph_data, chromosome_name == "16")))
   }else{
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21",
                                    "Chr-21", "Other")
