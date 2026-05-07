@@ -54,7 +54,7 @@ volcano_plot = function(graph_data, output_prefix, file){
   #read in gene metadata to determine symbol and chromosome for each
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
   print(head(genes, n=100))
-  graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
+  graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name", "external_gene_name")), by = "gene")
   
   #print(head(graph_data))
   #print(tail(graph_data))
