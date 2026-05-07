@@ -102,9 +102,6 @@ file_location = "Data/Plots/"
 if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
 for (file in files){
-  if(file == "GSE101942_gene_counts.tsv"){
-    next()
-  }
   
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
