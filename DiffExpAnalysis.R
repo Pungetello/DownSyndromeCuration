@@ -47,10 +47,11 @@ create_metadata = function(gse, column_type){
   return(metadata)
 }
 
-#TODO: highlight genes on anomalous chormosome
+
 #create a volcano plot of the data
-volcano_plot = function(graph_data, output_prefix){
+volcano_plot = function(graph_data, output_prefix, file){
   
+  #read in gene metadata to determine symbol and chromosome for each
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
   print(head(genes, n=100))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name")), by = "gene")
@@ -63,7 +64,7 @@ volcano_plot = function(graph_data, output_prefix){
   print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   
-  if(grepl("MAC", output_prefix)){
+  if(grepl("MAC", file)){
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21", "Chr-21", 
                                    ifelse(graph_data$chromosome_name == "16", "Chr-16", 
                                           "Other"))
@@ -76,6 +77,7 @@ volcano_plot = function(graph_data, output_prefix){
   
   graph_data = graph_data[order(graph_data$chromosome_name == "21"), ]
   
+  #label top 5 of each category
   top = rbind(
     filter(graph_data, chromosome_name == "21")[order(graph_data$padj), ][1:5, ], 
     filter(graph_data, chromosome_name != "21")[order(graph_data$padj), ][1:5, ])
@@ -157,7 +159,7 @@ for (file in files){
   write_tsv(sig_genes, file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
   
   #create and save volcano plot
-  volcano_plot(sig_genes, gse)
+  volcano_plot(sig_genes, gse, file)
   
 }
   

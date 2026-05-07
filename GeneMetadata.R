@@ -44,7 +44,7 @@ get_gene_metadata = function(values, filters, organism){
   
   if(length(values) > 0){
     gene_metadata = getBM(
-      attributes = c("entrezgene_id","hgnc_symbol","ensembl_gene_id","chromosome_name","start_position","end_position","gene_biotype"),
+      attributes = c("entrezgene_id","external_gene_name","ensembl_gene_id","chromosome_name","start_position","end_position","gene_biotype"),
       filters = filters,
       values = values,
       mart = mart
