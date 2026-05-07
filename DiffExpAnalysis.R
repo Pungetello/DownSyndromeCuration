@@ -53,7 +53,7 @@ volcano_plot = function(graph_data, output_prefix, file){
   
   #read in gene metadata to determine symbol and chromosome for each
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
-  print(head(genes, n=100))
+  # print(head(genes, n=100))
   graph_data = inner_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name", "external_gene_name")), by = "gene")
   
   #print(head(graph_data))
@@ -81,6 +81,7 @@ volcano_plot = function(graph_data, output_prefix, file){
   top = rbind(
     filter(graph_data, chromosome_name == "21")[order(graph_data$padj), ][1:5, ], 
     filter(graph_data, chromosome_name != "21")[order(graph_data$padj), ][1:5, ])
+  print(top)
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chr21_flag)) +
     labs(color = "Chromosome") +
@@ -109,13 +110,13 @@ for (file in files){
   
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
-  
-  print("HUMAN GENES IN COUNTS:")
-  counts%>%
-    filter(startsWith(gene_id, "ENSG"))%>%
-    arrange(across(2), decreasing = TRUE)%>%
-    head()%>%
-    print()
+  # 
+  # print("HUMAN GENES IN COUNTS:")
+  # counts%>%
+  #   filter(startsWith(gene_id, "ENSG"))%>%
+  #   arrange(across(2), decreasing = TRUE)%>%
+  #   head()%>%
+  #   print()
   
   
   counts = as.data.frame(counts)

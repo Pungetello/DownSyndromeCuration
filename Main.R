@@ -31,3 +31,6 @@ source("DiffExpAnalysis.R")
 
 #makes metadata tables
 source("MetadataTables.R")
+
+#uses SVASec to find any missing metadata vaiables
+source("FindSurrogateVars.R")
