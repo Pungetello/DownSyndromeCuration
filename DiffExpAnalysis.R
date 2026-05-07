@@ -86,7 +86,7 @@ volcano_plot = function(graph_data, output_prefix, file){
     labs(color = "Chromosome") +
     geom_point(alpha = 0.2) +
     #scale_color_manual(values = c("black","green", "blue")) +
-    geom_text_repel(data = top, aes(label = gene), show.legend = FALSE) +
+    geom_text_repel(data = top, aes(label = external_gene_name), show.legend = FALSE) +
     theme_bw()
   
   ggsave(filename = paste0(getwd(), "/Data/Plots/", output_prefix, "_Volcano.png"), width = 10, height = 5, units = "in")
