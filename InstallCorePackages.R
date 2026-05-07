@@ -34,7 +34,8 @@ BiocManager::install(c("tidyverse",
                        "ggrepel",
                        "Rsamtools",
                        "GenomeInfoDb",
-                       "rtracklayer"
+                       "rtracklayer",
+                       "sva"
                        ), lib = user_lib
 )
 
