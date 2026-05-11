@@ -59,8 +59,8 @@ volcano_plot = function(graph_data, output_prefix, file){
   #print(head(graph_data))
   #print(tail(graph_data))
   print(output_prefix)
-  # print("HUMAN GENES IN GRAPH DATA:")
-  # print(head(filter(graph_data, startsWith(gene, "ENSG"))))
+  print("HUMAN GENES IN GRAPH DATA:")
+  print(head(filter(graph_data, startsWith(gene, "ENSG"))))
   print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   
