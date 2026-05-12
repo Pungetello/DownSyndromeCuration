@@ -87,7 +87,7 @@ volcano_plot = function(graph_data, output_prefix, file){
     filter(graph_data, chr21_flag == "Chr-21")[order(graph_data$padj), ][1:5, ], 
     filter(graph_data, chr21_flag == "Chr-16")[order(graph_data$padj), ][1:5, ],
     filter(graph_data, chr21_flag == "Other")[order(graph_data$padj), ][1:5, ])
-  top = na.omit(top)
+  #top = na.omit(top)
   print(top)
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chr21_flag)) +
