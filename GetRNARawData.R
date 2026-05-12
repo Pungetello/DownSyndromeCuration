@@ -228,7 +228,6 @@ create_mac_annotation = function(mac_fragments){
 #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
 create_GSE_to_SRR(Datasets)
 
-
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
   if(Datasets$Type[Datasets$Name == geo_id] == "RNA" && Datasets$Organism[Datasets$Name == geo_id] == "mouse"){

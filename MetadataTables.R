@@ -57,9 +57,7 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
   
   GSMs = filter(sample_metadata, Dataset_ID == geo_id)%>%
     pull(ID)
-  
-  
-  
+
   #get geo_id specific sources
   #DE_file = read_tsv(DE_filename)
   metadata = get_metadata(geo_id)
@@ -86,24 +84,26 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
   }
   
   
-  for(i in 1:length(GSMs)){
+  for(i in 1:nrow(metadata)){
+    SampleID = find_value_from_keys(metadata, i, "title") 
     GSM = GSMs[i]
     DatasetID = geo_id #table says get EMODS ID and name, but chat says NCBI doesn't have one, so from where?
     Dataset_name = NA
-    SampleID = GSM
     Data_model_version = NA
     Script = "https://github.com/Pungetello/DownSyndromeCuration/blob/main/Main.R"
     
     
     #add values for other tibble's genotype columns
-    X__Sample_Genotype = find_value_from_keys(metadata, i, c("strain_ch1", "strain_ch1", "genotype_ch1", "background_strain_ch1")[match_index])#GSE109293&4, GSE202938, GSE210117
+    X__Sample_Genotype = find_value_from_keys(metadata, i, "genotype_ch1")#GSE109293&4, GSE202938, GSE210117
     
-    status = filter(sample_metadata, ID==GSM)%>%
-      pull(Value)
-    if(status=="affected_group"){
-      X__Sample_Karyotype = "T21"
-    }else if(status=="control_group"){
-      X__Sample_Karyotype = "Control"
+    if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+      status = filter(sample_metadata, ID==GSM)%>%
+        pull(Value)
+      if(status=="affected_group"){
+        X__Sample_Karyotype = "T21"
+      }else if(status=="control_group"){
+        X__Sample_Karyotype = "Control"
+      }
     }else{
       X__Sample_Karyotype = NA
     }
@@ -190,6 +190,7 @@ make_abundance_data = function(geo_id, model, mouse_genes){
   RPKM = read_tsv(RPKM_file)
   SRRs = colnames(RPKM)[-1]
   gene_metadata_file = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", geo_id, ".tsv.gz")) #from GeneMetadata.R
+  metadata = get_metadata(geo_id)
   
   #define variables for columns that are the same in all rows
   Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
@@ -200,16 +201,21 @@ make_abundance_data = function(geo_id, model, mouse_genes){
   Data_model_version = NA
   Script = "https://github.com/Pungetello/DownSyndromeCuration/blob/main/Main.R"
   
-  for(SRR in SRRs){
-    SampleID = SRR#should I convert these all to the GSMs to make it consistent?
+  for(i in 1:length(SRRs)){
+    SRR_i = SRRs[i]
+    GSM = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))%>%
+      filter(SRR == SRR_i)%>%
+      pull("GSM")
+    SampleID = filter(metadata, geo_accession == GSM)%>%
+      pull("title")
     
     #Do I need a row for each gene and its count for each GSM? This will be very big.
     FeatureID = pull(RPKM, "gene_id") #Gene/protein/metab identifier. Vector!
-    Value = pull(RPKM, SRR)#Feature abundance in sample. Should be vector of same length!
+    Value = pull(RPKM, SRR_i)#Feature abundance in sample. Should be vector of same length!
     Units = "RPKM"
     
     SRR_tibble = inner_join(tibble(DatasetID,Dataset_name,SampleID,FeatureID,FeatureID_type,Value,Units,Data_model_version,Date_exported,Data_contact,Script), gene_metadata_file, by=join_by("FeatureID"=="ensembl_gene_id"))%>%
-      rename("X__Feature_chromosome"="chromosome_name", "X__Feature_gene_type"="gene_biotype", "Feature_name"="hgnc_symbol")%>%
+      dplyr::rename("X__Feature_chromosome"="chromosome_name", "X__Feature_gene_type"="gene_biotype", "Feature_name"="hgnc_symbol")%>%
       dplyr::select(!c("entrezgene_id","start_position","end_position"))
     
     #SRR_tibble = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, SampleID=SampleID, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, Value = Value, Units = Units, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
