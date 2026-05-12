@@ -75,7 +75,12 @@ volcano_plot = function(graph_data, output_prefix, file){
                                    "Chr-21", "Other")
   }
   
-  graph_data = graph_data[order(graph_data$chromosome_name == "21"||graph_data$chromosome_name == "16"), ]
+  graph_data = graph_data[
+    order(
+      ifelse(graph_data$chromosome_name == "21", 3,
+             ifelse(graph_data$chromosome_name == "16", 2, 1))
+    ),
+  ]
   
   #label top 5 of each category
   top = rbind(
