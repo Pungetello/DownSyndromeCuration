@@ -19,6 +19,7 @@ run_sva = function(path, gse){
   gene_counts = read_tsv(path)
   
   #do stuff
+  #learn the package, identify latent covariates, save to file, compare against metadata variables.
   
 }
 
