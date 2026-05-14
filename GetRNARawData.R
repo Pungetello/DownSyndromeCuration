@@ -67,6 +67,7 @@ create_GSE_to_SRR = function(datasets_table){
   GSE_to_SRR = tibble(GSE = character(), GSM = character(), SRX = character(), SRR = character())
   
   for (geo_id in pull(datasets_table, Name)){
+    print(geo_id)
     if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){
       gse = getGEO(geo_id, GSEMatrix = FALSE)
       
@@ -74,7 +75,6 @@ create_GSE_to_SRR = function(datasets_table){
       for(gsm in GSMList(gse)) {
         relations = Meta(gsm)$relation
         sra_line = grep("SRA", relations, value = TRUE)
-        print(sra_line)
         
         #extract SRX from line, convert to SRR
         srx = strsplit(sra_line, '=')[[1]][2]
