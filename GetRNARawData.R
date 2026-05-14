@@ -74,6 +74,7 @@ create_GSE_to_SRR = function(datasets_table){
       for(gsm in GSMList(gse)) {
         relations = Meta(gsm)$relation
         sra_line = grep("SRA", relations, value = TRUE)
+        print(sra_line)
         
         #extract SRX from line, convert to SRR
         srx = strsplit(sra_line, '=')[[1]][2]
@@ -102,7 +103,7 @@ download_raw = function(geo_id){
     
     if(!file.exists(paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sra"))){
       print(paste0(getwd(), "/Data/RawRNA/", srr, "NOT FOUND, DOWNLOADING RAW DATA FOR ", srr))
-    
+      
       #download raw data by SRR ID if not done already
       system2(
         prefetch,
@@ -133,7 +134,7 @@ download_reference = function(){
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/GRCm39.primary_assembly.genome.fa.gz"
   destination = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
   safe_download(link, destination)
-
+  
   #download annotation table
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M38/gencode.vM38.annotation.gtf.gz"
   destination = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
@@ -143,7 +144,7 @@ download_reference = function(){
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.primary_assembly.genome.fa.gz"
   destination = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
   safe_download(link, destination)
-
+  
   link = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz"
   destination = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
   safe_download(link, destination)
@@ -168,7 +169,7 @@ create_mac_reference = function(){
   
   #make sure it doesn't already exist
   if(!file.exists(paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa"))){
-  
+    
     #read in human reference genome
     genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
     names(genome) <- sub(" .*", "", names(genome))
@@ -178,7 +179,7 @@ create_mac_reference = function(){
       chr <- as.character(seqnames(mac_fragments)[i])
       start <- start(mac_fragments)[i]
       end <- end(mac_fragments)[i]
-  
+      
       subseq(genome[[chr]], start = start, end = end)
     }))
     
@@ -238,7 +239,7 @@ for (geo_id in pull(Datasets, Name)){
       
       #make sure SRA toolkit is downloaded
       check_sra()
-
+      
       print("DOWNLOADING RAW DATA")
       #prefetch the raw data
       download_raw(geo_id)
