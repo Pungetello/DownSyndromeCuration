@@ -230,23 +230,27 @@ create_GSE_to_SRR(Datasets)
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
-  if(Datasets$Type[Datasets$Name == geo_id] == "RNA" && Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
     print(geo_id)
-    destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, ".tsv.gz")
-    #if(!file.exists(destination)){ #for filtering out human RNA
-
+    human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
+    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
+    if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
+      
       #make sure SRA toolkit is downloaded
       check_sra()
 
+      print("DOWNLOADING RAW DATA")
       #prefetch the raw data
       download_raw(geo_id)
     }
   }
-#}
+}
 
 #download reference genomes needed
 download_reference()
 
 #create MAC combined reference genome
-mac_fragments = create_mac_reference()
-create_mac_annotation(mac_fragments)
+if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
+  mac_fragments = create_mac_reference()
+  create_mac_annotation(mac_fragments)
+}
