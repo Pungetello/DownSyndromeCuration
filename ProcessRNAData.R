@@ -32,6 +32,9 @@ prefetch = "prefetch"
 #install the raw data using the SRA toolkit
 install_raw = function(srr){
   in_path = paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sra")
+  if(!file.exists(in_path)){
+    in_path = paste0(getwd(), "/Data/RawRNA/", srr, "/", srr, ".sralite")
+  }
   out_path = paste0(getwd(), "/fastq/", srr, "_1.fastq")
   
   #skip if file has already been downloaded
@@ -98,6 +101,10 @@ process_data = function(srr, index, annotation, mac){
   write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_gene_counts.tsv"))
   
   calculate_data_files(feature_counts, mac)
+  
+  #delete input files to save space for next ones
+  file.remove(input_file)
+  file.remove(input_file_2)
 }
 
 
