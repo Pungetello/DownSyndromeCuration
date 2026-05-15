@@ -27,7 +27,6 @@ run_sva = function(path, gse){
     filter(GSE == gse)%>%
     inner_join(GSM_to_Value, by = "GSM")%>%
     rename(status = Value)%>% #unsure what to name this. Karyotype? Status? Control_v_Affected? Group?
-    #mutate(status)
     select(SRR, status)
   
   #make sure SRRs are in the same order
@@ -40,44 +39,31 @@ run_sva = function(path, gse){
   #null model matrix is just indeces, since we are not including any other variables
   mod0 = model.matrix(~1, data = var_of_interest)
   
-  #determine how many surrogate variables to look for
-  n.sv = 2
-  
+  #convert gene_counts to matrix, filter out rows with no variance
   gene_counts_matrix = column_to_rownames(gene_counts, var = "gene_id") %>% 
     as.matrix()
   
-  print(mod)
-  print(mod0)
-  print(head(gene_counts_matrix))
+  variance = apply(gene_counts_matrix, 1, var)
   
-  print(class(gene_counts_matrix))
-  print(typeof(gene_counts_matrix))
+  gene_counts_matrix = gene_counts_matrix[variance > 0, ]
   
-  print(class(mod))
-  print(typeof(mod))
-  
-  vars <- apply(gene_counts_matrix, 1, var)
-  print(sum(vars == 0))
-  
-  gene_counts_matrix = gene_counts_matrix[vars > 0, ]
-  print(head(gene_counts_matrix))
+  #determine how many surrogate variables to look for
+  n.sv = 2
   
   #run sva
-  svobj = sva(gene_counts_matrix, mod, mod0, n.sv = n.sv)%>%
-    print()
+  svobj = sva(gene_counts_matrix, mod, mod0, n.sv = n.sv)
   
-
-  stop()
-  
-  
-  #do stuff
-  #learn the package, identify latent covariates, save to file, compare against metadata variables.
-  
+  sv = as.data.frame(svobj$sv)
+  sv = cbind(SRR = colnames(gene_counts_matrix), sv)
+  write_tsv(sv, paste0(getwd(), "/Data/SVAResults/", gse, "_sva.tsv"))
 }
 
 
 
 #---------Find Surrogate Variables----------
+
+file_location = "Data/SVAResults/"
+if (!dir.exists(file_location)){dir.create(file_location, recursive = TRUE)}
 
 files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.tsv")
 print(files)
