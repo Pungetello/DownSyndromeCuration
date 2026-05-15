@@ -237,7 +237,7 @@ for (srr in srrs){
 
   #check if alignment has already been done
   if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
-    #print("OUTPUT ALREADY EXISTS, SKIPPING")
+    print("OUTPUT ALREADY EXISTS, SKIPPING")
     next()
   }
 
