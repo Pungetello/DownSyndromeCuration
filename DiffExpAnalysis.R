@@ -66,13 +66,14 @@ volcano_plot = function(graph_data, output_prefix, file){
   
   if(grepl("MAC", file)){
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21", "Chr-21", 
-                                   ifelse(graph_data$chromosome_name == "16", "Chr-16", 
-                                          "Other"))
-    # print("GENES ON CHR16:")
-    # print(head(filter(graph_data, chromosome_name == "16")))
+                            ifelse(graph_data$chromosome_name == "16", "Chr-16", 
+                            "Other"))
+    graph_data$chr21_flag = factor(graph_data$chr21_flag, levels = c("Chr-21", "Chr-16", "Other"))
+
   }else{
-    graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21",
-                                   "Chr-21", "Other")
+    graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21", "Chr-21", 
+                            "Other")
+    graph_data$chr21_flag = factor(graph_data$chr21_flag, levels = c("Chr-21", "Other"))
   }
   
   graph_data = graph_data[
