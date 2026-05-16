@@ -58,10 +58,10 @@ volcano_plot = function(graph_data, output_prefix, file){
   
   #print(head(graph_data))
   #print(tail(graph_data))
-  # print(output_prefix)
+  print(output_prefix)
   # print("HUMAN GENES IN GRAPH DATA:")
   # print(head(filter(graph_data, startsWith(gene, "ENSG"))))
-  # print(sort(unique(pull(graph_data, "chromosome_name"))))
+  print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   
   if(grepl("MAC", file)){
@@ -84,9 +84,19 @@ volcano_plot = function(graph_data, output_prefix, file){
   
   #label top 5 of each category
   top = rbind(
-    filter(graph_data, chr21_flag == "Chr-21")[order(graph_data$padj), ][1:5, ], 
-    filter(graph_data, chr21_flag == "Chr-16")[order(graph_data$padj), ][1:5, ],
-    filter(graph_data, chr21_flag == "Other")[order(graph_data$padj), ][1:5, ])
+    filter(graph_data, chr21_flag == "Chr-21") %>%
+      arrange(padj) %>%
+      slice_head(n = 5),
+    
+    filter(graph_data, chr21_flag == "Chr-16") %>%
+      arrange(padj) %>%
+      slice_head(n = 5),
+    
+    filter(graph_data, chr21_flag == "Other") %>%
+      arrange(padj) %>%
+      slice_head(n = 5)
+  )
+  
   #top = na.omit(top)
   print(top, width=Inf)
   
@@ -118,12 +128,12 @@ for (file in files){
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
   #
-  print("HUMAN GENES IN COUNTS:")
-  counts%>%
-    filter(startsWith(gene_id, "ENSG"))%>%
-    arrange(across(2), decreasing = TRUE)%>%
-    head()%>%
-    print()
+  # print("HUMAN GENES IN COUNTS:")
+  # counts%>%
+  #   filter(startsWith(gene_id, "ENSG"))%>%
+  #   arrange(across(2), decreasing = TRUE)%>%
+  #   head()%>%
+  #   print()
 
 
   counts = as.data.frame(counts)
