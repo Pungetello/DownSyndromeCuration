@@ -58,18 +58,18 @@ volcano_plot = function(graph_data, output_prefix, file){
   
   #print(head(graph_data))
   #print(tail(graph_data))
-  print(output_prefix)
-  print("HUMAN GENES IN GRAPH DATA:")
-  print(head(filter(graph_data, startsWith(gene, "ENSG"))))
-  print(sort(unique(pull(graph_data, "chromosome_name"))))
+  # print(output_prefix)
+  # print("HUMAN GENES IN GRAPH DATA:")
+  # print(head(filter(graph_data, startsWith(gene, "ENSG"))))
+  # print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   
   if(grepl("MAC", file)){
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21", "Chr-21", 
                                    ifelse(graph_data$chromosome_name == "16", "Chr-16", 
                                           "Other"))
-    print("GENES ON CHR16:")
-    print(head(filter(graph_data, chromosome_name == "16")))
+    # print("GENES ON CHR16:")
+    # print(head(filter(graph_data, chromosome_name == "16")))
   }else{
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21",
                                    "Chr-21", "Other")
@@ -88,7 +88,7 @@ volcano_plot = function(graph_data, output_prefix, file){
     filter(graph_data, chr21_flag == "Chr-16")[order(graph_data$padj), ][1:5, ],
     filter(graph_data, chr21_flag == "Other")[order(graph_data$padj), ][1:5, ])
   #top = na.omit(top)
-  print(top)
+  print(top, width=Inf)
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chr21_flag)) +
     labs(color = "Chromosome") +
@@ -117,32 +117,32 @@ for (file in files){
   
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
-  # 
+  #
   print("HUMAN GENES IN COUNTS:")
   counts%>%
     filter(startsWith(gene_id, "ENSG"))%>%
     arrange(across(2), decreasing = TRUE)%>%
     head()%>%
     print()
-  
-  
+
+
   counts = as.data.frame(counts)
   rownames(counts) = counts$gene_id
   counts$gene_id = NULL
   counts = as.matrix(counts)
-  
-  
+
+
   #create tibble mapping each sample to 'control_group' or 'affected_group'
   gse = strsplit(basename(file), "_")[[1]][1]#"\\." for human
   metadata = create_metadata(gse, "srr")#"gsm" for human
-  
+
   if(length(unique(metadata$Value)) < 2){
     print("Only one variable, skipping dataset")
     next()
   }
   # print(metadata)
   # print(head(counts))
-  
+
   #set up input
   dds = DESeqDataSetFromMatrix(
     countData = counts,
@@ -151,18 +151,18 @@ for (file in files){
   )
   dds$Value = as.factor(metadata$Value)
   dds$Value = relevel(dds$Value, ref="control_group")
-  
+
   #run the analysis
   dds = DESeq(dds)
-  
+
   results = results(dds)
-  
+
   #filter results to adjusted p-value < 0.05 and sort by padj
   #sig_genes = subset(results, padj < 0.05)%>%
   sig_genes = as_tibble(results, rownames='gene')%>%
     drop_na()%>%
     arrange(padj)
-  
+
   #write to file
   write_tsv(sig_genes, file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
   
