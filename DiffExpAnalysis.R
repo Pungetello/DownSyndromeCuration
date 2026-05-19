@@ -83,6 +83,8 @@ volcano_plot = function(graph_data, output_prefix, file){
     ),
   ]
   
+  print(unique(pull(graph_data, chr21_flag)))
+  
   #label top 5 of each category
   top = rbind(
     filter(graph_data, chr21_flag == "Chr-21") %>%
