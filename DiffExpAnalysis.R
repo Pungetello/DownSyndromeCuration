@@ -53,35 +53,20 @@ volcano_plot = function(graph_data, output_prefix, file){
   
   #read in gene metadata to determine symbol and chromosome for each
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))
-  # print(head(genes, n=100))
   graph_data = full_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name", "external_gene_name")), by = "gene")
   
-  #print(head(graph_data))
-  #print(tail(graph_data))
   print(output_prefix)
-  # print("HUMAN GENES IN GRAPH DATA:")
-  # print(head(filter(graph_data, startsWith(gene, "ENSG"))))
-  #print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   
   if(grepl("MAC", file)){
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21", "Chr-21", 
                             ifelse(graph_data$chromosome_name == "16", "Chr-16", 
                             "Other"))
-    print("NAs:")
-    print(filter(graph_data, is.na(chromosome_name)), width=Inf)
-    #print(filter(read_tsv(paste0(getwd(), "/Data/NormalizedData/", file)), is.na()))
-    
-    
-    #print(unique(pull(graph_data, chr21_flag)))
     graph_data$chr21_flag = factor(graph_data$chr21_flag, levels = c("Chr-21", "Chr-16", "Other"))
 
   }else{
     graph_data$chr21_flag = ifelse(graph_data$chromosome_name == "21", "Chr-21", 
                             "Other")
-    print("NAs:")
-    print(filter(graph_data, is.na(chromosome_name)), width=Inf)
-    #print(unique(pull(graph_data, chr21_flag)))
     graph_data$chr21_flag = factor(graph_data$chr21_flag, levels = c("Chr-21", "Other"))
   }
   
@@ -92,7 +77,6 @@ volcano_plot = function(graph_data, output_prefix, file){
     ),
   ]
   
-  #print(unique(pull(graph_data, chr21_flag)))
   
   #label top 5 of each category
   top = rbind(
@@ -108,9 +92,6 @@ volcano_plot = function(graph_data, output_prefix, file){
       arrange(padj) %>%
       slice_head(n = 5)
   )
-  
-  #top = na.omit(top)
-  print(top, width=Inf)
   
   ggplot(graph_data, aes(x = log2FoldChange, y = -log10(padj), color = chr21_flag)) +
     labs(color = "Chromosome") +
@@ -128,8 +109,6 @@ volcano_plot = function(graph_data, output_prefix, file){
 
 #TODO: maybe reimplement this to itterate over Datasets list instead of the files in the folder, so other traits can be found
 files = list.files(path = "Data/NormalizedData", pattern = "GSE[0-9]+\\w*_gene_counts\\.tsv")
-#files = c("GSE190053_gene_counts.tsv")
-#files = c("GSE101942_old.tsv.gz", "GSE190053_old.tsv.gz")
 print(files)
 
 file_location = "Data/Plots/"
@@ -139,14 +118,6 @@ for (file in files){
   
   #get gene_counts for the GSE
   counts = read_tsv(paste0("Data/NormalizedData/",file))
-  #
-  # print("HUMAN GENES IN COUNTS:")
-  # counts%>%
-  #   filter(startsWith(gene_id, "ENSG"))%>%
-  #   arrange(across(2), decreasing = TRUE)%>%
-  #   head()%>%
-  #   print()
-
 
   counts = as.data.frame(counts)
   rownames(counts) = counts$gene_id
@@ -162,8 +133,6 @@ for (file in files){
     print("Only one variable, skipping dataset")
     next()
   }
-  # print(metadata)
-  # print(head(counts))
 
   #set up input
   dds = DESeqDataSetFromMatrix(
@@ -180,7 +149,6 @@ for (file in files){
   results = results(dds)
 
   #filter results to adjusted p-value < 0.05 and sort by padj
-  #sig_genes = subset(results, padj < 0.05)%>%
   sig_genes = as_tibble(results, rownames='gene')%>%
     drop_na()%>%
     arrange(padj)
