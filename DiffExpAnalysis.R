@@ -61,7 +61,7 @@ volcano_plot = function(graph_data, output_prefix, file){
   print(output_prefix)
   # print("HUMAN GENES IN GRAPH DATA:")
   # print(head(filter(graph_data, startsWith(gene, "ENSG"))))
-  print(sort(unique(pull(graph_data, "chromosome_name"))))
+  #print(sort(unique(pull(graph_data, "chromosome_name"))))
   
   
   if(grepl("MAC", file)){
@@ -70,7 +70,10 @@ volcano_plot = function(graph_data, output_prefix, file){
                             "Other"))
     print("NAs:")
     print(filter(graph_data, is.na(chromosome_name)), width=Inf)
-    print(unique(pull(graph_data, chr21_flag)))
+    #print(filter(read_tsv(paste0(getwd(), "/Data/NormalizedData/", file)), is.na()))
+    
+    
+    #print(unique(pull(graph_data, chr21_flag)))
     graph_data$chr21_flag = factor(graph_data$chr21_flag, levels = c("Chr-21", "Chr-16", "Other"))
 
   }else{
@@ -78,7 +81,7 @@ volcano_plot = function(graph_data, output_prefix, file){
                             "Other")
     print("NAs:")
     print(filter(graph_data, is.na(chromosome_name)), width=Inf)
-    print(unique(pull(graph_data, chr21_flag)))
+    #print(unique(pull(graph_data, chr21_flag)))
     graph_data$chr21_flag = factor(graph_data$chr21_flag, levels = c("Chr-21", "Other"))
   }
   
@@ -89,7 +92,7 @@ volcano_plot = function(graph_data, output_prefix, file){
     ),
   ]
   
-  print(unique(pull(graph_data, chr21_flag)))
+  #print(unique(pull(graph_data, chr21_flag)))
   
   #label top 5 of each category
   top = rbind(
