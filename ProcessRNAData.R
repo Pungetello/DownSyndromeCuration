@@ -252,7 +252,7 @@ GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 # 
 #   #run alignment and save output files
 #   process_data(srr, index, annotation, MAC)
-}
+# }
 
 
 combine_results_per_GSE()
