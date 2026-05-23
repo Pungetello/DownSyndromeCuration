@@ -73,6 +73,9 @@ process_data = function(srr, index, annotation, mac){
   
   #make sure data is downloaded
   if (!file.exists(input_file)){
+    input_file = paste0(getwd(), "/fastq/", srr, ".fastq")
+  }
+  if (!file.exists(input_file)){
     print(paste0("INPUT FILE NOT FOUND FOR ", srr))
     return()
   }
