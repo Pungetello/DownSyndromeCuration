@@ -214,6 +214,7 @@ for (srr in srrs){
     next()
   }else if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
     print("NOT SELECTED GSE, SKIPPING")
+    next()
   }
 
   MAC = ""
