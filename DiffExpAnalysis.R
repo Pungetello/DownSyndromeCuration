@@ -54,7 +54,8 @@ volcano_plot = function(graph_data, output_prefix, file){
   #read in gene metadata to determine symbol and chromosome for each
   genes = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", output_prefix, ".tsv.gz"))%>%
     mutate(external_gene_name = coalesce(external_gene_name, ensembl_gene_id))
-  graph_data = full_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name", "external_gene_name")), by = "gene")
+  graph_data = full_join(graph_data, select(rename(genes, gene = ensembl_gene_id), c("gene", "chromosome_name", "external_gene_name", "gene_biotype")), by = "gene")%>%
+    filter(gene_biotype == "protein_coding") #filter to only protein coding genes
   
   print(output_prefix)
   
