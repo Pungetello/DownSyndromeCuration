@@ -168,7 +168,7 @@ create_mac_reference = function(){
   mac_fragments = setdiff(mac_full, deletions)
   
   #make sure it doesn't already exist
-  if(!file.exists(paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa"))){
+  if(!file.exists(paste0(getwd(), "/RefGenomes/mouse_plus_mac_reordered.fa"))){
     
     #read in human reference genome
     genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
@@ -188,14 +188,14 @@ create_mac_reference = function(){
     #append to copy of mouse reference genome
     mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
     mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac_reordered.fa")
     
     writeXStringSet(seqs, mac_file)
     
     mouse <- readDNAStringSet(mouse_file)
     mac <- readDNAStringSet(mac_file)
     
-    combined <- c(mouse, mac)
+    combined <- c(mac, mouse)
     
     writeXStringSet(combined, combined_file)
   }
