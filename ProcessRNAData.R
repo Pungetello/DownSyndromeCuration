@@ -212,7 +212,7 @@ for (srr in srrs){
   if(length(geo_id)==0){
     print("NO GEOID FOUND")
     next()
-  }else if(sum(geo_id == c(GSE109293,GSE109294,GSE202938,GSE210117)) == 0){
+  }else if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
     print("NOT SELECTED GSE, SKIPPING")
   }
 
