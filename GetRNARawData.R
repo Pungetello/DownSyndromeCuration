@@ -230,22 +230,22 @@ create_mac_annotation = function(mac_fragments){
 #create_GSE_to_SRR(Datasets)
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-# for (geo_id in pull(Datasets, Name)){
-#   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
-#     print(geo_id)
-#     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
-#     mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
-#     if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
-#       
-#       #make sure SRA toolkit is downloaded
-#       check_sra()
-#       
-#       print("DOWNLOADING RAW DATA")
-#       #prefetch the raw data
-#       download_raw(geo_id)
-#     }
-#   }
-# }
+for (geo_id in pull(Datasets, Name)){
+  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+    print(geo_id)
+    human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
+    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
+    if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
+      
+      #make sure SRA toolkit is downloaded
+      check_sra()
+      
+      print("DOWNLOADING RAW DATA")
+      #prefetch the raw data
+      download_raw(geo_id)
+    }
+  }
+}
 
 #download reference genomes needed
 download_reference()
