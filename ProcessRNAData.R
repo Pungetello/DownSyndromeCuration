@@ -62,7 +62,7 @@ build_index = function(index_file, ref){
 
 
 
-#runs alignment, gets feature counts, and makes tpm file
+#runs alignment, gets feature counts, and calls calculate_data_files
 process_data = function(srr, index, annotation, mac){
   print(paste0("PROCESSING ", srr))
   output_file = paste0(srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
@@ -252,6 +252,9 @@ for (srr in srrs){
 
   #run alignment and save output files
   process_data(srr, index, annotation, MAC)
+  
+  #remove srr RawRNA file to save space
+  unlink(paste0(getwd(), "/Data/RawRNA/", srr), recursive = TRUE)
 }
 
 
