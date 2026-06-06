@@ -50,10 +50,10 @@ run_sva = function(path, gse){
   gene_counts_matrix = gene_counts_matrix[variance > 0, ]
   
   #determine how many surrogate variables to look for
-  n.sv = 2
+  #n.sv = 2
   
   #run sva
-  svobj = sva(gene_counts_matrix, mod, mod0, n.sv = n.sv)
+  svobj = sva(gene_counts_matrix, mod, mod0)#, n.sv = n.sv)
   
   sv = as.data.frame(svobj$sv)
   sv = cbind(SRR = colnames(gene_counts_matrix), sv)
@@ -76,65 +76,52 @@ get_metadata = function(geo_ID) {
 
 
 
-#make a graph comparing the sva values to existing variables
-make_graph = function(gse, sv){
-  if(gse == "GSE109293"||gse == "GSE109293"){
+#wrapper function for explicitly setting metadata variables to compare with.
+make_graphs = function(gse, sv){
+  print(gse)
+  if(gse == "GSE109293"||gse == "GSE109294"){
     #No other variables besides the test variable, unsure what to do
     return()
   }else if(gse == "GSE202938"){
-    metadata = get_metadata(gse)%>%
-      dplyr::rename("GSM" = "geo_accession")
-    GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
-    metadata = inner_join(metadata, GSE_to_SRR, by = "GSM")%>%
-      select(c("SRR","GSM","genotype_ch1"))
-    
-    sv = inner_join(sv, metadata, by = "SRR")%>%
-      select(c(SRR, V1, V2, genotype_ch1))
-    
-    plot_data = pivot_longer(sv, cols = starts_with("V"),
-                             names_to = "SV",
-                             values_to = "SV_value")%>%
-      pivot_longer(cols = c("genotype_ch1"),
-                   names_to = "variable",
-                   values_to = "group")
-    
-    #graph it!
-    print("GRAPH!")
-      ggplot(plot_data, aes(x = factor(group), y = SV_value)) +
-        geom_boxplot() +
-        facet_grid(SV ~ variable, scales = "free_x") +
-        theme_bw()
-    
-      ggsave(filename = paste0(getwd(), "/Data/SVAResults/", gse, "_plots.png"), width = 10, height = 5, units = "in")
-    
+    graph_helper(gse, sv, c("genotype_ch1"))
   }else if(gse == "GSE210117"){
-    metadata = get_metadata(gse)%>%
-      dplyr::rename("GSM" = "geo_accession")%>%
-      print()
-    GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
-    metadata = inner_join(metadata, GSE_to_SRR, by = "GSM")%>%
-      select(c("SRR","GSM","genotype_ch1", "age_ch1","sex_ch1","tissue_ch1"))
-    sv = inner_join(sv, metadata, by = "SRR")%>%
-      select(c(SRR, V1, V2, genotype_ch1, age_ch1,sex_ch1,tissue_ch1))
-    
-    plot_data = pivot_longer(sv, cols = starts_with("V"),
-                             names_to = "SV",
-                             values_to = "SV_value")%>%
-      pivot_longer(cols = c("genotype_ch1","age_ch1","sex_ch1","tissue_ch1"),
-                   names_to = "variable",
-                   values_to = "group")
-    
-    #graph it!
-    print("GRAPH!")
-      ggplot(plot_data, aes(x = factor(group), y = SV_value)) +
-        geom_boxplot() +
-        facet_grid(SV ~ variable, scales = "free_x") +
-        theme_bw()
-      
-      ggsave(filename = paste0(getwd(), "/Data/SVAResults/", gse, "_plots.png"), width = 10, height = 5, units = "in")
+    graph_helper(gse, sv, c("genotype_ch1", "age_ch1","sex_ch1","tissue_ch1"))
+  }else if(gse == "GSE101942"){
+    graph_helper(gse, sv, c("cell_type_ch1","passages_ch1"))
+  }else if(gse == "GSE190053"){
+    graph_helper(gse, sv, c("description","disease_state_ch1"))
+  }else{
+    #print(gse)
   }
-  
   #print(sv)
+}
+
+
+
+#make a graph comparing the sva values to existing variables.
+graph_helper = function(gse, sv, variables){
+  metadata = get_metadata(gse)%>%
+    dplyr::rename("GSM" = "geo_accession")
+  GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
+  metadata = inner_join(metadata, GSE_to_SRR, by = "GSM")%>%
+    select(c("SRR","GSM",variables))
+  sv = inner_join(sv, metadata, by = "SRR")%>%
+    select(c(SRR, starts_with("V"), genotype_ch1, age_ch1,sex_ch1,tissue_ch1))
+  
+  plot_data = pivot_longer(sv, cols = starts_with("V"),
+                           names_to = "SV",
+                           values_to = "SV_value")%>%
+    pivot_longer(cols = variables,
+                 names_to = "variable",
+                 values_to = "group")
+  
+  #graph it!
+  ggplot(plot_data, aes(x = factor(group), y = SV_value)) +
+    geom_boxplot() +
+    facet_grid(SV ~ variable, scales = "free_x") +
+    theme_bw()
+  
+  ggsave(filename = paste0(getwd(), "/Data/SVAResults/", gse, "_plots.png"), width = 10, height = 5, units = "in")
   
 }
 
