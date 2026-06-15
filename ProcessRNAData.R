@@ -101,7 +101,7 @@ process_data = function(srr, index, annotation, mac){
   counts_df = rename(counts_df, !!srr := paste0(srr,"_AlignResults.BAM")) %>%
     select("gene_id", srr)
   
-  write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_gene_counts_sans16.tsv"))
+  write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_gene_counts.tsv"))
   
   calculate_data_files(feature_counts, mac)
   
@@ -125,7 +125,7 @@ calculate_data_files = function(feature_counts, mac){
   rpkm_df = rownames_to_column(as.data.frame(rpkm), "gene_id")
   colnames(rpkm_df)[2] <- srr
   
-  write_tsv(rpkm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_RPKM_sans16.tsv"))
+  write_tsv(rpkm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_RPKM.tsv"))
   
   #calculate tpm
   length_kb <- gene_length / 1000
@@ -135,7 +135,7 @@ calculate_data_files = function(feature_counts, mac){
   tpm_df = rownames_to_column(as.data.frame(tpm), "gene_id")
   colnames(tpm_df)[2] <- srr
   
-  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_TPM_sans16.tsv"))
+  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_TPM.tsv"))
 }
 
 
@@ -159,9 +159,9 @@ combine_results_per_GSE = function(){
       pull(SRR)
     
     
-    combine_files(gse, srrs, paste0(mac, "_gene_counts_sans16.tsv"))
-    combine_files(gse, srrs, paste0(mac, "_TPM_sans16.tsv"))
-    combine_files(gse, srrs, paste0(mac, "_RPKM_sans16.tsv"))
+    combine_files(gse, srrs, paste0(mac, "_gene_counts.tsv"))
+    combine_files(gse, srrs, paste0(mac, "_TPM.tsv"))
+    combine_files(gse, srrs, paste0(mac, "_RPKM.tsv"))
     
   }
 }
@@ -212,9 +212,9 @@ for (srr in srrs){
   if(length(geo_id)==0){
     print("NO GEOID FOUND")
     next()
-  }else if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
-    print("NOT SELECTED GSE, SKIPPING")
-    next()
+  # }else if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
+  #   print("NOT SELECTED GSE, SKIPPING")
+  #   next()
   }
 
   MAC = ""
@@ -236,13 +236,13 @@ for (srr in srrs){
 
     MAC = "_MAC"
     #mouse with MAC
-    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac_sans16.fa")
-    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac_sans16.gtf.gz")
+    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
     index = "mouse_plus_mac_index"
   }
 
   #check if alignment has already been done
-  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM_sans16.tsv"))){
+  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
     print("OUTPUT ALREADY EXISTS, SKIPPING")
     next()
   }

@@ -118,6 +118,7 @@ graph_helper = function(gse, sv, variables){
   #graph it!
   ggplot(plot_data, aes(x = factor(group), y = SV_value)) +
     geom_boxplot() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
     facet_grid(SV ~ variable, scales = "free_x") +
     theme_bw()
   

@@ -19,7 +19,7 @@ options(repos = c(CRAN = "https://cloud.r-project.org"))
 
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager", lib = user_lib)
-BiocManager::install(version = "3.22", lib = user_lib)
+BiocManager::install(version = "3.23", lib = user_lib)
 BiocManager::install(c("tidyverse",
                        "SCAN.UPC",
                        "GEOquery",
