@@ -35,7 +35,8 @@ BiocManager::install(c("tidyverse",
                        "Rsamtools",
                        "GenomeInfoDb",
                        "rtracklayer",
-                       "sva"
+                       "sva",
+                       "ArrayExpress"
                        ), lib = user_lib
 )
 
@@ -47,7 +48,6 @@ BiocManager::install(c("tidyverse",
 #"Biostrings",
 #"doParallel",
 #"osfr",
-#"affy",
-#"BiocManager"
+#"affy"
 
 #TODO: go through this periodically to see if there are any we are no longer using

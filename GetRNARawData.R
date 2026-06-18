@@ -19,6 +19,8 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
+library(ArrayExpress)
+
 
 #----------functions-------------
 
@@ -93,7 +95,7 @@ create_GSE_to_SRR = function(datasets_table){
 
 
 #get the true raw data using the SRA toolkit
-download_raw = function(geo_id){
+download_raw_geo = function(geo_id){
   
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   
@@ -110,6 +112,34 @@ download_raw = function(geo_id){
         prefetch,
         args = c(srr, "-O", paste0(getwd(), "/Data/RawRNA")))
     }
+  }
+}
+
+
+
+#get the raw data for E-MTAB id types
+download_raw_emtab = function(id){
+  
+  ae = getAE(id, type = "full")
+  
+  sdrf <- read.delim(
+    "E-MTAB-1234/E-MTAB-1234.sdrf.txt",
+    check.names = FALSE
+  )
+  
+  print(colnames(sdrf))
+  
+  fastq_urls <- unique(
+    unlist(strsplit(
+      sdrf$`Comment[FASTQ_URI]`,
+      ";"
+    ))
+  )
+  print("WHAT IS HAPPENING")
+  print(head(fastq_urls))
+  
+  for (u in fastq_urls) {
+    download.file(u, paste0(getwd(), "/fastq/", basename(u)))
   }
 }
 
@@ -247,21 +277,24 @@ for (geo_id in pull(Datasets, Name)){
     mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
     if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
 
-      #make sure SRA toolkit is downloaded
-      check_sra()
-
       print("DOWNLOADING RAW DATA")
       #prefetch the raw data
-      download_raw(geo_id)
+      if(startsWith(geo_id, "GSE")){
+        #make sure SRA toolkit is downloaded
+        # check_sra()
+        # download_raw_geo(geo_id)
+      }else if(startsWith(geo_id, "E-MTAB")){
+        download_raw_emtab(geo_id)
+      }
     }
   }
 }
 
-#download reference genomes needed
-download_reference()
-
-#create MAC combined reference genome
-if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
-  mac_fragments = create_mac_reference()
-  create_mac_annotation(mac_fragments)
-}
+# #download reference genomes needed
+# download_reference()
+# 
+# #create MAC combined reference genome
+# if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
+#   mac_fragments = create_mac_reference()
+#   create_mac_annotation(mac_fragments)
+# }
