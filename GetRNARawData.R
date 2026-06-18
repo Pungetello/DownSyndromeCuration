@@ -235,10 +235,9 @@ create_mac_annotation = function(mac_fragments){
 
 #--------------Download_RNA_data-------------
 
-#create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-print(Datasets[1:7,1:5])
-create_GSE_to_SRR(Datasets[1:7,1:5])
-print("DONE!")
+# #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
+# create_GSE_to_SRR(Datasets)
+# print("DONE!")
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
