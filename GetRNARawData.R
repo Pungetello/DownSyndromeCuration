@@ -189,19 +189,19 @@ create_mac_reference = function(){
     #append to copy of mouse reference genome
     mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
     mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac_sans16.fa")
+    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
     
     writeXStringSet(seqs, mac_file)
     
     mouse <- readDNAStringSet(mouse_file)
     mac <- readDNAStringSet(mac_file)
     
-    #Detective work: filter out chr16
-    print(names(mouse))
-    mouse_filtered <- mouse[!names(mouse) %in% "chr16 16"]
-    print(names(mouse_filtered))
+    # #Detective work: filter out chr16
+    # print(names(mouse))
+    # mouse_filtered <- mouse[!names(mouse) %in% "chr16 16"]
+    # print(names(mouse_filtered))
     
-    combined <- c(mac, mouse_filtered)
+    combined <- c(mac, mouse)
     
     writeXStringSet(combined, combined_file)
   }
@@ -226,40 +226,40 @@ create_mac_annotation = function(mac_fragments){
   combined_gtf <- c(human_subset, mouse_gtf)
   
   #Detective work: remove all mouse chr16 genes
-  combined_gtf_sans16 = combined_gtf[seqnames(combined_gtf) != "chr16"]
+  # combined_gtf_sans16 = combined_gtf[seqnames(combined_gtf) != "chr16"]
   
-  export(combined_gtf_sans16, paste0(getwd(), "/RefGenomes/mouse_plus_mac_sans16.gtf.gz"))
+  export(combined_gtf_sans16, paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz"))
 }
 
 
 
 #--------------Download_RNA_data-------------
 
-# #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-# print(Datasets[1:7,1:5])
-# create_GSE_to_SRR(Datasets[1:7,1:5])
-# print("DONE!")
-# 
-# #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-# for (geo_id in pull(Datasets, Name)){
-#   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
-#     print(geo_id)
-#     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
-#     mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
-#     if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
-# 
-#       #make sure SRA toolkit is downloaded
-#       check_sra()
-# 
-#       print("DOWNLOADING RAW DATA")
-#       #prefetch the raw data
-#       download_raw(geo_id)
-#     }
-#   }
-# }
-# 
-# #download reference genomes needed
-# download_reference()
+#create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
+print(Datasets[1:7,1:5])
+create_GSE_to_SRR(Datasets[1:7,1:5])
+print("DONE!")
+
+#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
+for (geo_id in pull(Datasets, Name)){
+  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+    print(geo_id)
+    human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
+    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
+    if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
+
+      #make sure SRA toolkit is downloaded
+      check_sra()
+
+      print("DOWNLOADING RAW DATA")
+      #prefetch the raw data
+      download_raw(geo_id)
+    }
+  }
+}
+
+#download reference genomes needed
+download_reference()
 
 #create MAC combined reference genome
 if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){

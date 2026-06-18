@@ -9,10 +9,12 @@ if (user_lib == "" || file.access(user_lib, 2) != 0) {
 
 #-----------loading_libraries-----------
 
+library(GEOquery)
 library(tidyverse)
 library(sva)
 library(janitor)
 library(ggplot2)
+
 
 #----------functions-------------
 
@@ -44,13 +46,11 @@ run_sva = function(path, gse){
   #convert gene_counts to matrix, filter out rows with no variance
   gene_counts_matrix = column_to_rownames(gene_counts, var = "gene_id") %>% 
     as.matrix()
-  
   variance = apply(gene_counts_matrix, 1, var)
-  
   gene_counts_matrix = gene_counts_matrix[variance > 0, ]
   
   #determine how many surrogate variables to look for
-  #n.sv = 2
+  n.sv = 4
   
   #run sva
   svobj = sva(gene_counts_matrix, mod, mod0)#, n.sv = n.sv)
@@ -93,37 +93,37 @@ make_graphs = function(gse, sv){
   }else{
     #print(gse)
   }
-  #print(sv)
 }
 
 
 
 #make a graph comparing the sva values to existing variables.
 graph_helper = function(gse, sv, variables){
+  #get and format data
   metadata = get_metadata(gse)%>%
     dplyr::rename("GSM" = "geo_accession")
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
   metadata = inner_join(metadata, GSE_to_SRR, by = "GSM")%>%
     select(c("SRR","GSM",variables))
   sv = inner_join(sv, metadata, by = "SRR")%>%
-    select(c(SRR, starts_with("V"), genotype_ch1, age_ch1,sex_ch1,tissue_ch1))
+    select(c(SRR, starts_with("V"), variables))
   
   plot_data = pivot_longer(sv, cols = starts_with("V"),
                            names_to = "SV",
                            values_to = "SV_value")%>%
     pivot_longer(cols = variables,
                  names_to = "variable",
-                 values_to = "group")
+                 values_to = "group")%>%
+    drop_na()
   
   #graph it!
   ggplot(plot_data, aes(x = factor(group), y = SV_value)) +
     geom_boxplot() +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
     facet_grid(SV ~ variable, scales = "free_x") +
-    theme_bw()
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
   
-  ggsave(filename = paste0(getwd(), "/Data/SVAResults/", gse, "_plots.png"), width = 10, height = 5, units = "in")
-  
+  ggsave(filename = paste0(getwd(), "/Data/SVAResults/", gse, "_plots.png"), width = 10, height = 10, units = "in")
 }
 
 
@@ -142,6 +142,5 @@ for(file in files){
   
   sv = run_sva(path, gse)
   
-  make_graph(gse, sv)
-  
+  make_graphs(gse, sv)
 }
