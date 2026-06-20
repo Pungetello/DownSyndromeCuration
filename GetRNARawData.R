@@ -19,7 +19,7 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
-library(ArrayExpress)
+#library(ArrayExpress)
 
 
 #----------functions-------------
@@ -119,14 +119,15 @@ download_raw_geo = function(geo_id){
 
 #get the raw data for E-MTAB id types
 download_raw_emtab = function(id){
+  print("WHAT IS HAPPENING")
   
-  ae = getAE(id, type = "full")
+  ae = getAE(id, type = "raw", path = paste0(getwd(), "/Data/RawRNA/", id))
   
   sdrf <- read.delim(
     "E-MTAB-1234/E-MTAB-1234.sdrf.txt",
     check.names = FALSE
   )
-  
+  print("COLNAMES:")
   print(colnames(sdrf))
   
   fastq_urls <- unique(
@@ -135,7 +136,7 @@ download_raw_emtab = function(id){
       ";"
     ))
   )
-  print("WHAT IS HAPPENING")
+  print("HEAD:")
   print(head(fastq_urls))
   
   for (u in fastq_urls) {
@@ -281,8 +282,9 @@ for (geo_id in pull(Datasets, Name)){
       #prefetch the raw data
       if(startsWith(geo_id, "GSE")){
         #make sure SRA toolkit is downloaded
-        # check_sra()
-        # download_raw_geo(geo_id)
+        check_sra()
+        download_raw_geo(geo_id)
+        
       }else if(startsWith(geo_id, "E-MTAB")){
         download_raw_emtab(geo_id)
       }
