@@ -19,7 +19,7 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
-#library(ArrayExpress)
+# library(ArrayExpress)
 
 
 #----------functions-------------
@@ -291,9 +291,9 @@ for (geo_id in pull(Datasets, Name)){
       print("DOWNLOADING RAW DATA")
       #prefetch the raw data
       if(startsWith(geo_id, "GSE")){
-        # #make sure SRA toolkit is downloaded
-        # check_sra()
-        # download_raw_geo(geo_id)
+        #make sure SRA toolkit is downloaded
+        check_sra()
+        download_raw_geo(geo_id)
         
       }else if(startsWith(geo_id, "E-MTAB")){
         download_raw_emtab(geo_id)
