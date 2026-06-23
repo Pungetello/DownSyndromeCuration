@@ -19,7 +19,7 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
-#library(ArrayExpress)
+library(ArrayExpress)
 
 
 #----------functions-------------
@@ -272,6 +272,15 @@ create_mac_annotation = function(mac_fragments){
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
+  
+  #skip if in a dataset being processed currently
+  if(geo_id == c("GSE154418",
+                 "GSE160637",
+                 "GSE160690",
+                 "GSE166849",) > 0){
+    next()
+  }
+  
   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
     print(geo_id)
     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
@@ -281,9 +290,9 @@ for (geo_id in pull(Datasets, Name)){
       print("DOWNLOADING RAW DATA")
       #prefetch the raw data
       if(startsWith(geo_id, "GSE")){
-        #make sure SRA toolkit is downloaded
-        check_sra()
-        download_raw_geo(geo_id)
+        # #make sure SRA toolkit is downloaded
+        # check_sra()
+        # download_raw_geo(geo_id)
         
       }else if(startsWith(geo_id, "E-MTAB")){
         download_raw_emtab(geo_id)
