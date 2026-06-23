@@ -274,11 +274,11 @@ create_mac_annotation = function(mac_fragments){
 for (geo_id in pull(Datasets, Name)){
   
   #skip if in a dataset being processed currently
-  if(geo_id == c("GSE154418",
+  if(sum(geo_id == c("GSE154418",
                  "GSE160637",
                  "GSE160690",
                  "GSE166849",
-                 "GSE151282") > 0){
+                 "GSE151282")) > 0){
     next()
   }
   
