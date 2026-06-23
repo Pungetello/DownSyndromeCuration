@@ -19,7 +19,7 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
-library(ArrayExpress)
+#library(ArrayExpress)
 
 
 #----------functions-------------
@@ -277,7 +277,8 @@ for (geo_id in pull(Datasets, Name)){
   if(geo_id == c("GSE154418",
                  "GSE160637",
                  "GSE160690",
-                 "GSE166849",) > 0){
+                 "GSE166849",
+                 "GSE151282") > 0){
     next()
   }
   
