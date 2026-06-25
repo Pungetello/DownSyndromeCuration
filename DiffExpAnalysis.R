@@ -156,6 +156,7 @@ for (file in files){
     arrange(padj)
 
   #write to file
+  print("WRITING DE FILE FOR ", gse)
   write_tsv(sig_genes, file=paste0(getwd(), "/Data/NormalizedData/", gse, "_DE.tsv"))
   
   #create and save volcano plot
