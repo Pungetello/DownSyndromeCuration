@@ -16,7 +16,7 @@ get_metadata = function(geo_ID) {
   
   metadata = as_tibble(pData(metadata))
   metadata = clean_names(metadata)
-  metadata = fix_bespoke_issues(geo_ID, metadata) # debug
+  #metadata = fix_bespoke_issues(geo_ID, metadata) # debug
   return (metadata)
 }
 #TODO: these kinda repeat each other, refactor
@@ -61,7 +61,7 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
   #get geo_id specific sources
   #DE_file = read_tsv(DE_filename)
   metadata = get_metadata(geo_id)
-  print(metadata, width=Inf)#debug
+  #print(metadata, width=Inf)#debug
   #more_metadata = get_gse_metadata(geo_id)
   #print(more_metadata, width=Inf)
   
@@ -186,7 +186,10 @@ make_abundance_data = function(geo_id, model, mouse_genes){
     pull(ID)
   
   #get geo_id specific sources
-  RPKM_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
+  RPKM_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_RPKM.tsv")
+  if(!file.exists(RPKM_file)){
+    RPKM_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
+  }
   RPKM = read_tsv(RPKM_file)
   SRRs = colnames(RPKM)[-1]
   gene_metadata_file = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", geo_id, ".tsv.gz")) #from GeneMetadata.R
@@ -205,7 +208,8 @@ make_abundance_data = function(geo_id, model, mouse_genes){
     SRR_i = SRRs[i]
     GSM = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))%>%
       filter(SRR == SRR_i)%>%
-      pull("GSM")
+      pull("GSM")%>%
+      print() #debug
     SampleID = filter(metadata, geo_accession == GSM)%>%
       pull("title")
     
@@ -215,7 +219,7 @@ make_abundance_data = function(geo_id, model, mouse_genes){
     Units = "RPKM"
     
     SRR_tibble = inner_join(tibble(DatasetID,Dataset_name,SampleID,FeatureID,FeatureID_type,Value,Units,Data_model_version,Date_exported,Data_contact,Script), gene_metadata_file, by=join_by("FeatureID"=="ensembl_gene_id"))%>%
-      dplyr::rename("X__Feature_chromosome"="chromosome_name", "X__Feature_gene_type"="gene_biotype", "Feature_name"="hgnc_symbol")%>%
+      dplyr::rename("X__Feature_chromosome"="chromosome_name", "X__Feature_gene_type"="gene_biotype", "Feature_name"="external_gene_name")%>%
       dplyr::select(!c("entrezgene_id","start_position","end_position"))
     
     #SRR_tibble = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, SampleID=SampleID, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, Value = Value, Units = Units, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
@@ -307,10 +311,10 @@ for (geo_id in pull(Datasets, Name)){
   make_sample_metadata(geo_id, sample_metadata, SM_model)
   
   #make Abundance_data
-  #make_abundance_data(geo_id, AD_model)
+  make_abundance_data(geo_id, AD_model)
   
   #make Differential_analysis_results
-  #make_differential_analysis_results(geo_id, DAR_model)
+  make_differential_analysis_results(geo_id, DAR_model)
   
   
 }
