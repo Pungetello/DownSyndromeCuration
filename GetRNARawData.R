@@ -19,7 +19,8 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
-# library(ArrayExpress)
+library(ArrayExpress)
+library(curl)
 
 
 #----------functions-------------
@@ -119,28 +120,21 @@ download_raw_geo = function(geo_id){
 
 #get the raw data for E-MTAB id types
 download_raw_emtab = function(id){
-  print("WHAT IS HAPPENING")
   
-  ae = getAE(id, type = "raw", path = paste0(getwd(), "/Data/RawRNA/", id))
+  #get list of ERR's from metadata
   
-  sdrf <- read.delim(
-    "E-MTAB-1234/E-MTAB-1234.sdrf.txt",
-    check.names = FALSE
-  )
-  print("COLNAMES:")
-  print(colnames(sdrf))
-  
-  fastq_urls <- unique(
-    unlist(strsplit(
-      sdrf$`Comment[FASTQ_URI]`,
-      ";"
-    ))
-  )
-  print("HEAD:")
-  print(head(fastq_urls))
-  
-  for (u in fastq_urls) {
-    download.file(u, paste0(getwd(), "/fastq/", basename(u)))
+  for(ERR in ERRs){
+    file_report = download.file(paste0("https://www.ebi.ac.uk/ena/portal/api/filereport?accession=", ERR, "&result=read_run&fields=study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,fastq_ftp,submitted_ftp,bam_ftp&format=tsv&download=true&limit=0"))
+    print(file_report)
+    
+    fastq_urls = strsplit(file_report$fastq_ftp[1], ";")
+
+    for (i in length(fastq_urls)) {
+      url = fastq_urls[i]
+      curl_download(url, destfile = paste0(getwd(), "/fastq/", ERR, "_", i, ".fastq.gz"))#maybe just get this from the url directly
+      h = new_handle(dirlistonly=TRUE)
+      con = curl(url, "r", h)
+    }
   }
 }
 
@@ -267,8 +261,9 @@ create_mac_annotation = function(mac_fragments){
 #--------------Download_RNA_data-------------
 
 # #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-# create_GSE_to_SRR(Datasets)
+# create_GSE_to_SRR(Datasets[1:67, ])
 # print("DONE!")
+# stop()
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
@@ -291,9 +286,9 @@ for (geo_id in pull(Datasets, Name)){
       print("DOWNLOADING RAW DATA")
       #prefetch the raw data
       if(startsWith(geo_id, "GSE")){
-        #make sure SRA toolkit is downloaded
-        check_sra()
-        download_raw_geo(geo_id)
+        # #make sure SRA toolkit is downloaded
+        # check_sra()
+        # download_raw_geo(geo_id)
         
       }else if(startsWith(geo_id, "E-MTAB")){
         download_raw_emtab(geo_id)
@@ -310,3 +305,10 @@ for (geo_id in pull(Datasets, Name)){
 #   mac_fragments = create_mac_reference()
 #   create_mac_annotation(mac_fragments)
 # }
+
+
+# library(curl)
+# url = "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR330/005/ERR3305905/ERR3305905_1.fastq.gz"
+# curl_download(url, destfile = "testfile.gz")
+# h = new_handle(dirlistonly=TRUE)
+# con = curl(url, "r", h)
