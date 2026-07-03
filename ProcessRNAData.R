@@ -152,7 +152,7 @@ combine_results_per_GSE = function(){
     if(Datasets$Organism[Datasets$Name == gse] == "human"){
       mac = ""
     }else{
-      mac = "_MAC"
+      mac = "_MAC_fixed"
     }
     
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
@@ -212,9 +212,9 @@ for (srr in srrs){
   if(length(geo_id)==0){
     print("NO GEOID FOUND")
     next()
-  # }else if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
-  #   print("NOT SELECTED GSE, SKIPPING")
-  #   next()
+  }else if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
+    print("NOT SELECTED GSE, SKIPPING")
+    next()
   }
 
   MAC = ""
@@ -234,7 +234,7 @@ for (srr in srrs){
     # annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
     # index = "GRCm39_index"
 
-    MAC = "_MAC"
+    MAC = "_MAC_fixed"
     #mouse with MAC
     ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
     annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
