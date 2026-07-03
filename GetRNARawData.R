@@ -122,16 +122,24 @@ download_raw_geo = function(geo_id){
 download_raw_emtab = function(id){
   
   #get list of ERR's from metadata
+  #metadata = "https://seqout.org/p/E-MTAB-7932#samples=original"
+  
+  ERRs = c("ERR3305905")#debug
+  print(ERRs)
   
   for(ERR in ERRs){
-    file_report = download.file(paste0("https://www.ebi.ac.uk/ena/portal/api/filereport?accession=", ERR, "&result=read_run&fields=study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,fastq_ftp,submitted_ftp,bam_ftp&format=tsv&download=true&limit=0"))
+    file_report = curl_download(paste0("https://www.ebi.ac.uk/ena/portal/api/filereport?accession=", ERR, "&result=read_run&fields=study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,fastq_ftp,submitted_ftp,bam_ftp&format=tsv&download=true&limit=0"), "temp")
+    print(file_report)
+    
+    file_report = read_tsv(file_report)
     print(file_report)
     
     fastq_urls = strsplit(file_report$fastq_ftp[1], ";")
+    print(fastq_urls)#good up to here
 
     for (i in length(fastq_urls)) {
       url = fastq_urls[i]
-      curl_download(url, destfile = paste0(getwd(), "/fastq/", ERR, "_", i, ".fastq.gz"))#maybe just get this from the url directly
+      curl_download(url, destfile = paste0(getwd(), "/fastq/", basename(url)))
       h = new_handle(dirlistonly=TRUE)
       con = curl(url, "r", h)
     }
@@ -238,14 +246,28 @@ create_mac_reference = function(){
 
 #append relevant human genes in mac to the mouse annotation file
 create_mac_annotation = function(mac_fragments){
+  print(mac_fragments)
   
   #read in mouse and human annotation tables
   mouse_gtf <- import(paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz"))
   human_gtf <- import(paste0(getwd(), "/RefGenomes/49_ann.gtf.gz"))
   
   #extract MAC sections of human annotation table
-  human_subset <- subsetByOverlaps(human_gtf, mac_fragments)
-  seqlevels(human_subset) <- paste0("MAC_", seqlevels(human_subset))
+  mac1 <- subsetByOverlaps(human_gtf, mac_fragments[1])
+  seqlevels(mac1) <- c(chr21 = "MAC_1")
+  mac2 <- subsetByOverlaps(human_gtf, mac_fragments[2])
+  seqlevels(mac2) <- c(chr21 = "MAC_2")
+  mac3 <- subsetByOverlaps(human_gtf, mac_fragments[3])
+  seqlevels(mac3) <- c(chr21 = "MAC_3")
+  mac4 <- subsetByOverlaps(human_gtf, mac_fragments[4])
+  seqlevels(mac4) <- c(chr21 = "MAC_4")
+  mac5 <- subsetByOverlaps(human_gtf, mac_fragments[5]) 
+  seqlevels(mac5) <- c(chr21 = "MAC_5")
+  
+  human_subset = c(mac1, mac2, mac3, mac4, mac5)
+  
+  print(seqlevels(human_subset))
+  print(human_subset)
   
   #combine
   combined_gtf <- c(human_subset, mouse_gtf)
@@ -253,7 +275,7 @@ create_mac_annotation = function(mac_fragments){
   #Detective work: remove all mouse chr16 genes
   # combined_gtf_sans16 = combined_gtf[seqnames(combined_gtf) != "chr16"]
   
-  export(combined_gtf_sans16, paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz"))
+  export(combined_gtf, paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz"))
 }
 
 
@@ -265,46 +287,46 @@ create_mac_annotation = function(mac_fragments){
 # print("DONE!")
 # stop()
 
-#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-for (geo_id in pull(Datasets, Name)){
-  
-  #skip if in a dataset being processed currently
-  if(sum(geo_id == c("GSE154418",
-                 "GSE160637",
-                 "GSE160690",
-                 "GSE166849",
-                 "GSE151282")) > 0){
-    next()
-  }
-  
-  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
-    print(geo_id)
-    human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
-    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
-    if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
-
-      print("DOWNLOADING RAW DATA")
-      #prefetch the raw data
-      if(startsWith(geo_id, "GSE")){
-        # #make sure SRA toolkit is downloaded
-        # check_sra()
-        # download_raw_geo(geo_id)
-        
-      }else if(startsWith(geo_id, "E-MTAB")){
-        download_raw_emtab(geo_id)
-      }
-    }
-  }
-}
-
-# #download reference genomes needed
-# download_reference()
+# #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
+# for (geo_id in pull(Datasets, Name)){
+#   
+#   #skip if in a dataset being processed currently
+#   if(sum(geo_id == c("GSE154418",
+#                  "GSE160637",
+#                  "GSE160690",
+#                  "GSE166849",
+#                  "GSE151282")) > 0){
+#     next()
+#   }
+#   
+#   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+#     print(geo_id)
+#     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
+#     mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
+#     if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
 # 
-# #create MAC combined reference genome
-# if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
-#   mac_fragments = create_mac_reference()
-#   create_mac_annotation(mac_fragments)
+#       print("DOWNLOADING RAW DATA")
+#       #prefetch the raw data
+#       if(startsWith(geo_id, "GSE")){
+#         # #make sure SRA toolkit is downloaded
+#         # check_sra()
+#         # download_raw_geo(geo_id)
+#         
+#       }else if(startsWith(geo_id, "E-MTAB")){
+#         download_raw_emtab(geo_id)
+#       }
+#     }
+#   }
 # }
+
+#download reference genomes needed
+#download_reference()
+
+#create MAC combined reference genome
+#if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
+  mac_fragments = create_mac_reference()
+  create_mac_annotation(mac_fragments)
+#}
 
 
 # library(curl)
