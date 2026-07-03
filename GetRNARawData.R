@@ -19,8 +19,8 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
-library(ArrayExpress)
-library(curl)
+# library(ArrayExpress)
+# library(curl)
 
 
 #----------functions-------------
@@ -286,7 +286,7 @@ create_mac_annotation = function(mac_fragments){
 # create_GSE_to_SRR(Datasets[1:67, ])
 # print("DONE!")
 # stop()
-
+# 
 # #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 # for (geo_id in pull(Datasets, Name)){
 #   
@@ -318,10 +318,10 @@ create_mac_annotation = function(mac_fragments){
 #     }
 #   }
 # }
-
+# 
 #download reference genomes needed
 #download_reference()
-
+# 
 #create MAC combined reference genome
 #if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
   mac_fragments = create_mac_reference()
