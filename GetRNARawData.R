@@ -307,7 +307,7 @@ for (geo_id in pull(Datasets, Name)){
   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
     print(geo_id)
     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
-    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
+    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_fixed_gene_counts.tsv")
     if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
 
       print("DOWNLOADING RAW DATA")
