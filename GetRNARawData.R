@@ -282,51 +282,56 @@ create_mac_annotation = function(mac_fragments){
 
 #--------------Download_RNA_data-------------
 
-# #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
+#create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
 # create_GSE_to_SRR(Datasets[1:67, ])
 # print("DONE!")
 # stop()
-# 
-# #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-# for (geo_id in pull(Datasets, Name)){
-#   
-#   #skip if in a dataset being processed currently
-#   if(sum(geo_id == c("GSE154418",
-#                  "GSE160637",
-#                  "GSE160690",
-#                  "GSE166849",
-#                  "GSE151282")) > 0){
-#     next()
-#   }
-#   
-#   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
-#     print(geo_id)
-#     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
-#     mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
-#     if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
-# 
-#       print("DOWNLOADING RAW DATA")
-#       #prefetch the raw data
-#       if(startsWith(geo_id, "GSE")){
-#         # #make sure SRA toolkit is downloaded
-#         # check_sra()
-#         # download_raw_geo(geo_id)
-#         
-#       }else if(startsWith(geo_id, "E-MTAB")){
-#         download_raw_emtab(geo_id)
-#       }
-#     }
-#   }
-# }
-# 
+
+#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
+for (geo_id in pull(Datasets, Name)){
+
+  # #skip if in a dataset being processed currently
+  # if(sum(geo_id == c("GSE154418",
+  #                "GSE160637",
+  #                "GSE160690",
+  #                "GSE166849",
+  #                "GSE151282")) > 0){
+  #   next()
+  # }
+  #skip if in a dataset being processed currently
+  if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
+    print("NOT SELECTED GSE, SKIPPING")
+    next()
+  }
+
+  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+    print(geo_id)
+    human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
+    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_gene_counts.tsv")
+    if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
+
+      print("DOWNLOADING RAW DATA")
+      #prefetch the raw data
+      if(startsWith(geo_id, "GSE")){
+        #make sure SRA toolkit is downloaded
+        check_sra()
+        download_raw_geo(geo_id)
+
+      }else if(startsWith(geo_id, "E-MTAB")){
+        download_raw_emtab(geo_id)
+      }
+    }
+  }
+}
+
 #download reference genomes needed
-#download_reference()
-# 
+download_reference()
+
 #create MAC combined reference genome
-#if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
+if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
   mac_fragments = create_mac_reference()
   create_mac_annotation(mac_fragments)
-#}
+}
 
 
 # library(curl)
