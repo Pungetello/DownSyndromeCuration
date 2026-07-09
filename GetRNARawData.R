@@ -19,8 +19,10 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
+# library(jsonlite)
+
 # library(ArrayExpress)
-# library(curl)
+library(curl)
 
 
 #----------functions-------------
@@ -118,13 +120,16 @@ download_raw_geo = function(geo_id){
 
 
 
-#get the raw data for E-MTAB id types
+#get the raw data for E-MTAB id types. Works, but takes a long time.
+#TODO: (if needed) make faster and also compressed
 download_raw_emtab = function(id){
+  if (!dir.exists("fastq")){
+    dir.create("fastq", recursive = TRUE)
+  }
   
-  #get list of ERR's from metadata
-  #metadata = "https://seqout.org/p/E-MTAB-7932#samples=original"
-  
-  ERRs = c("ERR3305905")#debug
+  #get list of ERR's
+  ERRs = get_ERRs(id)
+  #ERRs = c("ERR3305905")#debug
   print(ERRs)
   
   for(ERR in ERRs){
@@ -132,19 +137,79 @@ download_raw_emtab = function(id){
     print(file_report)
     
     file_report = read_tsv(file_report)
+    file.remove("temp")
     print(file_report)
     
     fastq_urls = strsplit(file_report$fastq_ftp[1], ";")
-    print(fastq_urls)#good up to here
+    print(fastq_urls)
 
-    for (i in length(fastq_urls)) {
-      url = fastq_urls[i]
+    for (i in 1:length(fastq_urls[[1]])) {
+      url = fastq_urls[[1]][i]
+      print(basename(url))
       curl_download(url, destfile = paste0(getwd(), "/fastq/", basename(url)))
       h = new_handle(dirlistonly=TRUE)
       con = curl(url, "r", h)
     }
   }
 }
+
+
+
+#get a list of all ERRs from a given E-MTAB project to query download of raw data
+get_ERRs = function(emtab){
+
+  link = paste0("https://www.ebi.ac.uk/biostudies/files/", emtab, "/", emtab, ".sdrf.txt")
+  
+  #print("downloading SDRF")
+  sdrf = read.delim(link, check.names = FALSE)
+  
+  errs = unique(sdrf$`Comment[ENA_RUN]`)
+  
+  #print("RETURNING ERRS")
+  return(errs)
+}
+
+
+# library(jsonlite)
+# library(readr)
+# library(stringr)
+# library(dplyr)
+
+# get_ERRs = function(emtab){
+#   
+#   ## Get BioStudies metadata
+#   meta <- fromJSON(
+#     sprintf(
+#       "https://www.ebi.ac.uk/biostudies/api/v1/studies/%s",
+#       emtab
+#     ),
+#     simplifyVector = FALSE
+#   )
+#   
+#   ## Find the SDRF file
+#   sdrf <- Filter(
+#     \(x) grepl("\\.sdrf\\.txt$", x$path),
+#     meta$files
+#   )[[1]]$path
+#   
+#   ## Download it
+#   sdrf_url <- paste0(
+#     "https://www.ebi.ac.uk/biostudies/files/",
+#     emtab,
+#     "/",
+#     sdrf
+#   )
+#   
+#   dat <- read_tsv(sdrf_url, show_col_types = FALSE)
+#   
+#   ## Find the column containing ERRs
+#   err_col <- names(dat)[
+#     sapply(dat, function(x)
+#       any(str_detect(x, "^ERR[0-9]+$"), na.rm = TRUE))
+#   ][1]
+#   
+#   unique(dat[[err_col]])
+# }
 
 
 
@@ -308,7 +373,7 @@ for (geo_id in pull(Datasets, Name)){
     print(geo_id)
     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
     mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_fixed_gene_counts.tsv")
-    if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
+    # if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
 
       print("DOWNLOADING RAW DATA")
       #prefetch the raw data
@@ -320,18 +385,18 @@ for (geo_id in pull(Datasets, Name)){
       }else if(startsWith(geo_id, "E-MTAB")){
         download_raw_emtab(geo_id)
       }
-    }
+    # }
   }
 }
 
-#download reference genomes needed
-download_reference()
-
-#create MAC combined reference genome
-if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
-  mac_fragments = create_mac_reference()
-  create_mac_annotation(mac_fragments)
-}
+# #download reference genomes needed
+# download_reference()
+# 
+# #create MAC combined reference genome
+# if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
+#   mac_fragments = create_mac_reference()
+#   create_mac_annotation(mac_fragments)
+# }
 
 
 # library(curl)
