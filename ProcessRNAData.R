@@ -152,7 +152,7 @@ combine_results_per_GSE = function(){
     if(Datasets$Organism[Datasets$Name == gse] == "human"){
       mac = ""
     }else{
-      mac = "_MAC_fixed"
+      mac = "_human"
     }
     
     srrs = filter(GSE_to_SRR, GSE == gse)%>%
@@ -219,27 +219,27 @@ for (srr in srrs){
 
   MAC = ""
 
-  if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+  #if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
 
     #human stuff
     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
     annotation = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
     index = "GRCh38_index"
-  }
+  #}
 
-  else if(Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+  #else if(Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
 
     # #normal mouse stuff
     # ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
     # annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
     # index = "GRCm39_index"
 
-    MAC = "_MAC_fixed"
+    MAC = "_human"
     #mouse with MAC
-    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
-    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
-    index = "mouse_plus_mac_index"
-  }
+    # ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+    # annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
+    # index = "mouse_plus_mac_index"
+  # }
 
   #check if alignment has already been done
   if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
