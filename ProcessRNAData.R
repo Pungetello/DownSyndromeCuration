@@ -140,12 +140,8 @@ calculate_data_files = function(feature_counts, mac){
 
 
 
-#TODO: make function to split up datasets per GSEs
-
-
-
-
 #For each GSE in the GSE_to_SRR file, combine all the result data from its SRR's into one file
+#TODO: working, must test
 combine_results_per_dataset = function(){
   
   GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"), show_col_types=FALSE)
@@ -274,5 +270,5 @@ combine_files = function(gse, srrs, dataset, suffix){
 # }
 
 
-combine_results_per_GSE()
+combine_results_per_dataset()
 
