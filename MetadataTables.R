@@ -208,8 +208,7 @@ make_abundance_data = function(geo_id, model, mouse_genes){
     SRR_i = SRRs[i]
     GSM = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))%>%
       filter(SRR == SRR_i)%>%
-      pull("GSM")%>%
-      print() #debug
+      pull("GSM")
     SampleID = filter(metadata, geo_accession == GSM)%>%
       pull("title")
     
@@ -235,11 +234,13 @@ make_abundance_data = function(geo_id, model, mouse_genes){
 make_differential_analysis_results = function(geo_id, model){
   
   #make results table
-  attributes = filter(model,`Attribute tier`=="Tier1 (applies to all dataset)")%>%
-    filter(!endsWith(`Required`, "Optional"))%>%
+  attributes = dplyr::filter(model,`Table`=="Results_DE")%>%
+    dplyr::filter(!endsWith(`Required`, "Optional"))%>%
     pull(`Attribute name`)
   
   table = tibble::as_tibble(setNames(rep(list(character()), length(attributes)), attributes))
+  print(table)
+  #rework: table is made only to be overwritten later
   
   #get geo_id specific sources
   DE_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")
@@ -253,9 +254,6 @@ make_differential_analysis_results = function(geo_id, model){
     
     
     #Do I need a row for each gene and its count?
-    FeatureID = NA#Gene/protein/metab identifier
-    FeatureID_type = NA#Identifier type - Entity|Database
-    Feature_name = NA#Feature name/symbol
     Value = NA#Feature abundance in sample
     Units = NA#Feature abundance metric unit
     
@@ -267,7 +265,6 @@ make_differential_analysis_results = function(geo_id, model){
     Model_specification = NA
     FeatureID = pull(DE_results, "gene")
     FeatureID_type = "Ensembl"
-    Feature_name = NA#gene symbol?
     FoldChange = pull(DE_results, "log2FoldChange")
     pvalue = pull(DE_results, "pvalue")
     padj = pull(DE_results, "padj")
@@ -275,8 +272,16 @@ make_differential_analysis_results = function(geo_id, model){
     X__Feature_chromosome = NA#see above
     X__Feature_gene_type = NA#
 
-    table = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, Statistical_method=Statistical_method, Comparison=Comparison, Model_specification=Model_specification, FeatureID = FeatureID, FeatureID_type = FeatureID_type, Feature_name = Feature_name, FoldChange=FoldChange, pvalue=pvalue, padj=padj, padj_type=padj_type, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
+    table = tibble(DatasetID=DatasetID, Dataset_name=Dataset_name, Statistical_method=Statistical_method, Comparison=Comparison, Model_specification=Model_specification, FeatureID = FeatureID, FeatureID_type = FeatureID_type, FoldChange=FoldChange, pvalue=pvalue, padj=padj, padj_type=padj_type, Data_model_version=Data_model_version, Date_exported=Date_exported, Data_contact=Data_contact, Script=Script)
 
+    gene_metadata_file = read_tsv(paste0(getwd(), "/Data/Metadata/GeneMetadata/", geo_id, ".tsv.gz"))%>% #from GeneMetadata.R
+      dplyr::rename("Feature_name"="external_gene_name", "FeatureID"="ensembl_gene_id")%>%
+      select("Feature_name","FeatureID")
+    
+    table = inner_join(table, gene_metadata_file, by = "FeatureID")%>%
+      relocate("Feature_name", .after = "FeatureID_type")%>%
+      print()
+    
   #print(table)
   write_tsv(table, paste0(getwd(), "/Data/Metadata/", geo_id, "_differential_analysis_results.tsv"))
 }
@@ -291,9 +296,9 @@ make_differential_analysis_results = function(geo_id, model){
 sample_metadata = read_tsv(paste0(getwd(), "/Data/Metadata/SampleMetadata.tsv"))
 #rna_genes = read_tsv(paste0(getwd(), "/Data/rna_gene_data.tsv.gz"))#TODO: this is human one, need to get mouse
 
-SM_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=1, skip=2)
-AD_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=2, skip=2)
-DAR_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.2_dictionary_bulk_RNASeq.xlsx"), sheet=3, skip=2)
+SM_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.3_dictionary.xlsx"), sheet=1, skip=2)
+AD_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.3_dictionary.xlsx"), sheet=2, skip=2)
+DAR_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.3_dictionary.xlsx"), sheet=3, skip=2)
 #print(AD_model)#debug
 
 for (geo_id in pull(Datasets, Name)){
@@ -307,15 +312,18 @@ for (geo_id in pull(Datasets, Name)){
   }
   
   
-  #make Sample_metadata
-  make_sample_metadata(geo_id, sample_metadata, SM_model)
-  
-  #make Abundance_data
-  make_abundance_data(geo_id, AD_model)
+  # #make Sample_metadata
+  # make_sample_metadata(geo_id, sample_metadata, SM_model)
+  # 
+  # #make Abundance_data
+  # make_abundance_data(geo_id, AD_model)
   
   #make Differential_analysis_results
   make_differential_analysis_results(geo_id, DAR_model)
   
+  #make Dataset_metadata
+  
+  #make Study_metadata
   
 }
 

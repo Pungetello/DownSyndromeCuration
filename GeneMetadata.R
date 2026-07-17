@@ -12,6 +12,9 @@ library(biomaRt)
 source("Datasets.R")
 
 
+#NOTE: This script get the gene metadata from biomaRt, which sometimes has bad connection or servers down.
+#If running it fails, try again later and it may work.
+
 
 #-----------functions------------------
 

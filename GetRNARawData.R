@@ -91,7 +91,63 @@ create_GSE_to_SRR = function(datasets_table){
     }
   }
   
-  #write dataframe of GSE mapped to each SRR to file
+  #return dataframe of GSE mapped to each SRR to file
+  #write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
+  return(GSE_to_SRR)
+}
+
+
+
+#TODO: once you're sure this is working, refactor so it calls this within the above function instead of writing to disk twice
+#adds a column to the GSE_to_SRR file that specifies which dataset of the GSE that SRR is part of
+add_dataset_column = function(GSE_to_SRR){
+  dataset_col = c()
+  
+  #go over each GSE and individually split the dataset. Can be refactored to be more universal later.
+  for(GSE_id in unique(pull(GSE_to_SRR, GSE))){
+    if(GSE_id == "GSE202938"){
+      metadata = getGEO(GSE_id)[[1]] 
+      metadata = as_tibble(pData(metadata))
+      
+      GSE_to_SRR_shrunk = filter(GSE_to_SRR, GSE == GSE_id)
+      #split into two
+      for(i in 1:nrow(GSE_to_SRR_shrunk)){
+        title = pull(filter(metadata, geo_accession == pull(GSE_to_SRR_shrunk, GSM)[i]), title)
+        
+        #sort by the TcMAC21 and euploid littermates, vs Ts65Dn and euploid littermates.
+        if(grepl("TcMAC21", title)){
+          dataset_col = c(dataset_col, 1)
+        }else if(grepl("Ts65Dn", title)){
+          dataset_col = c(dataset_col, 2)
+        }
+      }
+      
+    }else if(GSE_id == "GSE210117"){
+      #split into two
+      metadata = getGEO(GSE_id)[[1]] 
+      metadata = as_tibble(pData(metadata))
+      
+      GSE_to_SRR_shrunk = filter(GSE_to_SRR, GSE == GSE_id)
+      for(i in 1:nrow(GSE_to_SRR_shrunk)){
+        source = pull(filter(metadata, geo_accession == pull(GSE_to_SRR_shrunk, GSM)[i]), source_name_ch1)
+        
+        #sort by the TcMAC21 and euploid littermates, vs Ts65Dn and euploid littermates.
+        if(grepl("forebrain", source)){
+          dataset_col = c(dataset_col, 1)
+        }else if(grepl("hippocampus", source)){
+          dataset_col = c(dataset_col, 2)
+        }
+      }
+      
+    }else{
+      num_samples = nrow(filter(GSE_to_SRR, GSE == GSE_id))
+      for(i in 1:num_samples){dataset_col = c(dataset_col, 1)}
+    }
+    
+  }
+  
+  #append column and save
+  GSE_to_SRR = add_column(GSE_to_SRR, Dataset = dataset_col)
   write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
 }
 
@@ -168,48 +224,6 @@ get_ERRs = function(emtab){
   #print("RETURNING ERRS")
   return(errs)
 }
-
-
-# library(jsonlite)
-# library(readr)
-# library(stringr)
-# library(dplyr)
-
-# get_ERRs = function(emtab){
-#   
-#   ## Get BioStudies metadata
-#   meta <- fromJSON(
-#     sprintf(
-#       "https://www.ebi.ac.uk/biostudies/api/v1/studies/%s",
-#       emtab
-#     ),
-#     simplifyVector = FALSE
-#   )
-#   
-#   ## Find the SDRF file
-#   sdrf <- Filter(
-#     \(x) grepl("\\.sdrf\\.txt$", x$path),
-#     meta$files
-#   )[[1]]$path
-#   
-#   ## Download it
-#   sdrf_url <- paste0(
-#     "https://www.ebi.ac.uk/biostudies/files/",
-#     emtab,
-#     "/",
-#     sdrf
-#   )
-#   
-#   dat <- read_tsv(sdrf_url, show_col_types = FALSE)
-#   
-#   ## Find the column containing ERRs
-#   err_col <- names(dat)[
-#     sapply(dat, function(x)
-#       any(str_detect(x, "^ERR[0-9]+$"), na.rm = TRUE))
-#   ][1]
-#   
-#   unique(dat[[err_col]])
-# }
 
 
 
@@ -348,9 +362,10 @@ create_mac_annotation = function(mac_fragments){
 #--------------Download_RNA_data-------------
 
 #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-# create_GSE_to_SRR(Datasets[1:67, ])
-# print("DONE!")
-# stop()
+GSE_to_SRR = create_GSE_to_SRR(Datasets[1:67, ])
+add_dataset_column(GSE_to_SRR)
+print("DONE!")
+stop()
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
