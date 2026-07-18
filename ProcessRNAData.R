@@ -155,7 +155,7 @@ combine_results_per_dataset = function(){
     }else{
       mac = "_human"
     }
-    datasets = filter(GSE_to_SRR, GSE = gse) %>% 
+    datasets = filter(GSE_to_SRR, GSE == gse) %>% 
       pull(Dataset) %>% 
       unique()
     print(datasets)#debug
