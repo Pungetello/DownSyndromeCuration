@@ -276,7 +276,7 @@ combine_files = function(gse, srrs, dataset, suffix){
 
 for(geo_id in c("GSE109293","GSE109294","GSE184771","GSE202938","GSE210117")){
   TcMAC_genes = read_tsv(paste0(getwd(), "/Data/NormalizedData/GSE109293_MAC_fixed_gene_counts.tsv"))%>%
-    filter(grepl(gene_id, "ENSG"))%>%
+    filter(grepl("ENSG", gene_id))%>%
     select(gene_id)%>%
     print()
   
