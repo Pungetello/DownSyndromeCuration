@@ -274,14 +274,18 @@ combine_files = function(gse, srrs, dataset, suffix){
 
 #detective work code, delete later
 
-for(geo_id in c("GSE109293","GSE109294","GSE184771","GSE202938","GSE210117")){
+for(geo_id in c("GSE109293","GSE109294","GSE202938","GSE210117")){
   TcMAC_genes = read_tsv(paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_fixed_gene_counts.tsv"))%>%
-    filter(grepl("ENSG", gene_id))%>%
-    select(gene_id)%>%
+    filter(grepl("ENSG", gene_id))
+  
+  sum(select(TcMac_genes, !gene_id))%>%
     print()
   
   read_tsv(paste0(getwd(), "/Data/NormalizedData/", geo_id, "_human_gene_counts.tsv"))%>%
-    inner_join(TcMAC_genes)%>%
+    inner_join(select(TcMAC_genes, gene_id))%>%
+    print()%>%
+    select(!gene_id)%>%
+    sum()%>%
     print()
 }
 
