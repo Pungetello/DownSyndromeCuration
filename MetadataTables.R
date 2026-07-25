@@ -12,14 +12,17 @@ source("Datasets.R")
 
 # retrieves metadata using GEOquery function
 get_metadata = function(geo_ID) {
-  metadata = getGEO(geo_ID)[[1]] 
-  
-  metadata = as_tibble(pData(metadata))
-  metadata = clean_names(metadata)
-  #metadata = fix_bespoke_issues(geo_ID, metadata) # debug
+  metadata = getGEO(geo_ID)[[1]]%>%
+    pData()%>%
+    as_tibble()%>%
+    clean_names()#%>%
+    # rename_with(function(Attribute){Attribute = ifelse(endsWith(Attribute, "_ch1"), str_sub(Attribute, 1, -5), Attribute)})
+  #metadata = fix_bespoke_issues(geo_ID, metadata) # add back in if any bespoke issues are found
   return (metadata)
 }
-#TODO: these kinda repeat each other, refactor
+
+
+#TODO: these kinda repeat each other, refactor. But first finish the rest so you can know if/how you actually need them.
 get_gse_metadata = function(gse_id) {
   # Get GEO dataset (GSEMatrix = FALSE returns the main metadata structure)
   gse = getGEO(gse_id, GSEMatrix = FALSE)
@@ -37,66 +40,113 @@ get_gse_metadata = function(gse_id) {
 }
 
 
-find_value_from_keys = function(metadata, i, key){
-  result = NA
-  if (has_name(metadata, key)) {
-      result = metadata[[key]][[i]]
+
+#in order, searches the metadata for a column where the title matches a key, then returns the value in row i
+find_value_from_keys = function(metadata, i, keys){
+  for(key in keys){
+    if (has_name(metadata, key)) {
+        result = metadata[[key]][[i]]
+        return(result)
+    }
   }
-  return(result)
+  print("NO MATCH FOUND!")
+  return(NA)
 }
 
 
 
-make_sample_metadata = function(geo_id, sample_metadata, model){
-
+#makes the study metadata table for the geo_id given according to the model provided
+make_study_metadata = function(geo_id, model){
   #make results table
-  attributes = filter(model,`Attribute tier`=="Tier1 (applies to all dataset)")%>%
+  attributes = dplyr::filter(model,`Table`=="Study_metadata")%>%
     pull(`Attribute name`)
-  
   table = tibble::as_tibble(setNames(rep(list(character()), length(attributes)), attributes))
   
-  GSMs = filter(sample_metadata, Dataset_ID == geo_id)%>%
-    pull(ID)
+  #prepare metadata
+  website_metadata = get_gse_metadata(geo_id)
+  
+  
+  #for each column in results table, search metadata for the proper match or set manually
+  StudyID = geo_id
+  Study_name = find_value_from_keys(website_metadata, 1, "title")
+  Study_description = find_value_from_keys(website_metadata, 1, "overall_design") #or should this be summary?
+  PMID = find_value_from_keys(website_metadata, 1, "pubmed_id")
+  Data_model_version = "v0.5.3"
+  Date_exported = Date_exported = format(Sys.Date(), "%m%d%Y")
+  Data_contact = "Stephen Piccolo" #correct? Not the study's contact?
+  Script = "https://github.com/Pungetello/DownSyndromeCuration/blob/main/Main.R"
+ 
+  add_row(table, StudyID, Study_name, Study_description, PMID, Data_model_version, Date_exported, Data_contact, Script)%>%#FIX
+    print()%>%
+    return()
+}
 
-  #get geo_id specific sources
-  #DE_file = read_tsv(DE_filename)
-  metadata = get_metadata(geo_id)
-  #print(metadata, width=Inf)#debug
-  #more_metadata = get_gse_metadata(geo_id)
-  #print(more_metadata, width=Inf)
+
+
+#makes the dataset metadata for the given geo_id's given dataset. Some repetition from last function, refactor?
+make_dataset_metadata = function(geo_id, dataset, metadata, model, GSE_to_SRR){
+  #make results table
+  attributes = dplyr::filter(model,`Table`=="Dataset_metadata")%>%
+    filter(!endsWith(`Required`, "Optional"))%>%
+    pull(`Attribute name`)
+  table = tibble::as_tibble(setNames(rep(list(character()), length(attributes)), attributes))
+  
+  #prepare metadata #see if we actually need this later
+  GSMs = filter(GSE_to_SRR, GSE == geo_id, Dataset == dataset)%>%
+    pull(GSM)
+  dataset_metadata = dplyr::filter(metadata, geo_accession %in% GSMs)
   
   
-  #define variables for columns that are the same in all rows
-  Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
-  Data_contact = "Stephen Piccolo"
-  Additional_details = NA
+  #for each column in results table, search metadata for the proper match or set manually
+  StudyID = geo_id
+  DatasetID = paste0(geo_id, "_", dataset)
+  Model_system = find_value_from_keys(dataset_metadata, 1, "organism_ch1")
+  Tissue_cell_type = find_value_from_keys(dataset_metadata, 1, "source_name_ch1")#issue: this is different for each sample
+  Sample_type = find_value_from_keys(dataset_metadata, 1, "molecule_ch1")
+  Data_type = "bulk_RNASeq"
+  Protocol_details = find_value_from_keys(dataset_metadata, 1, "treatment_protocol_ch1")#has multiple columns of various protocols. Should I combine and use them all?
+  Visibility = "default" #indicates whether to display in portal
   
-  if(geo_id == "GSE109293"){
-    match_index = 1
-  }else if(geo_id == "GSE109294"){
-    match_index = 2
-  }else if(geo_id == "GSE202938"){
-    match_index = 3
-  }else if(geo_id == "GSE210117"){
-    match_index = 4
-  }else{
-    print("NO METADATA MATCHES CODED FOR GSE")
-  }
+  #These four are the same for all metadata tables. Make global variables?
+  Data_model_version = "v0.5.3"
+  Date_exported = Date_exported = format(Sys.Date(), "%m%d%Y")
+  Data_contact = "Stephen Piccolo" #correct? Not the study's contact?
+  Script = "https://github.com/Pungetello/DownSyndromeCuration/blob/main/Main.R"
   
+  
+  add_row(table, StudyID, DatasetID, Model_system, Tissue_cell_type, Sample_type, Data_type, Protocol_details, Visibility, Data_model_version, Date_exported, Data_contact, Script)%>%#FIX
+    print()%>%
+    return()
+}
+
+
+
+#TODO: REWORK THIS A BUNCH!
+make_sample_metadata = function(geo_id, dataset, metadata, model, GSE_to_SRR){
+
+  #make results table
+  attributes = dplyr::filter(model,`Table`=="Sample_metadata")%>%
+    filter(!endsWith(`Required`, "Optional"))%>%
+    pull(`Attribute name`)
+  table = tibble::as_tibble(setNames(rep(list(character()), length(attributes)), attributes))
+  
+  GSMs = filter(GSE_to_SRR, GSE == geo_id, Dataset == dataset)%>%
+    pull(GSM)
+  dataset_metadata = dplyr::filter(metadata, geo_accession %in% GSMs)
+  
+  DatasetID = paste0(geo_id, "_", dataset)
+  #these four again
+  Data_model_version = "v0.5.3"
+  Date_exported = Date_exported = format(Sys.Date(), "%m%d%Y")
+  Data_contact = "Stephen Piccolo" #correct? Not the study's contact?
+  Script = "https://github.com/Pungetello/DownSyndromeCuration/blob/main/Main.R"
   
   for(i in 1:nrow(metadata)){
-    SampleID = find_value_from_keys(metadata, i, "title") 
-    GSM = GSMs[i]
-    DatasetID = geo_id #table says get EMODS ID and name, but chat says NCBI doesn't have one, so from where?
-    Dataset_name = NA
-    Data_model_version = NA
-    Script = "https://github.com/Pungetello/DownSyndromeCuration/blob/main/Main.R"
+    SampleID = find_value_from_keys(metadata, i, "title")
     
-    
-    #add values for other tibble's genotype columns
-    X__Sample_Genotype = find_value_from_keys(metadata, i, "genotype_ch1")#GSE109293&4, GSE202938, GSE210117
-    
-    if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+    #add values for other tibble's genotype columns <- I don't remember what this means
+
+    if(Datasets$Organism[Datasets$Name == geo_id] == "human"){ #might need sample metadata after all? rework this.
       status = filter(sample_metadata, ID==GSM)%>%
         pull(Value)
       if(status=="affected_group"){
@@ -104,70 +154,22 @@ make_sample_metadata = function(geo_id, sample_metadata, model){
       }else if(status=="control_group"){
         X__Sample_Karyotype = "Control"
       }
+      table = add_row(table, DatasetID,SampleID,
+                      Data_model_version,Date_exported,Data_contact,Script,
+                      X__Sample_Genotype)
+      
+      
     }else{
-      X__Sample_Karyotype = NA
+      X__Sample_Genotype = find_value_from_keys(metadata, i, "genotype_ch1")#GSE109293&4, GSE202938, GSE210117
+      table = add_row(table, DatasetID,SampleID,
+                      Data_model_version,Date_exported,Data_contact,Script,
+                      X__Sample_Karyotype)
     }
-    
-    X__Sample_Treatment = NA #find_value_from_keys(metadata, i, c()), GSE109293&4, GSE202938, GSE210117
-    X__Sample_Sex = NA
-    X__Sample_Age_group = find_value_from_keys(metadata, i, c(NA, NA, NA, "age_ch1")[match_index])
-    X__Sample_age_in_days_post_birth = find_value_from_keys(metadata, i, c(NA, NA, "age_ch1", NA)[match_index])
-    X__Sample_age_in_days_post_conception = find_value_from_keys(metadata, i, c("source_name_ch1", NA, NA, NA)[match_index])
-    X__Sample_Age_in_weeks = find_value_from_keys(metadata, i, c("age_ch1", NA, NA, NA)[match_index])
-    X__Sample_Harvest_batch = NA
-    X__Sample_Cell_type = find_value_from_keys(metadata, i, c("cell_type_ch1", "tissue_ch1", "source_name_ch1", "tissue_ch1")[match_index])
-    X__Sample_Cell_line = NA
-    X__Sample_DonorID = NA
-    X__Sample_Batch = NA
-    X__Sample_Comparison_group = NA #is this anything?
-    X__Sample_tatoo = NA
-    X__Sample_CageID = NA
-    X__Sample_Donor_cell_type = NA
-    X__Sample_Pre_differentation_passage_number = NA
-    X__Sample_Post_differentation_passage_number = NA
-    X__Sample_Differentiation_factors = NA
-    X__Sample_Days_in_differentiation = NA
-    X__Sample_Oxygen_percent = NA
-    X__Sample_Coating_matrix = NA
-    
-    
-    table = add_row(table, DatasetID = DatasetID,
-                    Dataset_name = Dataset_name,
-                    SampleID = SampleID,
-                    Additional_details = Additional_details,
-                    Data_model_version = Data_model_version,
-                    Date_exported = Date_exported,
-                    Data_contact = Data_contact,
-                    Script = Script,
-                    X__Sample_Genotype = X__Sample_Genotype,
-                    X__Sample_Karyotype = X__Sample_Karyotype,
-                    X__Sample_Treatment = X__Sample_Treatment,
-                    X__Sample_Sex = X__Sample_Sex,
-                    X__Sample_Age_group = X__Sample_Age_group,
-                    X__Sample_age_in_days_post_birth = X__Sample_age_in_days_post_birth,
-                    X__Sample_age_in_days_post_conception = X__Sample_age_in_days_post_conception,
-                    X__Sample_Age_in_weeks = X__Sample_Age_in_weeks,
-                    X__Sample_Harvest_batch = X__Sample_Harvest_batch,
-                    X__Sample_Cell_type = X__Sample_Cell_type,
-                    X__Sample_Cell_line = X__Sample_Cell_line,
-                    X__Sample_DonorID = X__Sample_DonorID,
-                    X__Sample_Batch = X__Sample_Batch,
-                    X__Sample_Comparison_group = X__Sample_Comparison_group,
-                    X__Sample_tatoo = X__Sample_tatoo,
-                    X__Sample_CageID = X__Sample_CageID,
-                    X__Sample_Donor_cell_type = X__Sample_Donor_cell_type,
-                    X__Sample_Pre_differentation_passage_number = X__Sample_Pre_differentation_passage_number,
-                    X__Sample_Post_differentation_passage_number = X__Sample_Post_differentation_passage_number,
-                    X__Sample_Differentiation_factors = X__Sample_Differentiation_factors,
-                    X__Sample_Days_in_differentiation = X__Sample_Days_in_differentiation,
-                    X__Sample_Oxygen_percent = X__Sample_Oxygen_percent,
-                    X__Sample_Coating_matrix = X__Sample_Coating_matrix)
                     
   }
-  #remove any attributes that are all NA's
-  table = table[, colSums(!is.na(table)) > 0]
-  #print(table)
-  write_tsv(table, paste0(getwd(), "/Data/Metadata/", geo_id, "_Sample_metadata.tsv"))
+  print(table)%>%
+    return()
+  # write_tsv(table, paste0(getwd(), "/Data/Metadata/", geo_id, "_Sample_metadata.tsv"))
 }
 
 
@@ -243,8 +245,7 @@ make_differential_analysis_results = function(geo_id, model){
   #rework: table is made only to be overwritten later
   
   #get geo_id specific sources
-  DE_file = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")
-  DE_results = read_tsv(DE_file)
+  DE_results = read_tsv(paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv"))
   
   #define variables for columns that are the same in all rows
   Date_exported = format(Sys.Date(), "%m%d%Y") #Was this when I downloaded it, or when I make this?
@@ -296,34 +297,50 @@ make_differential_analysis_results = function(geo_id, model){
 sample_metadata = read_tsv(paste0(getwd(), "/Data/Metadata/SampleMetadata.tsv"))
 #rna_genes = read_tsv(paste0(getwd(), "/Data/rna_gene_data.tsv.gz"))#TODO: this is human one, need to get mouse
 
-SM_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.3_dictionary.xlsx"), sheet=1, skip=2)
-AD_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.3_dictionary.xlsx"), sheet=2, skip=2)
-DAR_model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.3_dictionary.xlsx"), sheet=3, skip=2)
-#print(AD_model)#debug
+model = read_excel(paste0(getwd(), "/EMODS_data_model_v0.5.3_dictionary.xlsx"), sheet=1, skip=0)
+GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (geo_id in pull(Datasets, Name)){
-  #geo_id = "GSE109293"
   print(geo_id)
-  RPKM_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_RPKM.tsv")
-  DE_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_DE.tsv")
-  if(!file.exists(RPKM_filename) || !file.exists(DE_filename)){
-    print("NO RPKM or NO DE RESULTS")
-    next()
+  
+  
+  #make Study_metadata. Each GEO = one study. Studies each take only one row, should they combine into one table for all of them?
+  make_study_metadata(geo_id, model)
+  
+  
+  
+  metadata = get_metadata(geo_id)  
+  datasets = filter(GSE_to_SRR, GSE == geo_id)%>%
+    pull(Dataset)%>%
+    unique()
+  
+  for(dataset in datasets){
+    print(paste0("DATASET ", dataset))
+    
+    # RPKM_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_", dataset, "_RPKM.tsv")#new implementation, update files to match
+    # DE_filename = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_", dataset, "_DE.tsv")
+    # if(!file.exists(RPKM_filename) || !file.exists(DE_filename)){
+    #   print("NO RPKM or NO DE RESULTS")
+    #   next()
+    # }
+    
+    #make Dataset_metadata. Same question as above: Should these be all one table together, or lots of single-row tables?
+    make_dataset_metadata(geo_id, dataset, metadata, model, GSE_to_SRR)
+    
+    # #make Sample_metadata
+    # make_sample_metadata(ggeo_id, dataset, metadata, model, GSE_to_SRR)
+    # 
+    # #make Abundance_data
+    # make_abundance_data(geo_id, AD_model)
+    # 
+    # #make Differential_analysis_results
+    # make_differential_analysis_results(geo_id, model)
+    
+    
   }
   
   
-  # #make Sample_metadata
-  # make_sample_metadata(geo_id, sample_metadata, SM_model)
-  # 
-  # #make Abundance_data
-  # make_abundance_data(geo_id, AD_model)
-  
-  #make Differential_analysis_results
-  make_differential_analysis_results(geo_id, DAR_model)
-  
-  #make Dataset_metadata
-  
-  #make Study_metadata
+  #make Results_Pathway_metadata?? Ask Zenitha.
   
 }
 

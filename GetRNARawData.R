@@ -19,9 +19,6 @@ library(GenomeInfoDb)
 library(Rsamtools)
 library(rtracklayer)
 
-# library(jsonlite)
-
-# library(ArrayExpress)
 library(curl)
 
 
@@ -36,6 +33,7 @@ library(curl)
 #Supercomputer locations
 fasterq = "fasterq-dump"
 prefetch = "prefetch"
+
 
 #TODO: add script to download and install SRA toolkit in location used.
 
@@ -82,7 +80,6 @@ create_GSE_to_SRR = function(datasets_table){
         sra_line = grep("SRA", relations, value = TRUE)
         
         #extract SRX from line, convert to SRR
-        print(sra_line)#debug
         srx = strsplit(sra_line, '=')[[1]][2]
         srr = get_srr_from_srx(srx)
         
@@ -92,13 +89,11 @@ create_GSE_to_SRR = function(datasets_table){
   }
   
   #return dataframe of GSE mapped to each SRR to file
-  #write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
   return(GSE_to_SRR)
 }
 
 
 
-#TODO: once you're sure this is working, refactor so it calls this within the above function instead of writing to disk twice
 #adds a column to the GSE_to_SRR file that specifies which dataset of the GSE that SRR is part of
 add_dataset_column = function(GSE_to_SRR){
   dataset_col = c()
@@ -106,49 +101,45 @@ add_dataset_column = function(GSE_to_SRR){
   #go over each GSE and individually split the dataset. Can be refactored to be more universal later.
   for(GSE_id in unique(pull(GSE_to_SRR, GSE))){
     if(GSE_id == "GSE202938"){
-      metadata = getGEO(GSE_id)[[1]] 
-      metadata = as_tibble(pData(metadata))
-      
-      GSE_to_SRR_shrunk = filter(GSE_to_SRR, GSE == GSE_id)
-      #split into two
-      for(i in 1:nrow(GSE_to_SRR_shrunk)){
-        title = pull(filter(metadata, geo_accession == pull(GSE_to_SRR_shrunk, GSM)[i]), title)
-        
-        #sort by the TcMAC21 and euploid littermates, vs Ts65Dn and euploid littermates.
-        if(grepl("TcMAC21", title)){
-          dataset_col = c(dataset_col, 1)
-        }else if(grepl("Ts65Dn", title)){
-          dataset_col = c(dataset_col, 2)
-        }
-      }
+      dataset_col = split_dataset(GSE_to_SRR, GSE_id, dataset_col, "title", c("TcMAC21", "Ts65Dn"))
       
     }else if(GSE_id == "GSE210117"){
-      #split into two
-      metadata = getGEO(GSE_id)[[1]] 
-      metadata = as_tibble(pData(metadata))
-      
-      GSE_to_SRR_shrunk = filter(GSE_to_SRR, GSE == GSE_id)
-      for(i in 1:nrow(GSE_to_SRR_shrunk)){
-        source = pull(filter(metadata, geo_accession == pull(GSE_to_SRR_shrunk, GSM)[i]), source_name_ch1)
-        
-        #sort by the TcMAC21 and euploid littermates, vs Ts65Dn and euploid littermates.
-        if(grepl("forebrain", source)){
-          dataset_col = c(dataset_col, 1)
-        }else if(grepl("hippocampus", source)){
-          dataset_col = c(dataset_col, 2)
-        }
-      }
+      dataset_col = split_dataset(GSE_to_SRR, GSE_id, dataset_col, "source_name_ch1", c("forebrain", "hippocampus"))
       
     }else{
       num_samples = nrow(filter(GSE_to_SRR, GSE == GSE_id))
       for(i in 1:num_samples){dataset_col = c(dataset_col, 1)}
     }
-    
   }
   
   #append column and save
   GSE_to_SRR = add_column(GSE_to_SRR, Dataset = dataset_col)
-  write_tsv(GSE_to_SRR, "Data/RNA_GSE_to_SRR.tsv")
+  return(GSE_to_SRR)
+}
+
+
+
+#helper function for the above. Currently only supports one regex to look for for each dataset, refactor if needed.
+#also assumes the GSM can be found in a column named 'geo_accession' in the metadata
+split_dataset = function(GSE_to_SRR, gse, dataset_col, split_col, groups){
+  #split into two
+  metadata = getGEO(gse)[[1]] 
+  metadata = as_tibble(pData(metadata))
+  
+  GSE_to_SRR_shrunk = filter(GSE_to_SRR, GSE == gse)
+  for(i in 1:nrow(GSE_to_SRR_shrunk)){
+    #split_col variable reassigned from the column's title as a string, to the column's value at the i'th GSM
+    split_col = filter(metadata, geo_accession == pull(GSE_to_SRR_shrunk, GSM)[i])%>%
+      pull(split_col)
+    
+    #sort by the TcMAC21 and euploid littermates, vs Ts65Dn and euploid littermates.
+    for(j in length(groups)){
+      if(grepl(groups[i], split_col)){
+        dataset_col = c(dataset_col, j)
+      }
+    }
+  }
+  return(dataset_col)
 }
 
 
@@ -362,10 +353,12 @@ create_mac_annotation = function(mac_fragments){
 #--------------Download_RNA_data-------------
 
 #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-GSE_to_SRR = create_GSE_to_SRR(Datasets[1:67, ])
-add_dataset_column(GSE_to_SRR)
-print("DONE!")
-stop()
+GSE_to_SRR = create_GSE_to_SRR(Datasets[1:67, ])%>%
+  add_dataset_column()%>%
+  write_tsv("Data/RNA_GSE_to_SRR.tsv")
+  
+# print("DONE!")
+# stop()
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
