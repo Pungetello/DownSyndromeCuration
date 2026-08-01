@@ -379,7 +379,7 @@ GSE_to_SRR = create_GSE_to_SRR(Datasets[1:7, ])%>%
   write_tsv("Data/RNA_GSE_to_SRR.tsv")
   
 print("DONE!")
-stop()
+# stop()
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
