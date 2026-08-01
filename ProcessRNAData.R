@@ -232,6 +232,7 @@ for (srr in srrs){
   ref = GSE_to_SRR$Reference_genome[GSE_to_SRR$SRR == srr]
 
   if(ref == "human"){
+    print("HUMAN REFERENCE GENOME")
 
     #human stuff
     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
@@ -239,6 +240,7 @@ for (srr in srrs){
     index = "GRCh38_index"
   }
   else if(ref == "mouse"){
+    print("MOUSE REFERENCE GENOME")
 
     #normal mouse stuff
     ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
@@ -246,6 +248,7 @@ for (srr in srrs){
     index = "GRCm39_index"
   }
   else if(ref == "MAC"){
+    print("MAC REFERENCE GENOME")
     
     #mouse with MAC
     ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
