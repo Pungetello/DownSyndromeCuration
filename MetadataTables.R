@@ -69,7 +69,7 @@ make_study_metadata = function(geo_id, model){
   #for each column in results table, search metadata for the proper match or set manually
   StudyID = geo_id
   Study_name = find_value_from_keys(website_metadata, 1, "title")
-  Study_description = find_value_from_keys(website_metadata, 1, "overall_design") #or should this be summary?
+  Study_description = find_value_from_keys(website_metadata, 1, "overall_design") #or should this be summary? TODO: do both!
   PMID = find_value_from_keys(website_metadata, 1, "pubmed_id")
   Data_model_version = "v0.5.3"
   Date_exported = Date_exported = format(Sys.Date(), "%m%d%Y")
@@ -94,17 +94,18 @@ make_dataset_metadata = function(geo_id, dataset, metadata, model, GSE_to_SRR){
   #prepare metadata #see if we actually need this later
   GSMs = filter(GSE_to_SRR, GSE == geo_id, Dataset == dataset)%>%
     pull(GSM)
-  dataset_metadata = dplyr::filter(metadata, geo_accession %in% GSMs)
+  dataset_metadata = dplyr::filter(metadata, geo_accession %in% GSMs)%>%
+    print()
   
   
   #for each column in results table, search metadata for the proper match or set manually
   StudyID = geo_id
   DatasetID = paste0(geo_id, "_", dataset)
-  Model_system = find_value_from_keys(dataset_metadata, 1, "organism_ch1")
-  Tissue_cell_type = find_value_from_keys(dataset_metadata, 1, "source_name_ch1")#issue: this is different for each sample
+  Model_system = find_value_from_keys(dataset_metadata, 1, "organism_ch1")#should this also include the model type, like for the different mice?
+  Tissue_cell_type = find_value_from_keys(dataset_metadata, 1, "source_name_ch1")#issue: this is different for each sample. Also doesn't provide enough information, some is in 'title' as well
   Sample_type = find_value_from_keys(dataset_metadata, 1, "molecule_ch1")
   Data_type = "bulk_RNASeq"
-  Protocol_details = find_value_from_keys(dataset_metadata, 1, "treatment_protocol_ch1")#has multiple columns of various protocols. Should I combine and use them all?
+  Protocol_details = find_value_from_keys(dataset_metadata, 1, c("treatment_protocol_ch1", "extract_protocol_ch1"))#some have multiple columns of various protocols. Should I combine and use them all?
   Visibility = "default" #indicates whether to display in portal
   
   #These four are the same for all metadata tables. Make global variables?
@@ -115,13 +116,14 @@ make_dataset_metadata = function(geo_id, dataset, metadata, model, GSE_to_SRR){
   
   
   add_row(table, StudyID, DatasetID, Model_system, Tissue_cell_type, Sample_type, Data_type, Protocol_details, Visibility, Data_model_version, Date_exported, Data_contact, Script)%>%#FIX
-    print()%>%
+    print(width=Inf)%>%
     return()
 }
 
 
 
 #TODO: REWORK THIS A BUNCH!
+#Makes the sample metadata for all of the samples within a given study and dataset, according to the provided model.
 make_sample_metadata = function(geo_id, dataset, metadata, model, GSE_to_SRR){
 
   #make results table
@@ -157,15 +159,12 @@ make_sample_metadata = function(geo_id, dataset, metadata, model, GSE_to_SRR){
       table = add_row(table, DatasetID,SampleID,
                       Data_model_version,Date_exported,Data_contact,Script,
                       X__Sample_Genotype)
-      
-      
     }else{
       X__Sample_Genotype = find_value_from_keys(metadata, i, "genotype_ch1")#GSE109293&4, GSE202938, GSE210117
       table = add_row(table, DatasetID,SampleID,
                       Data_model_version,Date_exported,Data_contact,Script,
                       X__Sample_Karyotype)
     }
-                    
   }
   print(table)%>%
     return()
@@ -327,9 +326,9 @@ for (geo_id in pull(Datasets, Name)){
     #make Dataset_metadata. Same question as above: Should these be all one table together, or lots of single-row tables?
     make_dataset_metadata(geo_id, dataset, metadata, model, GSE_to_SRR)
     
-    # #make Sample_metadata
-    # make_sample_metadata(ggeo_id, dataset, metadata, model, GSE_to_SRR)
-    # 
+    #make Sample_metadata
+    make_sample_metadata(geo_id, dataset, metadata, model, GSE_to_SRR)
+
     # #make Abundance_data
     # make_abundance_data(geo_id, AD_model)
     # 
@@ -338,9 +337,6 @@ for (geo_id in pull(Datasets, Name)){
     
     
   }
-  
-  
   #make Results_Pathway_metadata?? Ask Zenitha.
-  
 }
 

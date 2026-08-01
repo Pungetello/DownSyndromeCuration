@@ -94,26 +94,45 @@ create_GSE_to_SRR = function(datasets_table){
 
 
 
-#adds a column to the GSE_to_SRR file that specifies which dataset of the GSE that SRR is part of
-add_dataset_column = function(GSE_to_SRR){
+#adds a column to the GSE_to_SRR file that specifies which dataset of the GSE that SRR is part of, and another that specifies the reference genome to use
+add_dataset_columns = function(GSE_to_SRR){
   dataset_col = c()
+  ref_col = c()
   
   #go over each GSE and individually split the dataset. Can be refactored to be more universal later.
   for(GSE_id in unique(pull(GSE_to_SRR, GSE))){
     if(GSE_id == "GSE202938"){
-      dataset_col = split_dataset(GSE_to_SRR, GSE_id, dataset_col, "title", c("TcMAC21", "Ts65Dn"))
+      new_dataset_col = split_dataset(GSE_to_SRR, GSE_id, "title", c("TcMAC21", "Ts65Dn"))
       
+      for(dataset in new_dataset_col){
+        if(dataset == 1){
+          ref_col = c(ref_col, "MAC")
+        }else if(dataset == 2){
+          ref_col = c(ref_col, "mouse")
+        }
+      }
+      
+      dataset_col = c(dataset_col, new_dataset_col)
     }else if(GSE_id == "GSE210117"){
-      dataset_col = split_dataset(GSE_to_SRR, GSE_id, dataset_col, "source_name_ch1", c("forebrain", "hippocampus"))
+      new_dataset_col = split_dataset(GSE_to_SRR, GSE_id, "source_name_ch1", c("forebrain", "hippocampus"))
+      
+      for(dataset in new_dataset_col){ref_col = c(ref_col, "mouse")}
+      
+      dataset_col = c(dataset_col, new_dataset_col)
       
     }else{
+      #default: one dataset, reference genome same as organism
       num_samples = nrow(filter(GSE_to_SRR, GSE == GSE_id))
       for(i in 1:num_samples){dataset_col = c(dataset_col, 1)}
+      
+      default_ref = Datasets$Organism[Datasets$Name == GSE_id]
+      for(i in 1:num_samples){ref_col = c(ref_col, default_ref)}
     }
   }
   
-  #append column and save
+  #append columns and save
   GSE_to_SRR = add_column(GSE_to_SRR, Dataset = dataset_col)
+  GSE_to_SRR = add_column(GSE_to_SRR, Reference_genome = ref_col)
   return(GSE_to_SRR)
 }
 
@@ -121,7 +140,9 @@ add_dataset_column = function(GSE_to_SRR){
 
 #helper function for the above. Currently only supports one regex to look for for each dataset, refactor if needed.
 #also assumes the GSM can be found in a column named 'geo_accession' in the metadata
-split_dataset = function(GSE_to_SRR, gse, dataset_col, split_col, groups){
+split_dataset = function(GSE_to_SRR, gse, split_col, groups){
+  dataset_col = c()
+  
   #split into two
   metadata = getGEO(gse)[[1]] 
   metadata = as_tibble(pData(metadata))
@@ -129,12 +150,12 @@ split_dataset = function(GSE_to_SRR, gse, dataset_col, split_col, groups){
   GSE_to_SRR_shrunk = filter(GSE_to_SRR, GSE == gse)
   for(i in 1:nrow(GSE_to_SRR_shrunk)){
     #split_col variable reassigned from the column's title as a string, to the column's value at the i'th GSM
-    split_col = filter(metadata, geo_accession == pull(GSE_to_SRR_shrunk, GSM)[i])%>%
+    split_col_value = filter(metadata, geo_accession == pull(GSE_to_SRR_shrunk, GSM)[i])%>%
       pull(split_col)
     
     #sort by the TcMAC21 and euploid littermates, vs Ts65Dn and euploid littermates.
-    for(j in length(groups)){
-      if(grepl(groups[i], split_col)){
+    for(j in 1:length(groups)){
+      if(grepl(groups[j], split_col_value)){
         dataset_col = c(dataset_col, j)
       }
     }
@@ -353,12 +374,12 @@ create_mac_annotation = function(mac_fragments){
 #--------------Download_RNA_data-------------
 
 #create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-GSE_to_SRR = create_GSE_to_SRR(Datasets[1:67, ])%>%
-  add_dataset_column()%>%
+GSE_to_SRR = create_GSE_to_SRR(Datasets[1:7, ])%>%
+  add_dataset_columns()%>%
   write_tsv("Data/RNA_GSE_to_SRR.tsv")
   
-# print("DONE!")
-# stop()
+print("DONE!")
+stop()
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){

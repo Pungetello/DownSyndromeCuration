@@ -221,40 +221,43 @@ for (srr in srrs){
   if(length(geo_id)==0){
     print("NO GEOID FOUND")
     next()
-  }else if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
+  }else if(sum(geo_id == "GSE202938") == 0){
+    #c("GSE101942","GSE109293","GSE109294","GSE190053","GSE202938","GSE210117")
     print("NOT SELECTED GSE, SKIPPING")
     next()
   }
 
+  #TODO: remove the MAC variable's functionality once we're sure the MAC issue is resolved.
   MAC = ""
+  ref = GSE_to_SRR$Reference_genome[GSE_to_SRR$SRR == srr]
 
-  #if(Datasets$Organism[Datasets$Name == geo_id] == "human"){
+  if(ref == "human"){
 
     #human stuff
     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
     annotation = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
     index = "GRCh38_index"
-  #}
-
-  #else if(Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
-
-    # #normal mouse stuff
-    # ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-    # annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-    # index = "GRCm39_index"
-
-    MAC = "_human"
-    #mouse with MAC
-    # ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
-    # annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
-    # index = "mouse_plus_mac_index"
-  # }
-
-  #check if alignment has already been done
-  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
-    print("OUTPUT ALREADY EXISTS, SKIPPING")
-    next()
   }
+  else if(ref == "mouse"){
+
+    #normal mouse stuff
+    ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+    annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+    index = "GRCm39_index"
+  }
+  else if(ref == "MAC"){
+    
+    #mouse with MAC
+    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
+    index = "mouse_plus_mac_index"
+  }
+
+  # #check if alignment has already been done
+  # if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
+  #   print("OUTPUT ALREADY EXISTS, SKIPPING")
+  #   next()
+  # }
 
   #finish installation by converting to fastq format
   install_raw(srr)
