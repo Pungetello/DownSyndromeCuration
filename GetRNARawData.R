@@ -393,7 +393,7 @@ for (geo_id in pull(Datasets, Name)){
   #   next()
   # }
   #skip if in a dataset being processed currently
-  if(sum(geo_id == c("GSE109293","GSE109294","GSE202938","GSE210117")) == 0){
+  if(sum(geo_id == "GSE202938") == 0){
     print("NOT SELECTED GSE, SKIPPING")
     next()
   }
