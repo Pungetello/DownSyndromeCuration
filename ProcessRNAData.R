@@ -210,7 +210,6 @@ print(srrs)
 GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (srr in srrs){
-  next()#debug. faster than commenting it out
   print(srr)
   # if(!startsWith(srr, "SRR5")){
   #   next()
@@ -293,7 +292,6 @@ for(geo_id in c("GSE109293","GSE109294","GSE202938","GSE210117")){
   print("NUMBER OF HUMAN GENE MATCHES FOR HUMAN ALIGNMENT:")
   read_tsv(paste0(getwd(), "/Data/NormalizedData/", geo_id, "_human_gene_counts.tsv"))%>%
     inner_join(select(TcMAC_genes, gene_id))%>%
-    print()%>%
     select(!gene_id)%>%
     sum()%>%
     print()
