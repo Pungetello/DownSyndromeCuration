@@ -150,11 +150,11 @@ combine_results_per_dataset = function(){
     unique()
   
   for(gse in gses){
-    if(Datasets$Organism[Datasets$Name == gse] == "human"){
+    # if(Datasets$Organism[Datasets$Name == gse] == "human"){
       mac = ""
-    }else{
-      mac = "_human"
-    }
+    # }else{
+    #   mac = "_human"
+    # }
     datasets = filter(GSE_to_SRR, GSE == gse) %>% 
       pull(Dataset) %>% 
       unique()
@@ -210,6 +210,7 @@ print(srrs)
 GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (srr in srrs){
+  next()#debug. faster than commenting it out
   print(srr)
   # if(!startsWith(srr, "SRR5")){
   #   next()
