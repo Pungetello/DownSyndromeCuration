@@ -279,41 +279,39 @@ download_reference = function(){
 
 #append necessary sections of human chr21 to the mouse refrence genome
 create_mac_reference = function(){
-  #get coords of needed sequences within human genome
-  gene_mapping = read_tsv(paste0(getwd(), "/MouseModel_GeneMapping_v0.6_ZS_TcMAC21_genes.txt"))
-  region_coords = filter(gene_mapping, region_type == "MAC HSA21q")%>%
-    select(start, end)
-  
-  deletion_coords = filter(gene_mapping, region_type == "deletion")%>%
-    select(start, end)
-  
-  #create ranges
-  mac_full = GRanges(seqnames = "chr21", ranges = IRanges(start = region_coords$start[1], end = region_coords$end[1]))
-  deletions = GRanges(seqnames = "chr21", ranges = IRanges(start = pull(deletion_coords, start), end = pull(deletion_coords, end)))
-  mac_fragments = setdiff(mac_full, deletions)
-  
-  #make sure it doesn't already exist
-  if(!file.exists(paste0(getwd(), "/RefGenomes/mouse_plus_mac_sans16.fa"))){
+  # #get coords of needed sequences within human genome
+  # gene_mapping = read_tsv(paste0(getwd(), "/MouseModel_GeneMapping_v0.6_ZS_TcMAC21_genes.txt"))
+  # region_coords = filter(gene_mapping, region_type == "MAC HSA21q")%>%
+  #   select(start, end)
+  # 
+  # deletion_coords = filter(gene_mapping, region_type == "deletion")%>%
+  #   select(start, end)
+  # 
+  # #create ranges
+  # mac_full = GRanges(seqnames = "chr21", ranges = IRanges(start = region_coords$start[1], end = region_coords$end[1]))
+  # deletions = GRanges(seqnames = "chr21", ranges = IRanges(start = pull(deletion_coords, start), end = pull(deletion_coords, end)))
+  # mac_fragments = setdiff(mac_full, deletions)
     
     #read in human reference genome
     genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
     names(genome) <- sub(" .*", "", names(genome))
     
-    #extract sequences
-    seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
-      chr <- as.character(seqnames(mac_fragments)[i])
-      start <- start(mac_fragments)[i]
-      end <- end(mac_fragments)[i]
-      
-      subseq(genome[[chr]], start = start, end = end)
-    }))
+    # #extract sequences
+    # seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
+    #   chr <- as.character(seqnames(mac_fragments)[i])
+    #   start <- start(mac_fragments)[i]
+    #   end <- end(mac_fragments)[i]
+    #   
+    #   subseq(genome[[chr]], start = start, end = end)
+    # }))
+    seqs = DNAStringSet(genome[["chr21"]])
     
-    names(seqs) = paste0("MAC_", c("1","2","3","4","5"))
+    names(seqs) = "chr21"#paste0("MAC_", c("1","2","3","4","5"))
     
     #append to copy of mouse reference genome
     mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
     mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
+    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.fa")
     
     writeXStringSet(seqs, mac_file)
     
@@ -328,9 +326,8 @@ create_mac_reference = function(){
     combined <- c(mac, mouse)
     
     writeXStringSet(combined, combined_file)
-  }
   
-  return(mac_fragments)
+  # return(mac_fragments)
 }
 
 
@@ -343,88 +340,86 @@ create_mac_annotation = function(mac_fragments){
   mouse_gtf <- import(paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz"))
   human_gtf <- import(paste0(getwd(), "/RefGenomes/49_ann.gtf.gz"))
   
-  #extract MAC sections of human annotation table
-  mac1 <- subsetByOverlaps(human_gtf, mac_fragments[1])
-  seqlevels(mac1) <- c(chr21 = "MAC_1")
-  mac2 <- subsetByOverlaps(human_gtf, mac_fragments[2])
-  seqlevels(mac2) <- c(chr21 = "MAC_2")
-  mac3 <- subsetByOverlaps(human_gtf, mac_fragments[3])
-  seqlevels(mac3) <- c(chr21 = "MAC_3")
-  mac4 <- subsetByOverlaps(human_gtf, mac_fragments[4])
-  seqlevels(mac4) <- c(chr21 = "MAC_4")
-  mac5 <- subsetByOverlaps(human_gtf, mac_fragments[5]) 
-  seqlevels(mac5) <- c(chr21 = "MAC_5")
-  
-  human_subset = c(mac1, mac2, mac3, mac4, mac5)
-  
-  print(seqlevels(human_subset))
-  print(human_subset)
+  # #extract MAC sections of human annotation table
+  # mac1 <- subsetByOverlaps(human_gtf, mac_fragments[1])
+  # seqlevels(mac1) <- c(chr21 = "MAC_1")
+  # mac2 <- subsetByOverlaps(human_gtf, mac_fragments[2])
+  # seqlevels(mac2) <- c(chr21 = "MAC_2")
+  # mac3 <- subsetByOverlaps(human_gtf, mac_fragments[3])
+  # seqlevels(mac3) <- c(chr21 = "MAC_3")
+  # mac4 <- subsetByOverlaps(human_gtf, mac_fragments[4])
+  # seqlevels(mac4) <- c(chr21 = "MAC_4")
+  # mac5 <- subsetByOverlaps(human_gtf, mac_fragments[5]) 
+  # seqlevels(mac5) <- c(chr21 = "MAC_5")
+#   
+  # human_subset = c(mac1, mac2, mac3, mac4, mac5)
+  human_subset = human_gtf[seqnames(human_gtf) == "chr21"]
   
   #combine
-  combined_gtf <- c(human_subset, mouse_gtf)
+  combined_gtf = c(human_subset, mouse_gtf)
   
   #Detective work: remove all mouse chr16 genes
   # combined_gtf_sans16 = combined_gtf[seqnames(combined_gtf) != "chr16"]
   
-  export(combined_gtf, paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz"))
+  export(combined_gtf, paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.gtf.gz"))
 }
 
 
 
 #--------------Download_RNA_data-------------
 
-#create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-GSE_to_SRR = create_GSE_to_SRR(Datasets[1:7, ])%>%
-  add_dataset_columns()%>%
-  write_tsv("Data/RNA_GSE_to_SRR.tsv")
-  
-print("DONE!")
-# stop()
-
-#filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
-for (geo_id in pull(Datasets, Name)){
-
-  # #skip if in a dataset being processed currently
-  # if(sum(geo_id == c("GSE154418",
-  #                "GSE160637",
-  #                "GSE160690",
-  #                "GSE166849",
-  #                "GSE151282")) > 0){
-  #   next()
-  # }
-  #skip if in a dataset being processed currently
-  if(sum(geo_id == "GSE202938") == 0){
-    print("NOT SELECTED GSE, SKIPPING")
-    next()
-  }
-
-  if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
-    print(geo_id)
-    human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
-    mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_fixed_gene_counts.tsv")
-    # if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
-
-      print("DOWNLOADING RAW DATA")
-      #prefetch the raw data
-      if(startsWith(geo_id, "GSE")){
-        #make sure SRA toolkit is downloaded
-        check_sra()
-        download_raw_geo(geo_id)
-
-      }else if(startsWith(geo_id, "E-MTAB")){
-        download_raw_emtab(geo_id)
-      }
-    # }
-  }
-}
+# # create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
+# GSE_to_SRR = create_GSE_to_SRR(Datasets[1:7, ])%>%
+#   add_dataset_columns()%>%
+#   write_tsv("Data/RNA_GSE_to_SRR.tsv")
+#   
+# print("DONE!")
+# # stop()
+# 
+# #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
+# for (geo_id in pull(Datasets, Name)){
+# 
+#   # #skip if in a dataset being processed currently
+#   # if(sum(geo_id == c("GSE154418",
+#   #                "GSE160637",
+#   #                "GSE160690",
+#   #                "GSE166849",
+#   #                "GSE151282")) > 0){
+#   #   next()
+#   # }
+#   #skip if in a dataset being processed currently
+#   if(sum(geo_id == "GSE202938") == 0){
+#     print("NOT SELECTED GSE, SKIPPING")
+#     next()
+#   }
+# 
+#   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
+#     print(geo_id)
+#     human_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_gene_counts.tsv")
+#     mouse_destination = paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_fixed_gene_counts.tsv")
+#     # if(!file.exists(human_destination) && !file.exists(mouse_destination)){ #skip those already processed
+# 
+#       print("DOWNLOADING RAW DATA")
+#       #prefetch the raw data
+#       if(startsWith(geo_id, "GSE")){
+#         #make sure SRA toolkit is downloaded
+#         check_sra()
+#         download_raw_geo(geo_id)
+# 
+#       }else if(startsWith(geo_id, "E-MTAB")){
+#         download_raw_emtab(geo_id)
+#       }
+#     # }
+#   }
+# }
 
 # #download reference genomes needed
 # download_reference()
 # 
-# #create MAC combined reference genome
+#create MAC combined reference genome
 # if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
-#   mac_fragments = create_mac_reference()
-#   create_mac_annotation(mac_fragments)
+  mac_fragments = create_mac_reference()
+  create_mac_annotation(mac_fragments)
 # }
 
 

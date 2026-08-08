@@ -251,9 +251,10 @@ for (srr in srrs){
     print("MAC REFERENCE GENOME")
     
     #mouse with MAC
-    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac.fa")
-    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac.gtf.gz")
+    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.fa")
+    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.gtf.gz")
     index = "mouse_plus_mac_index"
+    MAC = "_full_21"
   }
 
   # #check if alignment has already been done
