@@ -272,8 +272,8 @@ for (srr in srrs){
   #run alignment and save output files
   process_data(srr, index, annotation, MAC)
 
-  #remove srr RawRNA file to save space
-  unlink(paste0(getwd(), "/Data/RawRNA/", srr), recursive = TRUE)
+  # #remove srr RawRNA file to save space
+  # unlink(paste0(getwd(), "/Data/RawRNA/", srr), recursive = TRUE)
 }
 
 
