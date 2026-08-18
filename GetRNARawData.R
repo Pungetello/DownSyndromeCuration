@@ -294,8 +294,11 @@ create_mac_reference = function(){
   # mac_fragments = setdiff(mac_full, deletions)
     
     #read in human reference genome
-    genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
-    names(genome) <- sub(" .*", "", names(genome))
+    human_genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
+    names(human_genome) = sub(" .*", "", names(human_genome))
+    names(human_genome) = paste0("human_", names(human_genome))
+    
+    print(names(human_genome))
     
     # #extract sequences
     # seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
@@ -305,14 +308,15 @@ create_mac_reference = function(){
     #   
     #   subseq(genome[[chr]], start = start, end = end)
     # }))
-    seqs = DNAStringSet(genome[["chr21"]])
-    
-    names(seqs) = "chr21"#paste0("MAC_", c("1","2","3","4","5"))
+    seqs = DNAStringSet(human_genome)
+    # 
+    # names(seqs) = "chr21"#paste0("MAC_", c("1","2","3","4","5"))
     
     #append to copy of mouse reference genome
+    #combined genome: human chrs are renamed to human_chrX, mouse stays as chrX
     mac_file = paste0(getwd(), "/RefGenomes/mac_sequences.fa")
     mouse_file = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-    combined_file = paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.fa")
+    combined_file = paste0(getwd(), "/RefGenomes/mouse_human_combined.fa")
     
     writeXStringSet(seqs, mac_file)
     
@@ -354,15 +358,17 @@ create_mac_annotation = function(mac_fragments){
   # seqlevels(mac5) <- c(chr21 = "MAC_5")
 #   
   # human_subset = c(mac1, mac2, mac3, mac4, mac5)
-  human_subset = human_gtf[seqnames(human_gtf) == "chr21"]
+  # human_subset = human_gtf[seqnames(human_gtf) == "chr21"]
+  seqlevels(human_gtf) = paste0("human_", seqlevels(human_gtf))
+  print(seqnames(human_gtf))
   
   #combine
-  combined_gtf = c(human_subset, mouse_gtf)
+  combined_gtf = c(human_gtf, mouse_gtf)
   
   #Detective work: remove all mouse chr16 genes
   # combined_gtf_sans16 = combined_gtf[seqnames(combined_gtf) != "chr16"]
   
-  export(combined_gtf, paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.gtf.gz"))
+  export(combined_gtf, paste0(getwd(), "/RefGenomes/mouse_human_combined.gtf.gz"))
 }
 
 
@@ -379,6 +385,7 @@ create_mac_annotation = function(mac_fragments){
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
+  next()
 
   # #skip if in a dataset being processed currently
   # if(sum(geo_id == c("GSE154418",
@@ -418,10 +425,10 @@ for (geo_id in pull(Datasets, Name)){
 # download_reference()
 # 
 #create MAC combined reference genome
-# if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
-  # mac_fragments = create_mac_reference()
-  # create_mac_annotation(mac_fragments)
-# }
+if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
+  mac_fragments = create_mac_reference()
+  create_mac_annotation(mac_fragments)
+}
 
 
 # library(curl)

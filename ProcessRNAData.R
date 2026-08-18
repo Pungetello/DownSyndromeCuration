@@ -151,7 +151,7 @@ combine_results_per_dataset = function(){
   
   for(gse in gses){
     # if(Datasets$Organism[Datasets$Name == gse] == "human"){
-      mac = "_full_21"
+      mac = "_mouse_human_combined"
     # }else{
     #   mac = "_human"
     # }
@@ -210,7 +210,6 @@ print(srrs)
 GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (srr in srrs){
-  next()
   print(srr)
   # if(!startsWith(srr, "SRR5")){
   #   next()
@@ -252,10 +251,10 @@ for (srr in srrs){
     print("MAC REFERENCE GENOME")
     
     #mouse with MAC
-    ref = paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.fa")
-    annotation = paste0(getwd(), "/RefGenomes/mouse_plus_mac_full_21.gtf.gz")
+    ref = paste0(getwd(), "/RefGenomes/mouse_human_combined.fa")
+    annotation = paste0(getwd(), "/RefGenomes/mouse_human_combined.gtf.gz")
     index = "mouse_plus_mac_index"
-    MAC = "_full_21"
+    MAC = "_mouse_human_combined"
   }
 
   # #check if alignment has already been done
