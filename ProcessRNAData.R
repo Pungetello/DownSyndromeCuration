@@ -151,7 +151,7 @@ combine_results_per_dataset = function(){
   
   for(gse in gses){
     # if(Datasets$Organism[Datasets$Name == gse] == "human"){
-      mac = ""
+      mac = "_full_21"
     # }else{
     #   mac = "_human"
     # }
@@ -210,6 +210,7 @@ print(srrs)
 GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
 
 for (srr in srrs){
+  next()
   print(srr)
   # if(!startsWith(srr, "SRR5")){
   #   next()
