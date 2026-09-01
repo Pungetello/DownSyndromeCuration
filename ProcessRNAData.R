@@ -151,7 +151,7 @@ combine_results_per_dataset = function(){
   
   for(gse in gses){
     # if(Datasets$Organism[Datasets$Name == gse] == "human"){
-      mac = "" #"_mouse_human_combined"
+      mac = "MAC" #"_mouse_human_combined"
     # }else{
     #   mac = "_human"
     # }
