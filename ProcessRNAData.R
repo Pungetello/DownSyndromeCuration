@@ -151,7 +151,7 @@ combine_results_per_dataset = function(){
   
   for(gse in gses){
     # if(Datasets$Organism[Datasets$Name == gse] == "human"){
-      mac = "_mouse_human_combined"
+      mac = "" #"_mouse_human_combined"
     # }else{
     #   mac = "_human"
     # }
@@ -203,98 +203,79 @@ combine_files = function(gse, srrs, dataset, suffix){
 
 #--------------process_RNA_data-------------
 
-#get list of all srr files prefetched by previous script
-srrs = list.files("Data/RawRNA")
-print(srrs)
-
-GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
-
-for (srr in srrs){
-  print(srr)
-  # if(!startsWith(srr, "SRR5")){
-  #   next()
-  # }
-
-  geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
-  print(geo_id)
-
-  if(length(geo_id)==0){
-    print("NO GEOID FOUND")
-    next()
-  }else if(sum(geo_id == "GSE202938") == 0){
-    #c("GSE101942","GSE109293","GSE109294","GSE190053","GSE202938","GSE210117")
-    print("NOT SELECTED GSE, SKIPPING")
-    next()
-  }
-
-  #TODO: remove the MAC variable's functionality once we're sure the MAC issue is resolved.
-  MAC = ""
-  ref = GSE_to_SRR$Reference_genome[GSE_to_SRR$SRR == srr]
-
-  if(ref == "human"){
-    print("HUMAN REFERENCE GENOME")
-
-    #human stuff
-    ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
-    annotation = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
-    index = "GRCh38_index"
-  }
-  else if(ref == "mouse"){
-    print("MOUSE REFERENCE GENOME")
-
-    #normal mouse stuff
-    ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-    annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-    index = "GRCm39_index"
-  }
-  else if(ref == "MAC"){
-    print("MAC REFERENCE GENOME")
-    
-    #mouse with MAC
-    ref = paste0(getwd(), "/RefGenomes/mouse_human_combined.fa")
-    annotation = paste0(getwd(), "/RefGenomes/mouse_human_combined.gtf.gz")
-    index = "mouse_plus_mac_index"
-    MAC = "_mouse_human_combined"
-  }
-
-  # #check if alignment has already been done
-  # if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
-  #   print("OUTPUT ALREADY EXISTS, SKIPPING")
-  #   next()
-  # }
-
-  #finish installation by converting to fastq format
-  install_raw(srr)
-
-  #build gene index if not already present
-  build_index(index, ref)
-
-  #run alignment and save output files
-  process_data(srr, index, annotation, MAC)
-
-  # #remove srr RawRNA file to save space
-  # unlink(paste0(getwd(), "/Data/RawRNA/", srr), recursive = TRUE)
-}
+# #get list of all srr files prefetched by previous script
+# srrs = list.files("Data/RawRNA")
+# print(srrs)
+# 
+# GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
+# 
+# for (srr in srrs){
+#   print(srr)
+#   # if(!startsWith(srr, "SRR5")){
+#   #   next()
+#   # }
+# 
+#   geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
+#   print(geo_id)
+# 
+#   if(length(geo_id)==0){
+#     print("NO GEOID FOUND")
+#     next()
+#   # }else if(sum(geo_id == "GSE202938") == 0){
+#   #   #c("GSE101942","GSE109293","GSE109294","GSE190053","GSE202938","GSE210117")
+#   #   print("NOT SELECTED GSE, SKIPPING")
+#   #   next()
+#   }
+# 
+#   #TODO: remove the MAC variable's functionality once we're sure the MAC issue is resolved.
+#   MAC = ""
+#   ref = GSE_to_SRR$Reference_genome[GSE_to_SRR$SRR == srr]
+# 
+#   if(ref == "human"){
+#     print("HUMAN REFERENCE GENOME")
+# 
+#     #human stuff
+#     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
+#     annotation = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
+#     index = "GRCh38_index"
+#   }
+#   else if(ref == "mouse"){
+#     print("MOUSE REFERENCE GENOME")
+# 
+#     #normal mouse stuff
+#     ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+#     annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+#     index = "GRCm39_index"
+#   }
+#   else if(ref == "MAC"){
+#     print("MAC REFERENCE GENOME")
+#     
+#     #mouse with MAC
+#     ref = paste0(getwd(), "/RefGenomes/mouse_human_combined.fa")
+#     annotation = paste0(getwd(), "/RefGenomes/mouse_human_combined.gtf.gz")
+#     index = "mouse_plus_mac_index"
+#     MAC = "_mouse_human_combined"
+#   }
+# 
+#   #check if alignment has already been done
+#   if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
+#     print("OUTPUT ALREADY EXISTS, SKIPPING")
+#     next()
+#   }
+# 
+#   #finish installation by converting to fastq format
+#   install_raw(srr)
+# 
+#   #build gene index if not already present
+#   build_index(index, ref)
+# 
+#   #run alignment and save output files
+#   process_data(srr, index, annotation, MAC)
+# 
+#   # #remove srr RawRNA file to save space
+#   # unlink(paste0(getwd(), "/Data/RawRNA/", srr), recursive = TRUE)
+# }
 
 
 combine_results_per_dataset()
-
-#detective work code, delete later
-
-# for(geo_id in c("GSE109293","GSE109294","GSE202938","GSE210117")){
-#   print(geo_id)
-#   TcMAC_genes = read_tsv(paste0(getwd(), "/Data/NormalizedData/", geo_id, "_MAC_fixed_gene_counts.tsv"))%>%
-#     filter(grepl("ENSG", gene_id))
-# 
-#   print("NUMBER OF HUMAN GENE MATCHES FOR MAC ALIGNMENT:")
-#   sum(select(TcMAC_genes, !gene_id))%>%
-#     print()
-# 
-#   print("NUMBER OF HUMAN GENE MATCHES FOR HUMAN ALIGNMENT:")
-#   read_tsv(paste0(getwd(), "/Data/NormalizedData/", geo_id, "_human_gene_counts.tsv"))%>%
-#     inner_join(select(TcMAC_genes, gene_id))%>%
-#     select(!gene_id)%>%
-#     sum()%>%
-#     print()
-# }
 

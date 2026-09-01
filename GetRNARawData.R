@@ -376,16 +376,15 @@ create_mac_annotation = function(mac_fragments){
 #--------------Download_RNA_data-------------
 
 # create a file mapping all GSE's in platforms_list to their respective GSM's, SRX's and SRR's.
-# GSE_to_SRR = create_GSE_to_SRR(Datasets[1:7, ])%>%
-#   add_dataset_columns()%>%
-#   write_tsv("Data/RNA_GSE_to_SRR.tsv")
+GSE_to_SRR = create_GSE_to_SRR(Datasets[1:7, ])%>%
+  add_dataset_columns()%>%
+  write_tsv("Data/RNA_GSE_to_SRR.tsv")
 # 
 # print("DONE!")
 # stop()
 
 #filter to geo_ids for RNAsec that do not have NormalizedData downloaded. Make sure to run GetRNASecData before this.
 for (geo_id in pull(Datasets, Name)){
-  next()
 
   # #skip if in a dataset being processed currently
   # if(sum(geo_id == c("GSE154418",
@@ -396,10 +395,10 @@ for (geo_id in pull(Datasets, Name)){
   #   next()
   # }
   #skip if in a dataset being processed currently
-  if(sum(geo_id == "GSE202938") == 0){
-    print("NOT SELECTED GSE, SKIPPING")
-    next()
-  }
+  # if(sum(geo_id == "GSE202938") == 0){
+  #   print("NOT SELECTED GSE, SKIPPING")
+  #   next()
+  # }
 
   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
     print(geo_id)
@@ -421,18 +420,11 @@ for (geo_id in pull(Datasets, Name)){
   }
 }
 
-# #download reference genomes needed
-# download_reference()
-# 
+#download reference genomes needed
+download_reference()
+
 #create MAC combined reference genome
 if(!file.exists(paste0(getwd(), "RefGenomes/mouse_plus_mac.fa"))){
   mac_fragments = create_mac_reference()
   create_mac_annotation(mac_fragments)
 }
-
-
-# library(curl)
-# url = "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR330/005/ERR3305905/ERR3305905_1.fastq.gz"
-# curl_download(url, destfile = "testfile.gz")
-# h = new_handle(dirlistonly=TRUE)
-# con = curl(url, "r", h)
