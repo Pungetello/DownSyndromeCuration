@@ -16,13 +16,6 @@ source("Datasets.R")
 
 #----------functions-------------
 
-
-#command locations
-
-#Optimus Prime locations
-# fasterq = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/fasterq-dump.exe"))
-# prefetch = normalizePath(paste0(getwd(),"/sratoolkit.current-win64/sratoolkit.3.3.0-win64/bin/prefetch.exe"))
-
 #Supercomputer locations
 fasterq = "fasterq-dump"
 prefetch = "prefetch"
@@ -63,7 +56,7 @@ build_index = function(index_file, ref){
 
 
 #runs alignment, gets feature counts, and calls calculate_data_files
-process_data = function(srr, index, annotation, mac){
+process_data = function(srr, index, annotation){
   print(paste0("PROCESSING ", srr))
   output_file = paste0(srr, "_AlignResults.BAM") #test, move to /Data/NormalizedData eventually
   
@@ -91,6 +84,7 @@ process_data = function(srr, index, annotation, mac){
     align(index=index,readfile1=input_file,output_file=output_file,phredOffset=33)
     feature_counts = featureCounts(files=output_file, annot.ext=annotation, isGTFAnnotationFile = TRUE)
   }
+  
   #delete BAM files
   file.remove(output_file)
   file.remove(paste0(output_file, ".indel.vcf"))
@@ -101,9 +95,9 @@ process_data = function(srr, index, annotation, mac){
   counts_df = rename(counts_df, !!srr := paste0(srr,"_AlignResults.BAM")) %>%
     select("gene_id", srr)
   
-  write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_gene_counts.tsv"))
+  write_tsv(counts_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_gene_counts.tsv"))
   
-  calculate_data_files(feature_counts, mac)
+  calculate_data_files(feature_counts)
   
   #delete input files to save space for next ones
   file.remove(input_file)
@@ -113,7 +107,7 @@ process_data = function(srr, index, annotation, mac){
 
 
 #Use edgeR to calculate rpkm, calculate tpm manually
-calculate_data_files = function(feature_counts, mac){
+calculate_data_files = function(feature_counts){
   counts = feature_counts$counts
   gene_length = feature_counts$annotation$Length
   
@@ -125,7 +119,7 @@ calculate_data_files = function(feature_counts, mac){
   rpkm_df = rownames_to_column(as.data.frame(rpkm), "gene_id")
   colnames(rpkm_df)[2] <- srr
   
-  write_tsv(rpkm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_RPKM.tsv"))
+  write_tsv(rpkm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_RPKM.tsv"))
   
   #calculate tpm
   length_kb <- gene_length / 1000
@@ -135,7 +129,7 @@ calculate_data_files = function(feature_counts, mac){
   tpm_df = rownames_to_column(as.data.frame(tpm), "gene_id")
   colnames(tpm_df)[2] <- srr
   
-  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, mac, "_TPM.tsv"))
+  write_tsv(tpm_df, file=paste0(getwd(), "/Data/NormalizedData/", srr, "_TPM.tsv"))
 }
 
 
@@ -150,15 +144,9 @@ combine_results_per_dataset = function(){
     unique()
   
   for(gse in gses){
-    # if(Datasets$Organism[Datasets$Name == gse] == "human"){
-      mac = "MAC" #"_mouse_human_combined"
-    # }else{
-    #   mac = "_human"
-    # }
     datasets = filter(GSE_to_SRR, GSE == gse) %>% 
       pull(Dataset) %>% 
       unique()
-    print(datasets)#debug
     
     #only combine srr results with the same GSE and dataset number
     for(dataset in datasets){
@@ -167,9 +155,9 @@ combine_results_per_dataset = function(){
       pull(SRR)
       
       
-      combine_files(gse, srrs, dataset, paste0(mac, "_gene_counts.tsv"))
-      combine_files(gse, srrs, dataset, paste0(mac, "_TPM.tsv"))
-      combine_files(gse, srrs, dataset, paste0(mac, "_RPKM.tsv"))
+      combine_files(gse, srrs, dataset, paste0("_gene_counts.tsv"))
+      combine_files(gse, srrs, dataset, paste0("_TPM.tsv"))
+      combine_files(gse, srrs, dataset, paste0("_RPKM.tsv"))
     }
     
   }
@@ -203,78 +191,71 @@ combine_files = function(gse, srrs, dataset, suffix){
 
 #--------------process_RNA_data-------------
 
-# #get list of all srr files prefetched by previous script
-# srrs = list.files("Data/RawRNA")
-# print(srrs)
-# 
-# GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
-# 
-# for (srr in srrs){
-#   print(srr)
-#   # if(!startsWith(srr, "SRR5")){
-#   #   next()
-#   # }
-# 
-#   geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
-#   print(geo_id)
-# 
-#   if(length(geo_id)==0){
-#     print("NO GEOID FOUND")
-#     next()
-#   # }else if(sum(geo_id == "GSE202938") == 0){
-#   #   #c("GSE101942","GSE109293","GSE109294","GSE190053","GSE202938","GSE210117")
-#   #   print("NOT SELECTED GSE, SKIPPING")
-#   #   next()
-#   }
-# 
-#   #TODO: remove the MAC variable's functionality once we're sure the MAC issue is resolved.
-#   MAC = ""
-#   ref = GSE_to_SRR$Reference_genome[GSE_to_SRR$SRR == srr]
-# 
-#   if(ref == "human"){
-#     print("HUMAN REFERENCE GENOME")
-# 
-#     #human stuff
-#     ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
-#     annotation = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
-#     index = "GRCh38_index"
-#   }
-#   else if(ref == "mouse"){
-#     print("MOUSE REFERENCE GENOME")
-# 
-#     #normal mouse stuff
-#     ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
-#     annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
-#     index = "GRCm39_index"
-#   }
-#   else if(ref == "MAC"){
-#     print("MAC REFERENCE GENOME")
-#     
-#     #mouse with MAC
-#     ref = paste0(getwd(), "/RefGenomes/mouse_human_combined.fa")
-#     annotation = paste0(getwd(), "/RefGenomes/mouse_human_combined.gtf.gz")
-#     index = "mouse_plus_mac_index"
-#     MAC = "_mouse_human_combined"
-#   }
-# 
-#   #check if alignment has already been done
-#   if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, MAC, "_RPKM.tsv"))){
-#     print("OUTPUT ALREADY EXISTS, SKIPPING")
-#     next()
-#   }
-# 
-#   #finish installation by converting to fastq format
-#   install_raw(srr)
-# 
-#   #build gene index if not already present
-#   build_index(index, ref)
-# 
-#   #run alignment and save output files
-#   process_data(srr, index, annotation, MAC)
-# 
-#   # #remove srr RawRNA file to save space
-#   # unlink(paste0(getwd(), "/Data/RawRNA/", srr), recursive = TRUE)
-# }
+#get list of all srr files prefetched by previous script
+srrs = list.files("Data/RawRNA")
+print(srrs)
+
+GSE_to_SRR = read_tsv(paste0(getwd(), "/Data/RNA_GSE_to_SRR.tsv"))
+
+for (srr in srrs){
+  print(srr)
+
+  geo_id = GSE_to_SRR$GSE[GSE_to_SRR$SRR == srr]
+  print(geo_id)
+
+  if(length(geo_id)==0){
+    print("NO GEOID FOUND")
+    next()
+  }else if(sum(geo_id == c("GSE109293", "GSE109294", "GSE210117")) == 0){
+    print("NOT SELECTED GSE, SKIPPING")
+    next()
+  }
+
+  ref = GSE_to_SRR$Reference_genome[GSE_to_SRR$SRR == srr]
+
+  if(ref == "human"){
+
+    #human stuff
+    ref = paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz")
+    annotation = paste0(getwd(), "/RefGenomes/49_ann.gtf.gz")
+    index = "GRCh38_index"
+  }
+  else if(ref == "mouse"){
+
+    #normal mouse stuff
+    ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+    annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+    index = "GRCm39_index"
+  }
+  else if(ref == "MAC"){
+
+    #This is currently just a repeat of the same mouse reference genome, 
+    #to be replaced with a MAC reference genome if one is ever found
+    
+    #normal mouse stuff
+    ref = paste0(getwd(), "/RefGenomes/GRCm39_ref.fna.gz")
+    annotation = paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz")
+    index = "GRCm39_index"
+  }
+
+  #check if alignment has already been done
+  if (file.exists(paste0(getwd(), "/Data/NormalizedData/", srr, "_RPKM.tsv"))){
+    print("OUTPUT ALREADY EXISTS, SKIPPING")
+    next()
+  }
+
+  #finish installation by converting to fastq format
+  install_raw(srr)
+
+  #build gene index if not already present
+  build_index(index, ref)
+
+  #run alignment and save output files
+  process_data(srr, index, annotation)
+
+  # #OPTIONAL: remove srr RawRNA file to save space
+  # unlink(paste0(getwd(), "/Data/RawRNA/", srr), recursive = TRUE)
+}
 
 
 combine_results_per_dataset()
