@@ -280,18 +280,6 @@ download_reference = function(){
 
 #append necessary sections of human chr21 to the mouse refrence genome
 create_mac_reference = function(){
-  # #get coords of needed sequences within human genome
-  # gene_mapping = read_tsv(paste0(getwd(), "/MouseModel_GeneMapping_v0.6_ZS_TcMAC21_genes.txt"))
-  # region_coords = filter(gene_mapping, region_type == "MAC HSA21q")%>%
-  #   select(start, end)
-  # 
-  # deletion_coords = filter(gene_mapping, region_type == "deletion")%>%
-  #   select(start, end)
-  # 
-  # #create ranges
-  # mac_full = GRanges(seqnames = "chr21", ranges = IRanges(start = region_coords$start[1], end = region_coords$end[1]))
-  # deletions = GRanges(seqnames = "chr21", ranges = IRanges(start = pull(deletion_coords, start), end = pull(deletion_coords, end)))
-  # mac_fragments = setdiff(mac_full, deletions)
     
     #read in human reference genome
     human_genome = readDNAStringSet(paste0(getwd(), "/RefGenomes/GRCh38_ref.fna.gz"))
@@ -300,17 +288,7 @@ create_mac_reference = function(){
     
     print(names(human_genome))
     
-    # #extract sequences
-    # seqs <- DNAStringSet(lapply(seq_along(mac_fragments), function(i){
-    #   chr <- as.character(seqnames(mac_fragments)[i])
-    #   start <- start(mac_fragments)[i]
-    #   end <- end(mac_fragments)[i]
-    #   
-    #   subseq(genome[[chr]], start = start, end = end)
-    # }))
     seqs = DNAStringSet(human_genome)
-    # 
-    # names(seqs) = "chr21"#paste0("MAC_", c("1","2","3","4","5"))
     
     #append to copy of mouse reference genome
     #combined genome: human chrs are renamed to human_chrX, mouse stays as chrX
@@ -322,11 +300,6 @@ create_mac_reference = function(){
     
     mouse <- readDNAStringSet(mouse_file)
     mac <- readDNAStringSet(mac_file)
-    
-    # #Detective work: filter out chr16
-    # print(names(mouse))
-    # mouse_filtered <- mouse[!names(mouse) %in% "chr16 16"]
-    # print(names(mouse_filtered))
     
     combined <- c(mac, mouse)
     
@@ -344,29 +317,12 @@ create_mac_annotation = function(mac_fragments){
   #read in mouse and human annotation tables
   mouse_gtf <- import(paste0(getwd(), "/RefGenomes/M38_ann.gtf.gz"))
   human_gtf <- import(paste0(getwd(), "/RefGenomes/49_ann.gtf.gz"))
-  
-  # #extract MAC sections of human annotation table
-  # mac1 <- subsetByOverlaps(human_gtf, mac_fragments[1])
-  # seqlevels(mac1) <- c(chr21 = "MAC_1")
-  # mac2 <- subsetByOverlaps(human_gtf, mac_fragments[2])
-  # seqlevels(mac2) <- c(chr21 = "MAC_2")
-  # mac3 <- subsetByOverlaps(human_gtf, mac_fragments[3])
-  # seqlevels(mac3) <- c(chr21 = "MAC_3")
-  # mac4 <- subsetByOverlaps(human_gtf, mac_fragments[4])
-  # seqlevels(mac4) <- c(chr21 = "MAC_4")
-  # mac5 <- subsetByOverlaps(human_gtf, mac_fragments[5]) 
-  # seqlevels(mac5) <- c(chr21 = "MAC_5")
-#   
-  # human_subset = c(mac1, mac2, mac3, mac4, mac5)
-  # human_subset = human_gtf[seqnames(human_gtf) == "chr21"]
   seqlevels(human_gtf) = paste0("human_", seqlevels(human_gtf))
   print(seqnames(human_gtf))
   
   #combine
   combined_gtf = c(human_gtf, mouse_gtf)
   
-  #Detective work: remove all mouse chr16 genes
-  # combined_gtf_sans16 = combined_gtf[seqnames(combined_gtf) != "chr16"]
   
   export(combined_gtf, paste0(getwd(), "/RefGenomes/mouse_human_combined.gtf.gz"))
 }
@@ -395,10 +351,10 @@ for (geo_id in pull(Datasets, Name)){
   #   next()
   # }
   #skip if in a dataset being processed currently
-  # if(sum(geo_id == "GSE202938") == 0){
-  #   print("NOT SELECTED GSE, SKIPPING")
-  #   next()
-  # }
+  if(sum(geo_id == c("GSE210117", "GSE109293", "GSE109294")) == 0){
+    print("NOT SELECTED GSE, SKIPPING")
+    next()
+  }
 
   if(Datasets$Type[Datasets$Name == geo_id] == "RNA"){ #&& Datasets$Organism[Datasets$Name == geo_id] == "mouse"){
     print(geo_id)
